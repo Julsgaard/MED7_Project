@@ -8,9 +8,15 @@ EditorBuildSettings:
   - enabled: 0
     path: Assets/Scenes/SampleScene.unity
     guid: 4755b35b590504809a7525fd2109c2e2
-  - enabled: 1
+  - enabled: 0
     path: Assets/Manomotion/Scenes/ManoMotionSDKPro.unity
     guid: 2e8ecbb9ea2e340009ac8d7dd6fbd854
+  - enabled: 0
+    path: Assets/Scenes/Multiplayer test scene.unity
+    guid: 42e381cdc8b3dc34e997ec38cb7dddd4
+  - enabled: 1
+    path: Assets/Samples/Netcode for GameObjects/1.11.0/Bootstrap/Scenes/Bootstrap.unity
+    guid: 7a6e122bd2b01425989087a299b6bb93
   m_configObjects:
     UnityEditor.XR.ARCore.ARCoreSettings: {fileID: 11400000, guid: 6ee72d15cf39dd748a13eac57397b9af,
       type: 2}
