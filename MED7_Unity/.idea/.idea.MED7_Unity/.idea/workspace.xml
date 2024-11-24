@@ -7,6 +7,7 @@
     <list default="true" id="05c6e882-459c-461a-a6db-dc6523f5c602" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/.idea.MED7_Unity/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.MED7_Unity/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Assets/Scenes/SampleScene.unity" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scenes/SampleScene.unity" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Scripts/NetworkManagerUI.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/NetworkManagerUI.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ProjectSettings/EditorBuildSettings.asset" beforeDir="false" afterPath="$PROJECT_DIR$/ProjectSettings/EditorBuildSettings.asset" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -29,6 +30,9 @@
     &quot;accountId&quot;: &quot;83733e6f-a53e-40b8-a606-0b02981a6e2e&quot;
   }
 }</component>
+  <component name="HighlightingSettingsPerFile">
+    <setting file="file://$PROJECT_DIR$/Assets/Scripts/Server.cs" root0="FORCE_HIGHLIGHTING" />
+  </component>
   <component name="ProjectColorInfo">{
   &quot;associatedIndex&quot;: 7
 }</component>
@@ -112,6 +116,8 @@
       <workItem from="1730158844678" duration="35000" />
       <workItem from="1730163018757" duration="46000" />
       <workItem from="1730163331406" duration="1668000" />
+      <workItem from="1732342292104" duration="1247000" />
+      <workItem from="1732446162461" duration="1874000" />
     </task>
     <servers />
   </component>
