@@ -12,7 +12,7 @@ public abstract class ManomotionBase : MonoBehaviour {
     protected abstract void SetUnityConditions();
     protected abstract void CalculateFPSAndProcessingTime();
     protected abstract void ProcessManomotion();
-    //protected abstract void UpdateTexturesWithNewInfo();
+    protected abstract void UpdateTexturesWithNewInfo();
     protected abstract void InstantiateSession();
 
 }

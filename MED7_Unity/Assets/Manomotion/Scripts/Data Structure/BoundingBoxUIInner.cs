@@ -11,8 +11,8 @@ public class BoundingBoxInner : MonoBehaviour
     private ManoUtils mano_utils;
     float textDepthModifier = 4;
     float textAdjustment = 0.01f;
-    float backgroundDepth = 8;
 
+    float backgroundDepth = 8;
     private void Start()
     {
         mano_utils = ManoUtils.Instance;
@@ -33,10 +33,13 @@ public class BoundingBoxInner : MonoBehaviour
 
     public void UpdateInfo(BoundingBox bounding_box)
     {
+
+    //    ManomotionManager.Instance.Hand_infos[0].hand_info.tracking_info.b
         if (!bound_line_renderer)
         {
             Debug.LogError("Bounding Box missing line renderer Component.");
             return;
+
         }
 
         normalizedTopLeftX = bounding_box.top_left.x;
@@ -67,4 +70,7 @@ public class BoundingBoxInner : MonoBehaviour
         width.transform.position = ManoUtils.Instance.CalculateNewPosition(normalizedTextWidth, backgroundDepth / textDepthModifier);
         width.GetComponent<TextMesh>().text = "Width: " + normalizedBBWidth.ToString("F2");
     }
+
+
+
 }

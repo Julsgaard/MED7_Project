@@ -24,9 +24,9 @@ public class ContourGizmo : MonoBehaviour
     private Vector3[] newContourPoints = new Vector3[200];
 
     /// <summary>
-    /// The amount of contour points used for the contour each frame.
+    /// The amount of contour points used for each frame.
     /// </summary>
-    private int amountOfContourPoints;
+    private int amountOfContourPoint;
 
     /// <summary>
     /// If no linerenderer is set this will get the Linerenderer from the GameObject
@@ -45,19 +45,18 @@ public class ContourGizmo : MonoBehaviour
     public void ShowContour()
     {
         trackingInfo = ManomotionManager.Instance.Hand_infos[0].hand_info.tracking_info;
-        amountOfContourPoints = trackingInfo.amount_of_contour_points;
-        newContourPoints = new Vector3[amountOfContourPoints];
+        amountOfContourPoint = trackingInfo.amount_of_contour_points;
 
-        float contourDepthPosition = trackingInfo.skeleton.joints[0].z;
-
-        if (ManomotionManager.Instance.Manomotion_Session.enabled_features.contour != 0 )
+        if (ManomotionManager.Instance.Manomotion_Session.enabled_features.contour != 0)
         {
-            for (int i = 0; i < amountOfContourPoints; i++)
+            newContourPoints = new Vector3[amountOfContourPoint];
+
+            for (int i = 0; i < amountOfContourPoint; i++)
             {
-                newContourPoints[i] = ManoUtils.Instance.CalculateNewPositionSkeletonPosition(new Vector3(trackingInfo.contour_points[i].x, trackingInfo.contour_points[i].y, contourDepthPosition), 1.5f);
+                newContourPoints[i] = ManoUtils.Instance.CalculateNewPositionDepth(new Vector3(trackingInfo.contour_points[i].x, trackingInfo.contour_points[i].y, trackingInfo.contour_points[i].z), trackingInfo.depth_estimation);
             }
 
-            contourLineRenderer.positionCount = amountOfContourPoints;
+            contourLineRenderer.positionCount = amountOfContourPoint;
             contourLineRenderer.SetPositions(newContourPoints);
         }
     }

@@ -5,7 +5,7 @@ Further improvement for finger try on features.
 Fixed left and right hand in front facing.
 Lowering of the wrist try on position (to get a more natural position).
 Improved Windows/Editor support.
-Hand texture cut out (ALPHA)
+Cut out frames from the segmentation (ALPHA)
 
 *** New Features 1.4.8:
 Further improvement on hand detection.

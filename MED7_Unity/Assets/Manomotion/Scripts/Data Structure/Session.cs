@@ -16,17 +16,10 @@ public enum AddOn
 /// </summary>
 public enum SupportedOrientation
 {
-    UNKNOWN = 0,
-    PORTRAIT = 1,
-    PORTRAIT_UPSIDE_DOWN = 2,
     LANDSCAPE_LEFT = 3,
     LANDSCAPE_RIGHT = 4,
-    FACE_UP = 5,
-    FACE_DOWN = 6,
-    PORTRAIT_FRONT_FACING = 7,
-    PORTRAIT_UPSIDE_DOWN_FRONT_FACING = 8,
-    LANDSCAPE_LEFT_FRONT_FACING = 9,
-    LANDSCAPE_RIGHT_FRONT_FACING = 10,
+    PORTRAIT = 1,
+    PORTRAIT_INVERTED = 2
 }
 
 /// <summary>
@@ -47,7 +40,7 @@ public struct Session
     /// Information about imgae size.  
     public Flags flag;
     /// The current orientation of the device
-    public SupportedOrientation orientation;
+    public DeviceOrientation orientation;
     /// Inforamtion if the SDK is used together with add on such as AR Foundation.
     public AddOn add_on;
     /// The current Tracking smoothing value (0-1) for the finger & wrist information.
@@ -85,8 +78,4 @@ public struct Features
     public int finger_info;
     /// 1 = contour on, 0 = contour off.
     public int contour;
-    ///\deprecated
-#if UNITY_STANDALONE
-    public int two_hands;
-#endif
 }

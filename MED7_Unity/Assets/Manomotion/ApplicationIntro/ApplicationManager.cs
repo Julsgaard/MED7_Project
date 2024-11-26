@@ -17,7 +17,7 @@ public class ApplicationManager : MonoBehaviour
         }
     }
 
-    private PrivacyPolicyDisclaimair privacyPolicy;
+    PrivacyPolicyDisclaimair privacyPolicy;
     public HowToInstructor howToInstructor;
     public RunTimeApplication runTimeApplication;
 
@@ -102,7 +102,6 @@ public class ApplicationManager : MonoBehaviour
         Debug.Log("Privacy Policy Accepted");
         runTimeApplication.HideApplicationComponents();
         howToInstructor.DisplayFirstTimeInstructions();
-        runTimeApplication.ShouldShowBackground(true);
     }
 
     /// <summary>
@@ -114,8 +113,6 @@ public class ApplicationManager : MonoBehaviour
         runTimeApplication.SetMenuIconVisibility();
         howToInstructor.InitializeHowtoInstructor();
         runTimeApplication.HideApplicationComponents();
-        runTimeApplication.ShouldShowBackground(true);
-        runTimeApplication.ShouldShowGestures(true);
     }
 
     /// <summary>
