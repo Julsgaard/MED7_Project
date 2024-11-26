@@ -17,6 +17,9 @@ EditorBuildSettings:
   - enabled: 0
     path: Assets/ManoMotion ARFoundation/Scenes/MakeThisWork.unity
     guid: f67d13a7b5b29884abe91bd32ed9161d
+  - enabled: 0
+    path: Assets/Samples/XR Interaction Toolkit/3.0.4/AR Starter Assets/ARDemoScene.unity
+    guid: da4db6c21a88243878fecfe160c1be3b
   m_configObjects:
     UnityEditor.XR.ARCore.ARCoreSettings: {fileID: 11400000, guid: 6ee72d15cf39dd748a13eac57397b9af,
       type: 2}
