@@ -16,12 +16,12 @@ public class PostItNote : NetworkBehaviour
     [SerializeField] private Color applicantColour;
     [SerializeField] private string note;
     
-    void Start()
+    private void Start()
     {
         networkTransform = GetComponent<NetworkTransform>();
     }
 
-    // Method to request moving the note
+    /*// Method to request moving the note
     public void RequestMove(Vector3 newPosition)
     {
         if (IsOwner || IsServer)
@@ -36,7 +36,16 @@ public class PostItNote : NetworkBehaviour
         // Server handles the movement of the note
         transform.position = newPosition;
         networkTransform.SetState(transform.position, transform.rotation, transform.localScale);
-    }
+    }*/
+    
+    // Send the note data to the server
+    /*public void SendNoteData(string noteText, Color noteColor)
+    {
+        if (IsOwner || IsServer)
+        {
+            SendNoteDataServerRpc(noteText, noteColor);
+        }
+    }*/
     
     // Method to change the colour of the note
     public void SetColour(Color newColour)
