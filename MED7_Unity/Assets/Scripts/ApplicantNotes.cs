@@ -1,25 +1,43 @@
+using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
-using UnityEngine;
-using UnityEngine.Serialization;
 using UnityEngine.UI;
 
+
+// Applicant class to store variables for each applicant (number, colour, notes)
+[System.Serializable]
+public class Applicant
+{
+    public int applicantNumber;
+    public Color applicantColour;
+    public List<string> notes;
+
+    public Applicant(int number, Color color)
+    {
+        applicantNumber = number;
+        applicantColour = color;
+        notes = new List<string>();
+    }
+}
 
 public class ApplicantNotes : MonoBehaviour
 {
     [SerializeField] private int applicantAmount = 3;
-    [SerializeField] private int currentApplicantNumber = 1;
-    [SerializeField] private string[] applicantNotes;
-    [SerializeField] private Color[] applicantColours;
-    
+    [SerializeField] private int currentApplicantIndex = 0;
+    [SerializeField] private List<Applicant> applicants;
+    [SerializeField] private Color[] possibleApplicantColours; // Possible colours for the applicants - #FEFF9C, #FF7EB9, #7AFCFF, #7AFF7A, #FFA87A
+
     // UI
-    [SerializeField] private TextMeshProUGUI currentApplicantText;
+    [SerializeField] private TextMeshProUGUI currentApplicantNumberText;
     [SerializeField] private Image currentApplicantColorImage;
     [SerializeField] private Button nextButton;
     [SerializeField] private Button previousButton;
     [SerializeField] private Button doneButton;
-    [SerializeField] private TextMeshProUGUI applicantNotesText;
-    //[SerializeField] private TMP_InputField[] applicantNotesInputFields;
+    [SerializeField] private Button addNoteButton;
+    [SerializeField] private Button removeNoteButton;
+    [SerializeField] private Transform notesParent;
+    [SerializeField] private GameObject addAndRemoveNotesObject;
+    [SerializeField] private GameObject applicantInputFieldPrefab;
     
     private GameManager _gameManager;
     
@@ -28,23 +46,19 @@ public class ApplicantNotes : MonoBehaviour
     {
         _gameManager = FindObjectOfType<GameManager>().GetComponent<GameManager>();
         
-        // Create new array of applicant notes
-        applicantNotes = new string[applicantAmount];
+        // Initialize the applicants list
+        //applicants = new List<Applicant>();
         
-        // Create new array of applicant input fields
-        //applicantNotesInputFields = new TMP_InputField[applicantAmount];
+        // Loop through the amount of applicants and create a new Applicant object for each one
+        for (int i = 0; i < applicantAmount; i++)
+        {
+            Color applicantColor = possibleApplicantColours[i];
+            Applicant newApplicant = new Applicant(i + 1, applicantColor);
+            applicants.Add(newApplicant);
+        }
         
         // Add listeners to the UI (buttons and input fields)
         AddListenersToUI();
-
-        // If the length of the applicant notes array is not equal to the amount of applicants, create a new array
-        // The array can manually be set in the inspector for testing purposes
-        if (applicantNotes.Length != applicantAmount)
-        {
-            applicantNotes = new string[applicantAmount];
-            
-            Debug.Log("New applicant notes array created");
-        }
         
         // Update the UI
         UpdateApplicantUI();
@@ -52,59 +66,28 @@ public class ApplicantNotes : MonoBehaviour
 
     private void AddListenersToUI()
     {
-        // Add listener to the next button
-        nextButton.onClick.AddListener(() =>
-        {
-            NextApplicant();
-        });
-        
-        // Add listener to the previous button
-        previousButton.onClick.AddListener(() =>
-        {
-            PreviousApplicant();
-        });
-        
-        // Add listener to the done button
-        doneButton.onClick.AddListener(() =>
-        {
-            CreateApplicantsDoneButton();
-        });
-        
-        // Add listener to the input fields
-        foreach (var inputField in applicantNotesInputFields)
-        {
-            inputField.onValueChanged.AddListener((value) =>
-            {
-                WhenInputFieldChanged(inputField);
-            });
-        }
+        // Add listener to the buttons
+        nextButton.onClick.AddListener(NextApplicant);
+        previousButton.onClick.AddListener(PreviousApplicant);
+        doneButton.onClick.AddListener(DoneButton);
+        addNoteButton.onClick.AddListener(AddNoteForApplicant);
+        removeNoteButton.onClick.AddListener(RemoveNoteForApplicant);
     }
     
-    private void WhenInputFieldChanged(TMP_InputField inputField)
-    {
-        // Check if the last character is a new line character
-        if (inputField.text.Length > 0 && inputField.text[inputField.text.Length - 1] == '\n')
-        {
-            // Append the bullet point at the end of the text
-            inputField.text += "* ";
-        
-            // Set the caret position at the end of the text after adding '* '
-            inputField.caretPosition = inputField.text.Length;
-        }
-    }
-
     
     private void NextApplicant()
     {
-        currentApplicantNumber++;
+        // Save the notes for the current applicant
+        SaveCurrentApplicantNotes();
+        
+        // Add one to the current applicant index
+        currentApplicantIndex++;
 
+        // If the current applicant index is greater than the amount of applicants - 1, set it back to 0
+        if (currentApplicantIndex > applicantAmount - 1)
+            currentApplicantIndex = 0;
         
-        if (currentApplicantNumber > applicantAmount)
-        {
-            currentApplicantNumber = 1;
-        }    
-        
-        Debug.Log($"Next applicant, current number: {currentApplicantNumber}");
+        Debug.Log($"Next applicant, current number: {currentApplicantIndex}");
         
         // Update UI
         UpdateApplicantUI();
@@ -112,22 +95,28 @@ public class ApplicantNotes : MonoBehaviour
     
     private void PreviousApplicant()
     {
-        currentApplicantNumber--;
+        // Save the notes for the current applicant
+        SaveCurrentApplicantNotes();
         
-        if (currentApplicantNumber < 1)
-        {
-            currentApplicantNumber = applicantAmount;
-        }
+        // Subtract one from the current applicant index
+        currentApplicantIndex--;
         
-        Debug.Log($"Previous applicant, current number: {currentApplicantNumber}");
+        // If the current applicant index is less than 1, set it to the amount of applicants - 1
+        if (currentApplicantIndex < 0)
+            currentApplicantIndex = applicantAmount - 1;
+        
+        Debug.Log($"Previous applicant, current number: {currentApplicantIndex}");
         
         // Update UI
         UpdateApplicantUI();
     }
     
     // Method for when the user presses the done button. The system will go to the next step.
-    private void CreateApplicantsDoneButton()
+    private void DoneButton()
     {
+        // Save the notes for the current applicant
+        SaveCurrentApplicantNotes();
+        
         Debug.Log("Done button pressed");
         
         // Disable the applicant notes UI
@@ -137,16 +126,97 @@ public class ApplicantNotes : MonoBehaviour
         _gameManager.ShowConnectUI();
     }
     
-    private void UpdateApplicantUI()
+    private void AddNoteForApplicant()
     {
-        // Update the text for the current applicant
-        currentApplicantText.text = $"Applicant {currentApplicantNumber}";
+        // Instantiate a new input field and set it as the second last child of the notesParent
+        GameObject newInputField = Instantiate(applicantInputFieldPrefab, notesParent);
+        newInputField.transform.SetSiblingIndex(notesParent.childCount - 1);
         
-        // Update the colour for the current applicant
-        currentApplicantColorImage.color = applicantColours[currentApplicantNumber - 1];
+        // Get the input field component
+        TMP_InputField inputFieldComponent = newInputField.GetComponent<TMP_InputField>();
         
-        // Update the notes for the current applicant
-        applicantNotesText.text = applicantNotes[currentApplicantNumber - 1];
+        // Add an empty note to the applicant's notes list
+        applicants[currentApplicantIndex].notes.Add(inputFieldComponent.text);
     }
     
+    private void RemoveNoteForApplicant()
+    {
+        // if there is only one note, do not remove it
+        if (applicants[currentApplicantIndex].notes.Count <= 1)
+            return;
+        
+        // Get the current applicant
+        Applicant currentApplicant = applicants[currentApplicantIndex];
+
+        // Remove the last note text from the applicants notes. RemoveAt removes the specified index.
+        currentApplicant.notes.RemoveAt(currentApplicant.notes.Count - 1);
+        
+        // Remove the last input field from the notesParent
+        Destroy(notesParent.GetChild(notesParent.childCount - 2).gameObject);
+        
+        // Update the UI
+        UpdateApplicantUI();
+    }
+    
+    private void UpdateApplicantUI()
+    {
+        // Clear the current notes from the UI, except the add and remove notes object
+        foreach (Transform child in notesParent)
+        {
+            if (child.gameObject != addAndRemoveNotesObject)
+            {
+                Destroy(child.gameObject);
+            }
+        }
+
+        // Get the current applicant
+        Applicant currentApplicant = applicants[currentApplicantIndex];
+        
+        // If there are no notes, create a default note
+        if (currentApplicant.notes.Count == 0)
+        {
+            AddNoteForApplicant();
+        }
+
+        // Update UI text and colour
+        currentApplicantNumberText.text = $"Applicant {currentApplicant.applicantNumber}";
+        currentApplicantColorImage.color = currentApplicant.applicantColour;
+
+        // Create the notes input fields again
+        foreach (string noteText in currentApplicant.notes)
+        {
+            // Instantiate the note input field and set it as the second last sibling of the notesParent
+            GameObject newInputField = Instantiate(applicantInputFieldPrefab, notesParent);
+            newInputField.transform.SetSiblingIndex(notesParent.childCount - 1);
+
+            // Get the input field component
+            TMP_InputField inputFieldComponent = newInputField.GetComponent<TMP_InputField>();
+
+            // Set the text
+            inputFieldComponent.text = noteText;
+        }
+    }
+
+    
+    private void SaveCurrentApplicantNotes()
+    {
+        // Get the current applicant
+        Applicant currentApplicant = applicants[currentApplicantIndex];
+
+        // Clear the current notes
+        currentApplicant.notes.Clear();
+
+        // Save the current notes from the UI
+        foreach (Transform child in notesParent)
+        {
+            if (child.gameObject != addAndRemoveNotesObject)
+            {
+                TMP_InputField inputField = child.GetComponent<TMP_InputField>();
+                if (inputField != null)
+                {
+                    currentApplicant.notes.Add(inputField.text);
+                }
+            }
+        }
+    }
 }
