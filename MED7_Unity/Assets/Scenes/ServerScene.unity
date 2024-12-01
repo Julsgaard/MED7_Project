@@ -151,6 +151,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fead3a897b556d84184b9d201e8f369f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  postItNotePrefab: {fileID: 8494581529409893070, guid: 84fa2a5ce9505694a99d354030f5980b,
+    type: 3}
 --- !u!4 &591633890
 Transform:
   m_ObjectHideFlags: 0

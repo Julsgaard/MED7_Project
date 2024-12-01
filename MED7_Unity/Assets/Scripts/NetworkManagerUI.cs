@@ -2,6 +2,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
+
 public class NetworkManagerUI : MonoBehaviour
 {
     [SerializeField] private Button connectToServerButton;
@@ -9,8 +10,8 @@ public class NetworkManagerUI : MonoBehaviour
     //[SerializeField] private Button hostButton;
     //[SerializeField] private Button serverButton;
     
-    [SerializeField] private GameObject _gameManagerObject;
-    [SerializeField] private GameManager _gameManagerScript;
+    private GameObject _gameManagerObject;
+    private GameManager _gameManagerScript;
     
     private void Awake()
     {
