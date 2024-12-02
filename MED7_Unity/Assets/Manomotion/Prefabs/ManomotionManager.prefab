@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 114656061702543436}
   - component: {fileID: 114251843207838166}
   - component: {fileID: 114227743657279858}
-  - component: {fileID: 108857179827587122}
+  - component: {fileID: 609108781}
   m_Layer: 0
   m_Name: ManomotionManager
   m_TagString: baseSDK
@@ -52,7 +52,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   statusAnimator: {fileID: 0}
-  lowPowerAnimator: {fileID: 0}
 --- !u!114 &114251843207838166
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -80,7 +79,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   currentOrientation: 0
   cam: {fileID: 0}
---- !u!114 &108857179827587122
+--- !u!114 &609108781
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -89,7 +88,8 @@ MonoBehaviour:
   m_GameObject: {fileID: 1627255014069736}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a64fac308960948f69c55398a4dc13af, type: 3}
+  m_Script: {fileID: 11500000, guid: 6439b6da07977404faf50ae931ff78cf, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  isFrontFacing: 0
+  maxCustomResolution: 300
+  arCameraBackground: {fileID: 0}

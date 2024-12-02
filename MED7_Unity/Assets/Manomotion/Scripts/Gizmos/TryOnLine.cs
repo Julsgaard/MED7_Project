@@ -21,15 +21,7 @@ public class TryOnLine : MonoBehaviour
 
     void LateUpdate()
     {
-        if (ManomotionManager.Instance.Hand_infos[0].hand_info.gesture_info.mano_class != ManoClass.NO_HAND)
-        {
-            DrawOutLine();
-        }
-        else
-        {
-            tryOnLineRenderer.SetPosition(0, -Vector3.one);
-            tryOnLineRenderer.SetPosition(1, -Vector3.one);
-        }
+        DrawOutLine();
     }
 
     /// <summary>

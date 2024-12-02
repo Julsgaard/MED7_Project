@@ -16,7 +16,7 @@ public class FingerInfoGizmo : MonoBehaviour
     /// The distance between the two finger points.
     /// </summary>
     private float _widthBetweenFingerPoints;
-
+    
     [SerializeField]
     private GameObject fingerInforamtionPrefab;
 
@@ -88,22 +88,19 @@ public class FingerInfoGizmo : MonoBehaviour
 
         _widthBetweenFingerPoints = Vector3.Distance(fingerInfo.left_point, fingerInfo.right_point);
 
-        leftFingerPoint3D.transform.position = ManoUtils.Instance.CalculateNewPositionSkeletonPosition(new Vector3(fingerInfo.left_point.x, fingerInfo.left_point.y, ManomotionManager.Instance.Hand_infos[0].hand_info.tracking_info.skeleton.joints[13].z), 1.5f);
-        rightFingerPoint3D.transform.position = ManoUtils.Instance.CalculateNewPositionSkeletonPosition(new Vector3(fingerInfo.right_point.x, fingerInfo.right_point.y, ManomotionManager.Instance.Hand_infos[0].hand_info.tracking_info.skeleton.joints[13].z), 1.5f);
+        leftFingerPoint3D.transform.position = ManoUtils.Instance.CalculateNewPositionDepth(new Vector3(fingerInfo.left_point.x, fingerInfo.left_point.y, 0), ManomotionManager.Instance.Hand_infos[0].hand_info.tracking_info.depth_estimation);
+        rightFingerPoint3D.transform.position = ManoUtils.Instance.CalculateNewPositionDepth(new Vector3(fingerInfo.right_point.x, fingerInfo.right_point.y, 0), ManomotionManager.Instance.Hand_infos[0].hand_info.tracking_info.depth_estimation);
 
         if (ManomotionManager.Instance.Hand_infos[0].hand_info.gesture_info.mano_class == ManoClass.NO_HAND)
         {
-            ActivateFingerGizmos(false);
+            rightFingerPoint3D.SetActive(false);
+            leftFingerPoint3D.SetActive(false);
         }
+
         else
         {
-            ActivateFingerGizmos(true);
+            rightFingerPoint3D.SetActive(true);
+            leftFingerPoint3D.SetActive(true);
         }
-    }
-
-    private void ActivateFingerGizmos(bool status)
-    {
-        rightFingerPoint3D.SetActive(status);
-        leftFingerPoint3D.SetActive(status);
     }
 }

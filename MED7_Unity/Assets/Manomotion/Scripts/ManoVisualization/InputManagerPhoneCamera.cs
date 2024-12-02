@@ -3,9 +3,6 @@ using System.Collections.Generic;
 using UnityEngine;
 using System;
 
-/// <summary>
-/// Gets the images from the phone camera and send it to the ManoMotionManager.
-/// </summary>
 public class InputManagerPhoneCamera : InputManagerBaseClass
 {
     #region consts
@@ -16,11 +13,9 @@ public class InputManagerPhoneCamera : InputManagerBaseClass
     #endregion
 
     #region  #Variables
-    /// The phone cameras.
-    private WebCamDevice[] webCamDevices;
-    private WebCamTexture backFacingCamera;
+    WebCamDevice[] webCamDevices;
+    WebCamTexture backFacingCamera;
     public ManoMotionFrame currentManoMotionFrame;
-    public ManoVisualization manoVisualization;
 
     #endregion
 
@@ -31,7 +26,36 @@ public class InputManagerPhoneCamera : InputManagerBaseClass
 
     private void Start()
     {
+        InitializeInputParameters();
         InitializeManoMotionFrame();
+    }
+
+    protected override void InitializeInputParameters()
+    {
+        webCamDevices = WebCamTexture.devices;
+        Debug.Log("Webcam devices " + webCamDevices.Length);
+
+        for (int i = 0; i < webCamDevices.Length; i++)
+        {
+            if (!webCamDevices[i].isFrontFacing)
+            {
+
+                backFacingCamera = new WebCamTexture(webCamDevices[i].name, STARTING_WIDTH, STARTING_HEIGHT);
+                backFacingCamera.Play();
+                Debug.Log("I have a proper back facing camera");
+                break;
+            }
+#if UNITY_EDITOR
+            backFacingCamera = new WebCamTexture(webCamDevices[i].name, STARTING_WIDTH, STARTING_HEIGHT);
+            backFacingCamera.Play();
+#endif
+
+        }
+        if (!backFacingCamera)
+        {
+            Debug.Log("Tried to create a camera but I could not");
+        }
+        Debug.Log("Initialized input parameters");
     }
 
     /// <summary>
@@ -50,7 +74,7 @@ public class InputManagerPhoneCamera : InputManagerBaseClass
         }
         else
         {
-            Debug.LogWarning("No one subscribed to OnFrameInitialized");
+            Debug.LogWarning("Noone is subscribed to OnFrameInitialized");
         }
     }
 
@@ -107,14 +131,12 @@ public class InputManagerPhoneCamera : InputManagerBaseClass
         }
     }
 
+    // Update is called once per frame
     void Update()
     {
         GetCameraFrameInformation();
     }
 
-    /// <summary>
-    /// Start the camera when enabled.
-    /// </summary>
     private void OnEnable()
     {
         if (backFacingCamera)
@@ -127,12 +149,10 @@ public class InputManagerPhoneCamera : InputManagerBaseClass
         else
         {
             Debug.LogError("I dont have a backfacing Camera");
+
         }
     }
 
-    /// <summary>
-    /// Stops the camera when disabled.
-    /// </summary>
     private void OnDisable()
     {
         if (backFacingCamera && !backFacingCamera.isPlaying)
@@ -142,13 +162,8 @@ public class InputManagerPhoneCamera : InputManagerBaseClass
     }
 
     #region Application on Background
-
     bool isPaused = false;
 
-    /// <summary>
-    /// Stops processing when application is put to background.
-    /// </summary>
-    /// <param name="hasFocus">If application is running or is in background</param>
     void OnApplicationFocus(bool hasFocus)
     {
         isPaused = !hasFocus;
@@ -156,12 +171,9 @@ public class InputManagerPhoneCamera : InputManagerBaseClass
         {
             ManomotionManager.Instance.StopProcessing();
         }
+
     }
 
-    /// <summary>
-    /// Stops the processing if application is paused.
-    /// </summary>
-    /// <param name="pauseStatus">If application is paused or not</param>
     void OnApplicationPause(bool pauseStatus)
     {
         isPaused = pauseStatus;
@@ -170,6 +182,5 @@ public class InputManagerPhoneCamera : InputManagerBaseClass
             ManomotionManager.Instance.StopProcessing();
         }
     }
-
     #endregion
 }

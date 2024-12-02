@@ -88,22 +88,19 @@ public class WristInfoGizmo : MonoBehaviour
 
         _widthBetweenWristPoints = (Vector3.Distance(wristInfo.left_point, wristInfo.right_point));
 
-        leftWrist3D.transform.position = ManoUtils.Instance.CalculateNewPositionSkeletonPosition(new Vector3(wristInfo.left_point.x, wristInfo.left_point.y, ManomotionManager.Instance.Hand_infos[0].hand_info.tracking_info.skeleton.joints[0].z), 1.5f);
-        rightWrist3D.transform.position = ManoUtils.Instance.CalculateNewPositionSkeletonPosition(new Vector3(wristInfo.right_point.x, wristInfo.right_point.y, ManomotionManager.Instance.Hand_infos[0].hand_info.tracking_info.skeleton.joints[0].z), 1.5f);
+        leftWrist3D.transform.position = ManoUtils.Instance.CalculateNewPositionDepth(new Vector3(wristInfo.left_point.x, wristInfo.left_point.y, 0), ManomotionManager.Instance.Hand_infos[0].hand_info.tracking_info.depth_estimation); ;
+        rightWrist3D.transform.position = ManoUtils.Instance.CalculateNewPositionDepth(new Vector3(wristInfo.right_point.x, wristInfo.right_point.y, 0), ManomotionManager.Instance.Hand_infos[0].hand_info.tracking_info.depth_estimation);
 
         if (ManomotionManager.Instance.Hand_infos[0].hand_info.gesture_info.mano_class == ManoClass.NO_HAND)
         {
-            ActivateWristGizmos(false);
+            rightWrist3D.SetActive(false);
+            leftWrist3D.SetActive(false);
         }
+
         else
         {
-            ActivateWristGizmos(true);
+            rightWrist3D.SetActive(true);
+            leftWrist3D.SetActive(true);
         }
-    }
-
-    private void ActivateWristGizmos(bool status)
-    {
-        rightWrist3D.SetActive(status);
-        leftWrist3D.SetActive(status);
     }
 }

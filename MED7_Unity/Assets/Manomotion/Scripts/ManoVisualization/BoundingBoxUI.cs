@@ -37,6 +37,7 @@ public class BoundingBoxUI : MonoBehaviour
 		{
 			Debug.LogError("Bounding Box missing line renderer Component.");
 			return;
+
 		}
 
 		normalizedTopLeftX = bounding_box.top_left.x;
@@ -54,6 +55,7 @@ public class BoundingBoxUI : MonoBehaviour
 		bound_line_renderer.SetPosition(2, ManoUtils.Instance.CalculateNewPosition(normalizedBotRight, backgroundDepth));
 		bound_line_renderer.SetPosition(3, ManoUtils.Instance.CalculateNewPosition(normalizedBotLeft, backgroundDepth));
 
+
 		normalizedTopLeft.y += textAdjustment * 3;
 		top_left.gameObject.transform.position = ManoUtils.Instance.CalculateNewPosition(normalizedTopLeft, backgroundDepth / textDepthModifier);
 		top_left.text = "Top Left: " + "X: " + normalizedTopLeftX.ToString("F2") + " Y: " + normalizedTopLeftY.ToString("F2");
@@ -66,4 +68,7 @@ public class BoundingBoxUI : MonoBehaviour
 		width.transform.position = ManoUtils.Instance.CalculateNewPosition(normalizedTextWidth, backgroundDepth / textDepthModifier);
 		width.GetComponent<TextMesh>().text = "Width: " + normalizedBBWidth.ToString("F2");
 	}
+
+
+
 }
