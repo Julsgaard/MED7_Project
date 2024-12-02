@@ -11,10 +11,10 @@ EditorBuildSettings:
   - enabled: 0
     path: Assets/Scenes/ServerScene.unity
     guid: 8a5e098f2a74bf7429181326957535ed
-  - enabled: 1
+  - enabled: 0
     path: Assets/Scenes/PostItCanvas.unity
     guid: 4ae1921aa2697a245a24f178a35d10bf
-  - enabled: 0
+  - enabled: 1
     path: Assets/Scenes/ARMarker.unity
     guid: db6eb0c7e2f274242bda2484b63006aa
   m_configObjects:
