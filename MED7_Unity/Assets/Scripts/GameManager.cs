@@ -14,15 +14,16 @@ public class GameManager : MonoBehaviour
     [SerializeField] private GameObject createApplicantUIObject;
     
     // Set the default IP address for the UI input field
-    private void Start()
+    private void Awake()
     {
         // Set the input field text to the default IP address
         ipAddressInputField.text = defaultIpAddress;
         
         // Disable the AR session object for the beginning
         arSessionObject.SetActive(false);
+        createApplicantUIObject.SetActive(false);
         
-        // ShowIntroUI();
+        ShowIntroUI();
     }
     
     private void ShowIntroUI()

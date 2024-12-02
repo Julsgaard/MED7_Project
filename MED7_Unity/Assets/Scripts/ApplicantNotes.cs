@@ -11,6 +11,7 @@ public class Applicant
     public Color applicantColour;
     public List<string> notes;
 
+    // Constructor for the Applicant class
     public Applicant(int number, Color color)
     {
         applicantNumber = number;
@@ -27,16 +28,14 @@ public class ApplicantNotes : MonoBehaviour
     [SerializeField] private Color[] possibleApplicantColours; // Possible colours for the applicants - #FEFF9C, #FF7EB9, #7AFCFF, #7AFF7A, #FFA87A
 
     // UI
+    [SerializeField] private GameObject areYouSureUI;
     [SerializeField] private TextMeshProUGUI currentApplicantNumberText;
     [SerializeField] private Image currentApplicantColorImage;
-    [SerializeField] private Button nextButton;
-    [SerializeField] private Button previousButton;
-    [SerializeField] private Button doneButton;
-    [SerializeField] private Button addNoteButton;
-    [SerializeField] private Button removeNoteButton;
+    [SerializeField] private Button nextButton, previousButton, doneButton, addNoteButton, removeNoteButton;
     [SerializeField] private Transform notesParent;
     [SerializeField] private GameObject addAndRemoveNotesObject;
     [SerializeField] private GameObject applicantInputFieldPrefab;
+    [SerializeField] private Button yesButton, noButton;
     
     private GameManager _gameManager;
     
@@ -67,9 +66,22 @@ public class ApplicantNotes : MonoBehaviour
         // Add listener to the buttons
         nextButton.onClick.AddListener(NextApplicant);
         previousButton.onClick.AddListener(PreviousApplicant);
-        doneButton.onClick.AddListener(DoneButton);
+        doneButton.onClick.AddListener(() =>
+        {
+            areYouSureUI.SetActive(true);
+        });
         addNoteButton.onClick.AddListener(AddNoteForApplicant);
         removeNoteButton.onClick.AddListener(RemoveNoteForApplicant);
+        yesButton.onClick.AddListener(() =>
+        {
+            areYouSureUI.SetActive(false);
+            gameObject.SetActive(false);
+            _gameManager.ShowConnectUI();
+        });
+        noButton.onClick.AddListener(() =>
+        {
+            areYouSureUI.SetActive(false);
+        });
     }
     
     private void NextApplicant()
@@ -94,17 +106,6 @@ public class ApplicantNotes : MonoBehaviour
         UpdateApplicantUI();
     }
     
-    private void DoneButton()
-    {
-        Debug.Log("Done button pressed");
-        
-        // Disable the applicant notes UI
-        gameObject.SetActive(false);
-        
-        // Show the connect to server UI
-        _gameManager.ShowConnectUI();
-    }
-    
     private void AddNoteForApplicant()
     {
         // Add an empty note to the applicant's notes list
@@ -119,34 +120,35 @@ public class ApplicantNotes : MonoBehaviour
         // If there is only one note, do not remove it
         if (applicants[currentApplicantIndex].notes.Count <= 1)
             return;
-
+        
         // Remove the last note text from the applicant's notes
         applicants[currentApplicantIndex].notes.RemoveAt(applicants[currentApplicantIndex].notes.Count - 1);
-
+        
         // Update the UI to reflect the removed note
         UpdateApplicantUI();
     }
     
     private void UpdateApplicantUI()
     {
-        // Clear the current notes from the UI, except the add and remove notes object
+        // Clear the current notes from the UI except the add and remove notes object
         foreach (Transform child in notesParent)
         {
-            if (child.gameObject != addAndRemoveNotesObject)
-            {
+            if (child.gameObject != addAndRemoveNotesObject) 
                 Destroy(child.gameObject);
-            }
-        }
-
+        } 
+        
+        // Ensure that addAndRemoveNotesObject is the last child
+        addAndRemoveNotesObject.transform.SetAsFirstSibling();
+        
         // Get the current applicant
         Applicant currentApplicant = applicants[currentApplicantIndex];
         
-        // If there are no notes, add an empty note to the list
+        // If there are no notes add an empty note to the list
         if (currentApplicant.notes.Count == 0)
         {
             currentApplicant.notes.Add("");
         }
-
+        
         // Update UI text and colour
         currentApplicantNumberText.text = $"Applicant {currentApplicant.applicantNumber}";
         currentApplicantColorImage.color = currentApplicant.applicantColour;
@@ -155,21 +157,24 @@ public class ApplicantNotes : MonoBehaviour
         for (int i = 0; i < currentApplicant.notes.Count; i++)
         {
             string noteText = currentApplicant.notes[i];
-
-            // Instantiate the note input field and set it as the second last sibling of the notesParent
+            
+            // Instantiate the note input field and set it before the addAndRemoveNotesObject
             GameObject newInputField = Instantiate(applicantInputFieldPrefab, notesParent);
+            
+            // Place the new input field before the addAndRemoveNotesObject
             newInputField.transform.SetSiblingIndex(notesParent.childCount - 1);
-
+            
             // Get the input field component
             TMP_InputField inputFieldComponent = newInputField.GetComponent<TMP_InputField>();
-
+            
             // Set the text
             inputFieldComponent.text = noteText;
-
-            // Capture the index for the closure
+            
+            // Get the index of the note
             int index = i;
-
-            // Add a listener to update the note when the input field changes
+            
+            // Add a listener to update the note when the input field changes.
+            // This is to prevent the notes from being lost when switching between applicants.
             inputFieldComponent.onValueChanged.AddListener((text) =>
             {
                 currentApplicant.notes[index] = text;
