@@ -41,6 +41,7 @@ public class ApplicantNotes : MonoBehaviour
     
     private void Awake()
     {
+        // Find the GameManager object in the scene
         _gameManager = FindObjectOfType<GameManager>();
 
         // Initialize the applicants list
@@ -54,10 +55,10 @@ public class ApplicantNotes : MonoBehaviour
             applicants.Add(newApplicant);
         }
         
-        // Add listeners to the UI (buttons and input fields)
+        // Add listeners to the UI buttons
         AddListenersToUI();
         
-        // Update the UI
+        // Update the UI to show the first applicant
         UpdateApplicantUI();
     }
 
@@ -137,9 +138,6 @@ public class ApplicantNotes : MonoBehaviour
                 Destroy(child.gameObject);
         } 
         
-        // Ensure that addAndRemoveNotesObject is the last child
-        addAndRemoveNotesObject.transform.SetAsFirstSibling();
-        
         // Get the current applicant
         Applicant currentApplicant = applicants[currentApplicantIndex];
         
@@ -156,13 +154,14 @@ public class ApplicantNotes : MonoBehaviour
         // Create the notes input fields again
         for (int i = 0; i < currentApplicant.notes.Count; i++)
         {
+            // Get the note text
             string noteText = currentApplicant.notes[i];
             
-            // Instantiate the note input field and set it before the addAndRemoveNotesObject
+            // Instantiate the note input field as a child of notesParent
             GameObject newInputField = Instantiate(applicantInputFieldPrefab, notesParent);
             
-            // Place the new input field before the addAndRemoveNotesObject
-            newInputField.transform.SetSiblingIndex(notesParent.childCount - 1);
+            // Ensure the addAndRemoveNotesObject is the last child
+            addAndRemoveNotesObject.transform.SetAsLastSibling();
             
             // Get the input field component
             TMP_InputField inputFieldComponent = newInputField.GetComponent<TMP_InputField>();
