@@ -1,6 +1,5 @@
 using System.Collections;
 using System.Collections.Generic;
-using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 
 public class FingerCollider : MonoBehaviour
@@ -34,7 +33,7 @@ public class FingerCollider : MonoBehaviour
 
     }
 
-    private void movePostIt(GameObject currentPostIt)
+    private void movePostIt(Postit currentPostIt)
     {
         Vector3 movePos = oldPos - gameObject.transform.position;
         oldPos = gameObject.transform.position;
