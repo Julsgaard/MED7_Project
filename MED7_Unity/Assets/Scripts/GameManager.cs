@@ -20,10 +20,10 @@ public class GameManager : MonoBehaviour
         ipAddressInputField.text = defaultIpAddress;
         
         // Disable the AR session object for the beginning
-        arSessionObject.SetActive(false);
+    //    arSessionObject.SetActive(false);
         createApplicantUIObject.SetActive(false);
         
-        ShowIntroUI();
+    //    ShowIntroUI();
     }
     
     private void ShowIntroUI()
