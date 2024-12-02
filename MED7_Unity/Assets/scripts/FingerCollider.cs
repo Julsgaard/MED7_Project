@@ -11,7 +11,7 @@ public class FingerCollider : MonoBehaviour
     void Start()
     {
         thisMaterial = this.gameObject.GetComponent<Renderer>().material;
-        GameObject.Find("Post-it Note");
+        postIt = GameObject.Find("Post-it Note").GetComponent<Postit>();
     }
 
     // Update is called once per frame
@@ -36,9 +36,8 @@ public class FingerCollider : MonoBehaviour
     private void movePostIt(Postit currentPostIt)
     {
         Vector3 movePos = oldPos - gameObject.transform.position;
-        oldPos = gameObject.transform.position;
         movePos = new Vector3(movePos.x, 0, movePos.z);
         currentPostIt.updatePosition(movePos);
-        
+        oldPos = gameObject.transform.position;
     }
 }

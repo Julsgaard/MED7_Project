@@ -17,6 +17,7 @@ public class Postit : MonoBehaviour
     }
     public void updatePosition(Vector3 movement)
     {
+        GetComponent<Renderer>().material.color = Color.green;
         gameObject.transform.position += movement;
     }
 }
