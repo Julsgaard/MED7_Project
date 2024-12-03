@@ -1,123 +1,73 @@
-using System;
-using TMPro;
 using Unity.Netcode;
-using Unity.Netcode.Components;
 using UnityEngine;
-using UnityEngine.UI;
 
-// Script for controlling the PostItNote GameObject in the scene using the NetworkTransform component
-
-// CHATGPT MADE RIGHT NOW FOR TESTING AND LEARNING PURPOSES
 public class PostItNoteNetwork : NetworkBehaviour
 {
-    private NetworkVariable<Color> noteColor = new NetworkVariable<Color>();
-    private NetworkVariable<string> noteText = new NetworkVariable<string>();
+    private NetworkVariable<Vector3> notePosition = new NetworkVariable<Vector3>();
 
-    private Renderer noteRenderer;
-    private TextMeshPro noteTextMesh;
-    
-    private void Awake()
-    {
-        noteRenderer = GetComponent<Renderer>();
-        noteTextMesh = GetComponentInChildren<TextMeshPro>();
-    }
-    
-    // Test method for moving the note
-    /*private void AddListenersToButtons()
-    {
-        //Add listeners to the buttons
-        moveNoteButton.onClick.AddListener(MoveNoteRandom);
-    }*/
-    
-    
     public override void OnNetworkSpawn()
     {
-        if (IsClient)
-        {
-            noteColor.OnValueChanged += OnColorChanged;
-            noteText.OnValueChanged += OnTextChanged;
+        base.OnNetworkSpawn();
 
-            // Apply initial values
-            OnColorChanged(Color.white, noteColor.Value);
-            OnTextChanged(string.Empty, noteText.Value);
+        notePosition.OnValueChanged += OnPositionChanged;
+
+        // Apply the initial position
+        OnPositionChanged(Vector3.zero, notePosition.Value);
+
+        if (IsOwner)
+        {
+            NoteManager.Instance.RegisterNote(this);
         }
     }
-    
-    public void Initialize(Color color, string text)
+
+    private void OnDestroy()
     {
-        if (IsServer)
-        {
-            noteColor.Value = color;
-            noteText.Value = text;
-        }
-    }
-    
-    private void OnColorChanged(Color previousColor, Color newColor)
-    {
-        noteRenderer.material.color = newColor;
+        notePosition.OnValueChanged -= OnPositionChanged;
     }
 
-    private void OnTextChanged(string previousText, string newText)
+    private void OnPositionChanged(Vector3 oldPosition, Vector3 newPosition)
     {
-        noteTextMesh.text = newText;
+        transform.position = newPosition;
     }
 
-    /*// Method to request moving the note
-    public void RequestMove(Vector3 newPosition)
+    public void MoveNote()
     {
-        if (IsOwner || IsServer)
-        {
-            RequestMoveServerRpc(newPosition);
-        }
-    }*/
-    
-    private void SetStartNotePosition()
-    {
-        // Set the start position of the note
-        //transform.position = position;
+        // if (IsServer)
+        // {
+        //     // Server moves the note directly
+        //     Debug.Log("Server moving the note.");
+        //     Vector3 newPosition = GenerateRandomPosition();
+        //     UpdatePosition(newPosition);
+        // }
+        // else if (IsClient)
+        // {
+        //     // Client requests the server to move the note
+        //     Debug.Log("Client requesting note move.");
+        //     RequestMoveServerRpc(GenerateRandomPosition());
+        // }
+
+
+        RequestMoveServerRpc(GenerateRandomPosition());
+        
     }
     
-    private void MoveNoteRandom()
-    {
-        // Move the note to a new position
-        Vector3 newPosition = new Vector3(UnityEngine.Random.Range(-1, 1), UnityEngine.Random.Range(-1, 1), UnityEngine.Random.Range(-1, 1));
-        RequestMoveServerRpc(newPosition);
-    }
-    
-    // ServerRpc for moving the note
-    [ServerRpc]
+
+    [ServerRpc(RequireOwnership = false)]
     private void RequestMoveServerRpc(Vector3 newPosition, ServerRpcParams rpcParams = default)
     {
-        // Server handles the movement of the note
-        transform.position = newPosition;
-        _networkTransform.SetState(transform.position, transform.rotation, transform.localScale);
-        Debug.Log("Note moved to: " + newPosition);
+        // Server handles the move request
+        Debug.Log($"Server received move request from client {rpcParams.Receive.SenderClientId}");
+        UpdatePosition(newPosition);
     }
-    
-    // Send the note data to the server
-    /*public void SendNoteData(string noteText, Color noteColor)
+
+    private void UpdatePosition(Vector3 newPosition)
     {
-        if (IsOwner || IsServer)
-        {
-            SendNoteDataServerRpc(noteText, noteColor);
-        }
-    }*/
-    
-    // Method to change the colour of the note
-    public void SetColour(Color newColour)
-    {
-        applicantColour = newColour;
-        
-        // Change the colour of the note
-        GetComponent<Renderer>().material.color = applicantColour;
+        notePosition.Value = newPosition;
+        Debug.Log($"Updated note position to {newPosition}");
     }
-    
-    // Method to change the text of the note
-    public void SetText(string newNote)
+
+    private Vector3 GenerateRandomPosition()
     {
-        note = newNote;
-        
-        // Change the text of the note
-        GetComponentInChildren<TextMeshPro>().text = note;
+        return new Vector3(Random.Range(0.1f, 0.2f), 0.1f, Random.Range(0.1f, 0.2f));
     }
 }

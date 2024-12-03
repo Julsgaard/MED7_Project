@@ -5,19 +5,22 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="05c6e882-459c-461a-a6db-dc6523f5c602" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/Assets/Scripts/NoteManager.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Scripts/NoteManager.cs.meta" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Scripts/Not Used.meta" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Scripts/Not Used/ServerManager.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Scripts/Not Used/SharedNetworking.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Scripts/Not Used/SharedNetworking.cs.meta" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.MED7_Unity/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.MED7_Unity/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/DefaultNetworkPrefabs.asset" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/DefaultNetworkPrefabs.asset" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/MobileARTemplateAssets/Prefabs/ARFeatheredPlane.prefab" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/MobileARTemplateAssets/Prefabs/ARFeatheredPlane.prefab" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Prefabs/NetworkManager.prefab" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Prefabs/NetworkManager.prefab" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Assets/Prefabs/Post-it Note.prefab" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Prefabs/Post-it Note.prefab" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Assets/Scenes/SampleScene.unity" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scenes/SampleScene.unity" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Assets/Scenes/ServerScene.unity" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scenes/ServerScene.unity" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Assets/Scripts/ApplicantNotes.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/ApplicantNotes.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Assets/Scripts/GameManager.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/GameManager.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Assets/Scripts/PostItNoteNetwork.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/PostItNoteNetwork.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Scripts/ServerManager.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/ServerManager.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Settings/URP-Performant.asset" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Settings/URP-Performant.asset" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Scripts/ServerManager.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Scripts/ServerManager.cs.meta" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/Not Used/ServerManager.cs.meta" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ProjectSettings/EditorBuildSettings.asset" beforeDir="false" afterPath="$PROJECT_DIR$/ProjectSettings/EditorBuildSettings.asset" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ProjectSettings/ProjectSettings.asset" beforeDir="false" afterPath="$PROJECT_DIR$/ProjectSettings/ProjectSettings.asset" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -75,7 +78,7 @@
 }</component>
   <component name="RunManager" selected="Attach to Unity Editor.Attach to Unity Editor">
     <configuration name="Standalone Player" type="RunUnityExe" factoryName="Unity Executable">
-      <option name="EXE_PATH" value="$PROJECT_DIR$/Builds/Server Build\MED7_Unity.exe" />
+      <option name="EXE_PATH" value="$PROJECT_DIR$/Builds/Server Build/MED7_Unity.exe" />
       <option name="PROGRAM_PARAMETERS" value="" />
       <option name="WORKING_DIRECTORY" value="C:\Users\krill\Documents\GitHub\MED7_Project\MED7_Unity\Builds\Multiplayer test scene" />
       <option name="PASS_PARENT_ENVS" value="1" />
