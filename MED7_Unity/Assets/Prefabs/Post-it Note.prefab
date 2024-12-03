@@ -8895,10 +8895,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 035f3ca353fd758408ae70bea9ca79f9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  position: {x: 0, y: 0, z: 0}
-  applicantColour: {r: 0, g: 0, b: 0, a: 0}
-  note: 
-  moveNoteButton: {fileID: 404455279823854277}
 --- !u!114 &8157072493330048188
 MonoBehaviour:
   m_ObjectHideFlags: 0

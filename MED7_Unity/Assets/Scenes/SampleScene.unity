@@ -2493,104 +2493,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 404891182}
   m_CullTransparentMesh: 1
---- !u!1 &411446319
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 411446322}
-  - component: {fileID: 411446321}
-  - component: {fileID: 411446320}
-  m_Layer: 0
-  m_Name: NetworkManager
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!114 &411446320
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 411446319}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6960e84d07fb87f47956e7a81d71c4e6, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_ProtocolType: 0
-  m_MaxPacketQueueSize: 128
-  m_MaxPayloadSize: 6144
-  m_HeartbeatTimeoutMS: 500
-  m_ConnectTimeoutMS: 1000
-  m_MaxConnectAttempts: 60
-  m_DisconnectTimeoutMS: 30000
-  ConnectionData:
-    Address: 192.168.50.141
-    Port: 7777
-    ServerListenAddress: 0.0.0.0
-  DebugSimulator:
-    PacketDelayMS: 0
-    PacketJitterMS: 0
-    PacketDropRate: 0
---- !u!114 &411446321
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 411446319}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 593a2fe42fa9d37498c96f9a383b6521, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  NetworkConfig:
-    ProtocolVersion: 0
-    NetworkTransport: {fileID: 411446320}
-    PlayerPrefab: {fileID: 6599546705194559054, guid: 149f911ff5bf6f24698a93b485738a18,
-      type: 3}
-    Prefabs:
-      NetworkPrefabsLists:
-      - {fileID: 11400000, guid: 96ea50e3ae1653e42b15568728ee1466, type: 2}
-    TickRate: 30
-    ClientConnectionBufferTimeout: 10
-    ConnectionApproval: 0
-    ConnectionData: 
-    EnableTimeResync: 0
-    TimeResyncInterval: 30
-    EnsureNetworkVariableLengthSafety: 0
-    EnableSceneManagement: 0
-    ForceSamePrefabs: 1
-    RecycleNetworkIds: 1
-    NetworkIdRecycleDelay: 120
-    RpcHashSize: 0
-    LoadSceneTimeOut: 120
-    SpawnTimeout: 10
-    EnableNetworkLogs: 1
-    OldPrefabList: []
-  RunInBackground: 1
-  LogLevel: 0
---- !u!4 &411446322
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 411446319}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -2.6147866, y: -2.9246516, z: 11.508097}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &414775131
 GameObject:
   m_ObjectHideFlags: 0
@@ -6072,6 +5974,51 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 846715049}
   m_CullTransparentMesh: 1
+--- !u!1 &866106099
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 866106101}
+  - component: {fileID: 866106100}
+  m_Layer: 0
+  m_Name: NoteManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &866106100
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 866106099}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f80dedf35f86467393d57622a75717cc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  moveAllNotesUpButton: {fileID: 1412956166}
+--- !u!4 &866106101
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 866106099}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 755.56805, y: 1278.7461, z: -13.76749}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &875343105
 GameObject:
   m_ObjectHideFlags: 0
@@ -9127,7 +9074,7 @@ RectTransform:
   m_GameObject: {fileID: 1216166842}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 1.1, y: 1.1, z: 1.1}
   m_ConstrainProportionsScale: 1
   m_Children: []
   m_Father: {fileID: 1293421297}
@@ -10316,6 +10263,74 @@ MonoBehaviour:
   m_VerticalAxis: Vertical
   m_SubmitButton: Submit
   m_CancelButton: Cancel
+--- !u!1001 &1331417637
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 1717742408817290173, guid: 6d6b964097745184cbd1b4a8ca1c712a,
+        type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -2.6147866
+      objectReference: {fileID: 0}
+    - target: {fileID: 1717742408817290173, guid: 6d6b964097745184cbd1b4a8ca1c712a,
+        type: 3}
+      propertyPath: m_LocalPosition.y
+      value: -2.9246516
+      objectReference: {fileID: 0}
+    - target: {fileID: 1717742408817290173, guid: 6d6b964097745184cbd1b4a8ca1c712a,
+        type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 11.508097
+      objectReference: {fileID: 0}
+    - target: {fileID: 1717742408817290173, guid: 6d6b964097745184cbd1b4a8ca1c712a,
+        type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1717742408817290173, guid: 6d6b964097745184cbd1b4a8ca1c712a,
+        type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1717742408817290173, guid: 6d6b964097745184cbd1b4a8ca1c712a,
+        type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1717742408817290173, guid: 6d6b964097745184cbd1b4a8ca1c712a,
+        type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1717742408817290173, guid: 6d6b964097745184cbd1b4a8ca1c712a,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1717742408817290173, guid: 6d6b964097745184cbd1b4a8ca1c712a,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1717742408817290173, guid: 6d6b964097745184cbd1b4a8ca1c712a,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7212579694864407152, guid: 6d6b964097745184cbd1b4a8ca1c712a,
+        type: 3}
+      propertyPath: m_Name
+      value: NetworkManager
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 6d6b964097745184cbd1b4a8ca1c712a, type: 3}
 --- !u!1 &1350136135
 GameObject:
   m_ObjectHideFlags: 0
@@ -11638,15 +11653,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cd51fa6bc2841c64394a79e77d0a4d73, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  arSession: {fileID: 702413258}
   defaultIpAddress: 192.168.50.141
   ipAddressInputField: {fileID: 2132021173}
   connectUIObject: {fileID: 1232902817}
   introUIObject: {fileID: 832707599}
   createApplicantUIObject: {fileID: 1689707418}
   blackBackgroundUI: {fileID: 1293421293}
+  arSettingsUI: {fileID: 2099970465}
   nextButton: {fileID: 1299660417}
   connectToServerButton: {fileID: 973703550}
+  applicantNotes: {fileID: 1724130751}
 --- !u!4 &1477298637
 Transform:
   m_ObjectHideFlags: 0
@@ -12030,7 +12046,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 1, y: 1}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: -100, y: -100}
+  m_AnchoredPosition: {x: -120, y: -120}
   m_SizeDelta: {x: 32, y: 32}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1520419811
@@ -12874,7 +12890,6 @@ GameObject:
   - component: {fileID: 1689707422}
   - component: {fileID: 1689707421}
   - component: {fileID: 1689707420}
-  - component: {fileID: 1689707424}
   m_Layer: 5
   m_Name: Create Applicant Notes UI
   m_TagString: Untagged
@@ -12965,41 +12980,6 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0, y: 0}
---- !u!114 &1689707424
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1689707418}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 28bc309ce59e4aa4c8dcd11e500dd417, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  applicantAmount: 3
-  currentApplicantIndex: 0
-  applicants: []
-  possibleApplicantColours:
-  - {r: 0.99607843, g: 1, b: 0.6117647, a: 1}
-  - {r: 1, g: 0.49411765, b: 0.7254902, a: 1}
-  - {r: 0.47843137, g: 0.9882353, b: 1, a: 1}
-  - {r: 0.47843134, g: 1, b: 0.47959116, a: 1}
-  - {r: 1, g: 0.6574226, b: 0.47843134, a: 1}
-  areYouSureUI: {fileID: 2037714033}
-  currentApplicantNumberText: {fileID: 1877551495}
-  currentApplicantColorImage: {fileID: 1843834490}
-  nextButton: {fileID: 14914357}
-  previousButton: {fileID: 713297140}
-  doneButton: {fileID: 921857782}
-  addNoteButton: {fileID: 997823629}
-  removeNoteButton: {fileID: 1553500801}
-  notesParent: {fileID: 1176970280}
-  addAndRemoveNotesObject: {fileID: 1827318526}
-  applicantInputFieldPrefab: {fileID: 3302505309398881557, guid: 1e17339e46303374888ccf2d6da6b310,
-    type: 3}
-  yesButton: {fileID: 1311416623}
-  noButton: {fileID: 330081427}
 --- !u!1 &1694484556
 GameObject:
   m_ObjectHideFlags: 0
@@ -13242,6 +13222,74 @@ RectTransform:
   m_AnchoredPosition: {x: 4.700012, y: 0.9000244}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
+--- !u!1 &1724130750
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1724130752}
+  - component: {fileID: 1724130751}
+  m_Layer: 0
+  m_Name: ApplicantNotesManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1724130751
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1724130750}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 28bc309ce59e4aa4c8dcd11e500dd417, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  applicantAmount: 3
+  currentApplicantIndex: 0
+  applicants: []
+  possibleApplicantColours:
+  - {r: 0.99607843, g: 1, b: 0.6117647, a: 1}
+  - {r: 1, g: 0.49411765, b: 0.7254902, a: 1}
+  - {r: 0.47843137, g: 0.9882353, b: 1, a: 1}
+  - {r: 0.47843134, g: 1, b: 0.47959116, a: 1}
+  - {r: 1, g: 0.6574226, b: 0.47843134, a: 1}
+  areYouSureUI: {fileID: 2037714033}
+  createApplicantUIObject: {fileID: 1689707418}
+  currentApplicantNumberText: {fileID: 1877551495}
+  currentApplicantColorImage: {fileID: 1843834490}
+  nextButton: {fileID: 14914357}
+  previousButton: {fileID: 713297140}
+  doneButton: {fileID: 921857782}
+  addNoteButton: {fileID: 997823629}
+  removeNoteButton: {fileID: 1553500801}
+  notesParent: {fileID: 1176970280}
+  addAndRemoveNotesObject: {fileID: 1827318526}
+  applicantInputFieldPrefab: {fileID: 3302505309398881557, guid: 1e17339e46303374888ccf2d6da6b310,
+    type: 3}
+  yesButton: {fileID: 1311416623}
+  noButton: {fileID: 330081427}
+--- !u!4 &1724130752
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1724130750}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 187.58833, y: 532.20575, z: -23.430225}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1753247169
 GameObject:
   m_ObjectHideFlags: 0
@@ -16006,7 +16054,7 @@ GameObject:
   - component: {fileID: 2099970472}
   - component: {fileID: 2099970471}
   m_Layer: 5
-  m_Name: AR UI
+  m_Name: AR Settings UI
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -17350,5 +17398,7 @@ SceneRoots:
   - {fileID: 1689707423}
   - {fileID: 832707604}
   - {fileID: 331264285}
-  - {fileID: 411446322}
   - {fileID: 1477298637}
+  - {fileID: 1331417637}
+  - {fileID: 866106101}
+  - {fileID: 1724130752}

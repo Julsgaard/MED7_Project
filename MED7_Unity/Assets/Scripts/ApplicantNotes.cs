@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
+using Unity.Netcode;
 using UnityEngine.UI;
 
 // Applicant class to store variables for each applicant (number, colour, notes)
@@ -28,7 +29,7 @@ public class ApplicantNotes : MonoBehaviour
     [SerializeField] private Color[] possibleApplicantColours; // Possible colours for the applicants - #FEFF9C, #FF7EB9, #7AFCFF, #7AFF7A, #FFA87A
 
     // UI
-    [SerializeField] private GameObject areYouSureUI;
+    [SerializeField] private GameObject areYouSureUI, createApplicantUIObject;
     [SerializeField] private TextMeshProUGUI currentApplicantNumberText;
     [SerializeField] private Image currentApplicantColorImage;
     [SerializeField] private Button nextButton, previousButton, doneButton, addNoteButton, removeNoteButton;
@@ -76,7 +77,7 @@ public class ApplicantNotes : MonoBehaviour
         yesButton.onClick.AddListener(() =>
         {
             areYouSureUI.SetActive(false);
-            gameObject.SetActive(false);
+            createApplicantUIObject.SetActive(false);
             _gameManager.ShowConnectUI();
         });
         noButton.onClick.AddListener(() =>
@@ -180,4 +181,6 @@ public class ApplicantNotes : MonoBehaviour
             });
         }
     }
+    
+    
 }

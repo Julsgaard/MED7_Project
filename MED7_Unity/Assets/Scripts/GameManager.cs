@@ -8,11 +8,11 @@ using UnityEngine.XR.ARFoundation;
 public class GameManager : MonoBehaviour
 {
     //[SerializeField] private GameObject arSessionObject;
-    [SerializeField] private ARSession arSession;
+    //[SerializeField] private ARSession arSession;
     [SerializeField] private string defaultIpAddress = "192.168.50.141";
     [SerializeField] private TMP_InputField ipAddressInputField;
     //[SerializeField] private TMP_InputField portInputField;
-    [SerializeField] private GameObject connectUIObject, introUIObject, createApplicantUIObject, blackBackgroundUI;
+    [SerializeField] private GameObject connectUIObject, introUIObject, createApplicantUIObject, blackBackgroundUI, arSettingsUI;
     [SerializeField] private Button nextButton, connectToServerButton;
     [SerializeField] private ApplicantNotes applicantNotes;
     
@@ -34,11 +34,12 @@ public class GameManager : MonoBehaviour
     {
         introUIObject.SetActive(true);
         blackBackgroundUI.SetActive(true);
-
         createApplicantUIObject.SetActive(false);
+        arSettingsUI.SetActive(false);
+        connectUIObject.SetActive(false);
     }
     
-    public void NextButtonIntro()
+    private void NextButtonIntro()
     {
         // Disable the intro UI
         introUIObject.SetActive(false);
@@ -54,7 +55,7 @@ public class GameManager : MonoBehaviour
         if (connectUIObject)
         {
             connectUIObject.SetActive(true);
-            Debug.Log("Connect UI enabled");
+            //Debug.Log("Connect UI enabled");
         }
     }
     
@@ -66,7 +67,7 @@ public class GameManager : MonoBehaviour
     }
     
     // Method for connecting to the server. Used in the NetworkManagerUI script
-    public void ConnectToServer()
+    private void ConnectToServer()
     {
         SetIPAddress();
         
@@ -82,8 +83,13 @@ public class GameManager : MonoBehaviour
             connectUIObject.SetActive(false);
             blackBackgroundUI.SetActive(false);
             
+            // Enable the AR settings UI
+            arSettingsUI.SetActive(true);
+            
             //arSession.enabled = true;
             //arSession.Reset(); 
+            
+            applicantNotes.SendNotesToServer();
         }
         else
         {
