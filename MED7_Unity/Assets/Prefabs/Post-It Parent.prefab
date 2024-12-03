@@ -13,7 +13,6 @@ GameObject:
   - component: {fileID: 4727038436850642606}
   - component: {fileID: 405066775424205574}
   - component: {fileID: -4681966813675338788}
-  - component: {fileID: 5615896121025247175}
   m_Layer: 0
   m_Name: Post-It Parent
   m_TagString: Untagged
@@ -64,7 +63,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 7b565b5add381ee45b035b89477b2524, type: 2}
+  - {fileID: 2100000, guid: df7b052d8678a2c4697271a6783450c4, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -122,15 +121,3 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_DestroyOnRemoval: 1
   m_VertexChangedThreshold: 0.01
---- !u!114 &5615896121025247175
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4218618458727912268}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0d5d14c961b01cf44b8af98944e59352, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
