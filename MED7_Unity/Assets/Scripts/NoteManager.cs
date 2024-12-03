@@ -1,17 +1,18 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 public class NoteManager : MonoBehaviour
 {
     public static NoteManager Instance { get; private set; }
 
-    private PostItNoteNetwork myNote;
+    private List<PostItNoteNetwork> notes = new List<PostItNoteNetwork>();
 
     private void Awake()
     {
         if (Instance == null)
         {
             Instance = this;
-            // Optional: Uncomment if you need this object to persist across scenes
+            // Optionally, use DontDestroyOnLoad if needed
             // DontDestroyOnLoad(gameObject);
         }
         else
@@ -22,14 +23,25 @@ public class NoteManager : MonoBehaviour
 
     public void RegisterNote(PostItNoteNetwork note)
     {
-        myNote = note;
+        if (!notes.Contains(note))
+        {
+            notes.Add(note);
+        }
     }
 
-    public void MoveNote()
+    public void UnregisterNote(PostItNoteNetwork note)
     {
-        if (myNote != null)
+        if (notes.Contains(note))
         {
-            myNote.MoveNote();
+            notes.Remove(note);
+        }
+    }
+
+    public void MoveAllNotes()
+    {
+        foreach (var note in notes)
+        {
+            note.RequestMoveNote();
         }
     }
 }

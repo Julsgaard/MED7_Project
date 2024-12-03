@@ -7,22 +7,15 @@ public class PostItNoteNetwork : NetworkBehaviour
 
     public override void OnNetworkSpawn()
     {
-        base.OnNetworkSpawn();
-
         notePosition.OnValueChanged += OnPositionChanged;
-
-        // Apply the initial position
         OnPositionChanged(Vector3.zero, notePosition.Value);
-
-        if (IsOwner)
-        {
-            NoteManager.Instance.RegisterNote(this);
-        }
+        NoteManager.Instance.RegisterNote(this);
     }
 
     private void OnDestroy()
     {
         notePosition.OnValueChanged -= OnPositionChanged;
+        NoteManager.Instance.UnregisterNote(this);
     }
 
     private void OnPositionChanged(Vector3 oldPosition, Vector3 newPosition)
@@ -30,40 +23,22 @@ public class PostItNoteNetwork : NetworkBehaviour
         transform.position = newPosition;
     }
 
-    public void MoveNote()
+    public void RequestMoveNote()
     {
-        // if (IsServer)
-        // {
-        //     // Server moves the note directly
-        //     Debug.Log("Server moving the note.");
-        //     Vector3 newPosition = GenerateRandomPosition();
-        //     UpdatePosition(newPosition);
-        // }
-        // else if (IsClient)
-        // {
-        //     // Client requests the server to move the note
-        //     Debug.Log("Client requesting note move.");
-        //     RequestMoveServerRpc(GenerateRandomPosition());
-        // }
-
-
-        RequestMoveServerRpc(GenerateRandomPosition());
-        
+        // Clients request the server to move the note
+        if (IsClient)
+        {
+            Vector3 newPosition = GenerateRandomPosition();
+            RequestMoveServerRpc(newPosition);
+        }
     }
-    
 
     [ServerRpc(RequireOwnership = false)]
     private void RequestMoveServerRpc(Vector3 newPosition, ServerRpcParams rpcParams = default)
     {
-        // Server handles the move request
-        Debug.Log($"Server received move request from client {rpcParams.Receive.SenderClientId}");
-        UpdatePosition(newPosition);
-    }
-
-    private void UpdatePosition(Vector3 newPosition)
-    {
+        // Server updates the note position
         notePosition.Value = newPosition;
-        Debug.Log($"Updated note position to {newPosition}");
+        Debug.Log($"Server moved note to {newPosition} on behalf of client {rpcParams.Receive.SenderClientId}");
     }
 
     private Vector3 GenerateRandomPosition()

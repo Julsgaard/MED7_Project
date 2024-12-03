@@ -73,7 +73,7 @@ public class GameManager : MonoBehaviour
     
     private void MoveAllNotesUp()
     {
-        NoteManager.Instance.MoveNote();
+        NoteManager.Instance.MoveAllNotes();
     }
     
     // Method for connecting to the server. Used in the NetworkManagerUI script
@@ -153,7 +153,7 @@ public class GameManager : MonoBehaviour
     {
         GameObject postItNoteObj = Instantiate(postItNotePrefab);
         NetworkObject networkObject = postItNoteObj.GetComponent<NetworkObject>();
-        networkObject.SpawnWithOwnership(clientId);
+        networkObject.Spawn();
         postItNoteObj.transform.position = new Vector3(0, 0, 0);
     }
 
