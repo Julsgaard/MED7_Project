@@ -14,6 +14,7 @@ public class GameManager : MonoBehaviour
     //[SerializeField] private TMP_InputField portInputField;
     [SerializeField] private GameObject connectUIObject, introUIObject, createApplicantUIObject, blackBackgroundUI;
     [SerializeField] private Button nextButton, connectToServerButton;
+    [SerializeField] private ApplicantNotes applicantNotes;
     
     // Set the default IP address for the UI input field
     private void Awake()
@@ -23,10 +24,8 @@ public class GameManager : MonoBehaviour
         // Set the input field text to the default IP address
         ipAddressInputField.text = defaultIpAddress;
         
-        //TODO: Disable the Camera?
+        //TODO: Disable the Camera. Right now the blackBackgroundUI is used to hide the camera view
         //arSession.enabled = false;
-        
-        createApplicantUIObject.SetActive(false);
         
         ShowIntroUI();
     }
@@ -34,6 +33,9 @@ public class GameManager : MonoBehaviour
     private void ShowIntroUI()
     {
         introUIObject.SetActive(true);
+        blackBackgroundUI.SetActive(true);
+
+        createApplicantUIObject.SetActive(false);
     }
     
     public void NextButtonIntro()
@@ -75,14 +77,18 @@ public class GameManager : MonoBehaviour
         if (NetworkManager.Singleton.IsClient)
         {
             Debug.Log("Connected to server");
+            
+            // Disable the connect to server UI
+            connectUIObject.SetActive(false);
+            blackBackgroundUI.SetActive(false);
+            
+            //arSession.enabled = true;
+            //arSession.Reset(); 
         }
-        
-        // Disable the connect to server UI
-        connectUIObject.SetActive(false);
-        blackBackgroundUI.SetActive(false);
-        
-        //arSession.enabled = true;
-        //arSession.Reset(); 
+        else
+        {
+            Debug.LogWarning("Failed to connect to server");
+        }
     }
     
     private void SetIPAddress()
