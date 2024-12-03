@@ -45,16 +45,16 @@ public class ServerManager : MonoBehaviour
         // Instantiate the post-it note prefab
         GameObject postItNoteObj = Instantiate(postItNotePrefab);
         postItNoteObj.GetComponent<NetworkObject>().Spawn();
-        PostItNote postItNote = postItNoteObj.GetComponent<PostItNote>();
+        PostItNoteNetwork postItNoteNetwork = postItNoteObj.GetComponent<PostItNoteNetwork>();
         
         // Set the position of the post-it note
         postItNoteObj.transform.position = new Vector3(0, 0, 0);
         
         // Set the colour of the post-it note
-        postItNote.SetColour(Color.yellow);
+        postItNoteNetwork.SetColour(Color.yellow);
         
         // Set the text of the post-it note
-        postItNote.SetText("test");
+        postItNoteNetwork.SetText("test");
 
     }
 
@@ -74,24 +74,23 @@ public class ServerManager : MonoBehaviour
         }
     }
     
-    /*[ServerRpc(RequireOwnership = false)]
-    public void ReceivePostItNoteDataServerRpc(string noteText, Color noteColor, ServerRpcParams rpcParams = default)
+    [ServerRpc(RequireOwnership = false)]
+    public void ReceiveNoteDataServerRpc(Color noteColor, string noteText, ServerRpcParams rpcParams = default)
     {
-        // Instantiate the post-it note prefab with the received data
+        // Instantiate the PostItNote prefab
         GameObject postItNoteObj = Instantiate(postItNotePrefab);
-        postItNoteObj.GetComponent<NetworkObject>().Spawn();
 
-        PostItNote postItNote = postItNoteObj.GetComponent<PostItNote>();
+        // Get the NetworkObject component
+        NetworkObject networkObject = postItNoteObj.GetComponent<NetworkObject>();
 
-        // Set the position of the post-it note (you can modify this to set different positions)
-        postItNoteObj.transform.position = new Vector3(0, 0, 0);
+        // Spawn the object with ownership assigned to the client who sent the data
+        networkObject.SpawnWithOwnership(rpcParams.Receive.SenderClientId);
 
-        // Set the color and text of the post-it note
-        postItNote.SetColour(noteColor);
-        postItNote.SetText(noteText);
+        // Initialize the note data
+        PostItNoteNetwork postItNoteNetwork = postItNoteObj.GetComponent<PostItNoteNetwork>();
+        postItNoteNetwork.Initialize(noteColor, noteText);
+    }
 
-        Debug.Log($"Spawned post-it note for client {rpcParams.Receive.SenderClientId}");
-    }*/
 
     private void OnApplicationQuit()
     {

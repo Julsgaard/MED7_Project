@@ -2,26 +2,30 @@ using System.Net;
 using TMPro;
 using Unity.Netcode;
 using UnityEngine;
+using UnityEngine.UI;
+using UnityEngine.XR.ARFoundation;
 
 public class GameManager : MonoBehaviour
 {
-    [SerializeField] private GameObject arSessionObject;
+    //[SerializeField] private GameObject arSessionObject;
+    //[SerializeField] private ARSession arSession;
     [SerializeField] private string defaultIpAddress = "192.168.50.141";
     [SerializeField] private TMP_InputField ipAddressInputField;
-    [SerializeField] private TMP_InputField portInputField;
-    [SerializeField] private GameObject connectUIObject;
-    [SerializeField] private GameObject introUIObject;
-    [SerializeField] private GameObject createApplicantUIObject;
+    //[SerializeField] private TMP_InputField portInputField;
+    [SerializeField] private GameObject connectUIObject, introUIObject, createApplicantUIObject, blackBackgroundUI, arSettingsUI;
+    [SerializeField] private Button nextButton, connectToServerButton;
+    [SerializeField] private ApplicantNotes applicantNotes;
     
     // Set the default IP address for the UI input field
     private void Awake()
     {
+        AddListenersToUI();
+        
         // Set the input field text to the default IP address
         ipAddressInputField.text = defaultIpAddress;
         
-        // Disable the AR session object for the beginning
-    //    arSessionObject.SetActive(false);
-        createApplicantUIObject.SetActive(false);
+        //TODO: Disable the Camera. Right now the blackBackgroundUI is used to hide the camera view
+        //arSession.enabled = false;
         
     //    ShowIntroUI();
     }
@@ -29,9 +33,13 @@ public class GameManager : MonoBehaviour
     private void ShowIntroUI()
     {
         introUIObject.SetActive(true);
+        blackBackgroundUI.SetActive(true);
+        createApplicantUIObject.SetActive(false);
+        arSettingsUI.SetActive(false);
+        connectUIObject.SetActive(false);
     }
     
-    public void NextButtonIntro()
+    private void NextButtonIntro()
     {
         // Disable the intro UI
         introUIObject.SetActive(false);
@@ -47,12 +55,19 @@ public class GameManager : MonoBehaviour
         if (connectUIObject)
         {
             connectUIObject.SetActive(true);
-            Debug.Log("Connect UI enabled");
+            //Debug.Log("Connect UI enabled");
         }
     }
     
+    private void AddListenersToUI()
+    {
+        // Add listeners to the buttons
+        connectToServerButton.onClick.AddListener(ConnectToServer);
+        nextButton.onClick.AddListener(NextButtonIntro);
+    }
+    
     // Method for connecting to the server. Used in the NetworkManagerUI script
-    public void ConnectToServer()
+    private void ConnectToServer()
     {
         SetIPAddress();
         
@@ -63,13 +78,22 @@ public class GameManager : MonoBehaviour
         if (NetworkManager.Singleton.IsClient)
         {
             Debug.Log("Connected to server");
-        }
-        
-        // Disable the connect to server UI
-        if (connectUIObject)
-        {
+            
+            // Disable the connect to server UI
             connectUIObject.SetActive(false);
-            Debug.Log("Connect UI disabled");
+            blackBackgroundUI.SetActive(false);
+            
+            // Enable the AR settings UI
+            arSettingsUI.SetActive(true);
+            
+            //arSession.enabled = true;
+            //arSession.Reset(); 
+            
+            applicantNotes.SendNotesToServer();
+        }
+        else
+        {
+            Debug.LogWarning("Failed to connect to server");
         }
     }
     
