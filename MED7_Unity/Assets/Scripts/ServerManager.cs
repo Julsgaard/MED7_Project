@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using Unity.Netcode;
 using UnityEngine;
 
@@ -6,6 +7,8 @@ using UnityEngine;
 public class ServerManager : MonoBehaviour
 {
     [SerializeField] private GameObject postItNotePrefab;
+    [SerializeField] private List<GameObject> users;
+    [SerializeField] private List<GameObject> postItNotes;
     
     void Start()
     {
@@ -29,7 +32,7 @@ public class ServerManager : MonoBehaviour
     {
         Debug.Log($"Client {clientId} connected");
         
-        SpawnPostItNote();
+        SpawnTestPostItNote();
 
     }
     private void OnClientDisconnected(ulong clientId)
@@ -37,7 +40,7 @@ public class ServerManager : MonoBehaviour
         Debug.Log($"Client {clientId} disconnected");
     }
     
-    private void SpawnPostItNote()
+    private void SpawnTestPostItNote()
     {
         // Instantiate the post-it note prefab
         GameObject postItNoteObj = Instantiate(postItNotePrefab);
@@ -53,6 +56,22 @@ public class ServerManager : MonoBehaviour
         // Set the text of the post-it note
         postItNote.SetText("test");
 
+    }
+
+    private void CollectUserPostItNotes(GameObject user)
+    {
+        
+        postItNotes.Add(user.gameObject.GetComponent<Applicant>().notes);
+    }
+
+    private void SpawnPostItNotes()
+    {
+        
+        
+        foreach (GameObject note in postItNotes)
+        {
+            note
+        }
     }
     
     /*[ServerRpc(RequireOwnership = false)]

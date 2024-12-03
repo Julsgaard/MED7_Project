@@ -15,6 +15,8 @@ GameObject:
   - component: {fileID: 826415573720856065}
   - component: {fileID: 8652683368326198422}
   - component: {fileID: 3464565329398610098}
+  - component: {fileID: -6632130042753777448}
+  - component: {fileID: -755004055029924682}
   m_Layer: 0
   m_Name: AR Default Plane
   m_TagString: Untagged
@@ -241,3 +243,30 @@ LineRenderer:
   m_UseWorldSpace: 0
   m_Loop: 1
   m_ApplyActiveColorSpace: 1
+--- !u!114 &-6632130042753777448
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6974871265453143642}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4694583967bd9483f9841409d278f46f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_FeatheringWidth: 0.2
+--- !u!114 &-755004055029924682
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6974871265453143642}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f8cec0b420e61fe41bb6ea180155de5b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_PlaneRenderer: {fileID: 0}
+  m_FadeSpeed: 1
