@@ -5,20 +5,11 @@ public class NoteManager : MonoBehaviour
 {
     public static NoteManager Instance { get; private set; }
 
-    private List<PostItNoteNetwork> notes = new List<PostItNoteNetwork>();
-
+    [SerializeField] private List<PostItNoteNetwork> notes = new List<PostItNoteNetwork>();
+    
     private void Awake()
     {
-        if (Instance == null)
-        {
-            Instance = this;
-            // Optionally, use DontDestroyOnLoad if needed
-            // DontDestroyOnLoad(gameObject);
-        }
-        else
-        {
-            Destroy(gameObject);
-        }
+        Instance = this;
     }
 
     public void RegisterNote(PostItNoteNetwork note)
@@ -26,14 +17,6 @@ public class NoteManager : MonoBehaviour
         if (!notes.Contains(note))
         {
             notes.Add(note);
-        }
-    }
-
-    public void UnregisterNote(PostItNoteNetwork note)
-    {
-        if (notes.Contains(note))
-        {
-            notes.Remove(note);
         }
     }
 

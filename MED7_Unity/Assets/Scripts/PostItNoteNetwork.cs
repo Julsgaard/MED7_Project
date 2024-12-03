@@ -3,19 +3,13 @@ using UnityEngine;
 
 public class PostItNoteNetwork : NetworkBehaviour
 {
-    private NetworkVariable<Vector3> notePosition = new NetworkVariable<Vector3>();
+    [SerializeField] private NetworkVariable<Vector3> notePosition = new NetworkVariable<Vector3>();
 
     public override void OnNetworkSpawn()
     {
         notePosition.OnValueChanged += OnPositionChanged;
         OnPositionChanged(Vector3.zero, notePosition.Value);
         NoteManager.Instance.RegisterNote(this);
-    }
-
-    private void OnDestroy()
-    {
-        notePosition.OnValueChanged -= OnPositionChanged;
-        NoteManager.Instance.UnregisterNote(this);
     }
 
     private void OnPositionChanged(Vector3 oldPosition, Vector3 newPosition)
@@ -30,6 +24,12 @@ public class PostItNoteNetwork : NetworkBehaviour
         {
             Vector3 newPosition = GenerateRandomPosition();
             RequestMoveServerRpc(newPosition);
+        }
+
+        if (IsServer)
+        {
+            Vector3 newPosition = GenerateRandomPosition();
+            notePosition.Value = newPosition;
         }
     }
 
