@@ -3,7 +3,6 @@ using TMPro;
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.UI;
-using UnityEngine.XR.ARFoundation;
 
 public class GameManager : MonoBehaviour
 {
@@ -13,8 +12,10 @@ public class GameManager : MonoBehaviour
     [SerializeField] private TMP_InputField ipAddressInputField;
     //[SerializeField] private TMP_InputField portInputField;
     [SerializeField] private GameObject connectUIObject, introUIObject, createApplicantUIObject, blackBackgroundUI, arSettingsUI;
-    [SerializeField] private Button nextButton, connectToServerButton;
+    [SerializeField] private Button nextButton, connectToServerButton, connectToServerButtonOptions, serverButton, moveAllNotesUpButton;
     [SerializeField] private ApplicantNotes applicantNotes;
+    //[SerializeField] private SharedNetworking sharedNetworking;
+    [SerializeField] private GameObject postItNotePrefab;
     
     // Set the default IP address for the UI input field
     private void Awake()
@@ -27,7 +28,7 @@ public class GameManager : MonoBehaviour
         //TODO: Disable the Camera. Right now the blackBackgroundUI is used to hide the camera view
         //arSession.enabled = false;
         
-    //    ShowIntroUI();
+        //ShowIntroUI();
     }
     
     private void ShowIntroUI()
@@ -63,7 +64,16 @@ public class GameManager : MonoBehaviour
     {
         // Add listeners to the buttons
         connectToServerButton.onClick.AddListener(ConnectToServer);
+        connectToServerButtonOptions.onClick.AddListener(ConnectToServer);
         nextButton.onClick.AddListener(NextButtonIntro);
+        
+        serverButton.onClick.AddListener(StartServer);
+        moveAllNotesUpButton.onClick.AddListener(MoveAllNotesUp);
+    }
+    
+    private void MoveAllNotesUp()
+    {
+        NoteManager.Instance.MoveNote();
     }
     
     // Method for connecting to the server. Used in the NetworkManagerUI script
@@ -89,7 +99,8 @@ public class GameManager : MonoBehaviour
             //arSession.enabled = true;
             //arSession.Reset(); 
             
-            applicantNotes.SendNotesToServer();
+            //applicantNotes.SendToServer();
+            // sharedNetworking.ClientToServerRpc();
         }
         else
         {
@@ -116,4 +127,34 @@ public class GameManager : MonoBehaviour
         // Set the IP address
         NetworkManager.Singleton.NetworkConfig.ConnectionData = ipAddressBytes;
     }
+    
+    private void StartServer()
+    {
+        NetworkManager.Singleton.OnClientConnectedCallback += OnClientConnected;
+        NetworkManager.Singleton.OnClientDisconnectCallback += OnClientDisconnected;
+        
+        // Start the server
+        NetworkManager.Singleton.StartServer();
+        Debug.Log("Server started");
+    }
+
+    private void OnClientConnected(ulong clientId)
+    {
+        Debug.Log($"Client {clientId} connected");
+        SpawnPostItNote(clientId);
+    }
+
+    private void OnClientDisconnected(ulong clientId)
+    {
+        Debug.Log($"Client {clientId} disconnected");
+    }
+    
+    private void SpawnPostItNote(ulong clientId)
+    {
+        GameObject postItNoteObj = Instantiate(postItNotePrefab);
+        NetworkObject networkObject = postItNoteObj.GetComponent<NetworkObject>();
+        networkObject.SpawnWithOwnership(clientId);
+        postItNoteObj.transform.position = new Vector3(0, 0, 0);
+    }
+
 }
