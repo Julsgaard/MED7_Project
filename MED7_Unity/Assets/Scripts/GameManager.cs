@@ -141,7 +141,7 @@ public class GameManager : MonoBehaviour
     private void OnClientConnected(ulong clientId)
     {
         Debug.Log($"Client {clientId} connected");
-        SpawnPostItNote(clientId);
+        SpawnPostItNote();
     }
 
     private void OnClientDisconnected(ulong clientId)
@@ -149,12 +149,26 @@ public class GameManager : MonoBehaviour
         Debug.Log($"Client {clientId} disconnected");
     }
     
-    private void SpawnPostItNote(ulong clientId)
+    private void SpawnPostItNote()
     {
-        GameObject postItNoteObj = Instantiate(postItNotePrefab);
-        NetworkObject networkObject = postItNoteObj.GetComponent<NetworkObject>();
-        networkObject.Spawn();
-        postItNoteObj.transform.position = new Vector3(0, 0, 0);
+        foreach (var applicant in applicantNotes.applicants)
+        {
+            foreach (var noteText in applicant.notes)
+            {
+                GameObject postItNoteObj = Instantiate(postItNotePrefab);
+                NetworkObject networkObject = postItNoteObj.GetComponent<NetworkObject>();
+                networkObject.Spawn();
+                postItNoteObj.transform.position = new Vector3(0, 0, 0);
+
+                // Set the text for the note
+                // TextMeshProUGUI textMeshPro = postItNoteObj.GetComponentInChildren<TextMeshProUGUI>();
+                // textMeshPro.text = noteText;
+                //
+                // // Set the color for the note
+                // Renderer renderer = postItNoteObj.GetComponent<Renderer>();
+                // renderer.material.color = applicant.applicantColour;
+            }
+        }
     }
 
 }

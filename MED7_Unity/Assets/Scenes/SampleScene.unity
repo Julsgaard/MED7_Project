@@ -12886,6 +12886,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: caf3b77cac247dd4292cb42c5a011a32, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  notes: []
 --- !u!4 &1622872691
 Transform:
   m_ObjectHideFlags: 0
@@ -13483,7 +13484,23 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   applicantAmount: 3
   currentApplicantIndex: 0
-  applicants: []
+  applicants:
+  - applicantNumber: 0
+    applicantColour: {r: 1, g: 0, b: 0, a: 0}
+    notes:
+    - test
+    - test2
+  - applicantNumber: 1
+    applicantColour: {r: 0, g: 1, b: 0.13166785, a: 0}
+    notes:
+    - test3
+    - test4
+  - applicantNumber: 2
+    applicantColour: {r: 0, g: 0.10399532, b: 1, a: 0}
+    notes:
+    - test5
+    - test6
+    - test7
   possibleApplicantColours:
   - {r: 0.99607843, g: 1, b: 0.6117647, a: 1}
   - {r: 1, g: 0.49411765, b: 0.7254902, a: 1}
@@ -17874,3 +17891,7 @@ SceneRoots:
   - {fileID: 1724130752}
   - {fileID: 1941622493}
   - {fileID: 1622872691}
+  - {fileID: 41723964}
+  - {fileID: 227629301}
+  - {fileID: 702413259}
+  - {fileID: 2103447777}
