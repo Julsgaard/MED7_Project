@@ -1,23 +1,55 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
+using TMPro;
 using UnityEngine;
+using UnityEngine.XR.ARFoundation;
 
 public class FingerCollider : MonoBehaviour
 {
     public static Postit postIt = null;
     private Vector3 oldPos;
     Material thisMaterial;
+    //ManomotionManager manomotionManager;
     // Start is called before the first frame update
     void Start()
     {
-        thisMaterial = this.gameObject.GetComponent<Renderer>().material;
-        postIt = GameObject.Find("Post-it Note").GetComponent<Postit>();
+        thisMaterial = gameObject.GetComponent<Renderer>().material;
+        //manomotionManager = ManomotionManager.Instance;
+        thisMaterial.color = Color.blue;
     }
 
     // Update is called once per frame
     void Update()
     {
-        movePostIt(postIt);
+        
+        //thisMaterial.color = Color.green;
+        //movePostIt(postIt);
+        //GetComponentInChildren<TextMeshPro>().text = gameObject.transform.position.ToString();
+        HandInfo handInfo = ManomotionManager.Instance.Hand_infos[0].hand_info;
+        if (handInfo.gesture_info.mano_gesture_trigger == ManoGestureTrigger.PICK)
+        {
+            if(postIt == null)
+            {
+                thisMaterial.color = Color.green;
+                catchPostIt();
+                oldPos = gameObject.transform.position;
+            }
+            else
+            {
+                postIt.gameObject.GetComponent<Renderer>().material.color = Color.green;
+                movePostIt(postIt);
+            }
+        }
+        else if (handInfo.gesture_info.mano_gesture_trigger == ManoGestureTrigger.DROP)
+        {
+            thisMaterial.color = Color.red;
+
+            if (postIt != null)
+            {
+                postIt = null;
+            }
+        }
     }
     private void OnTriggerEnter(Collider other)
     {
@@ -31,6 +63,29 @@ public class FingerCollider : MonoBehaviour
     private void OnTriggerStay(Collider other)
     {
 
+    }
+    private void catchPostIt()
+    {
+        thisMaterial.color = Color.yellow;
+        Vector3 screenPoint = Camera.main.WorldToScreenPoint(gameObject.transform.position);
+        Debug.Log(screenPoint);
+        GetComponentInChildren<TextMeshPro>().text = screenPoint.ToString();
+        Ray cameraRay = Camera.main.ScreenPointToRay(screenPoint);
+        RaycastHit[] hits = Physics.RaycastAll(cameraRay, Mathf.Infinity, 3);
+        Debug.DrawLine(Camera.main.WorldToScreenPoint(gameObject.transform.position), gameObject.transform.position, Color.blue);
+        if (hits.Length == 0)
+        {
+            return;
+        }
+        foreach (RaycastHit hit in hits)
+        {
+            
+            if (hit.collider.gameObject.tag == "Post-it")
+            {
+                postIt = hit.collider.gameObject.GetComponent<Postit>();
+                break;
+            }
+        }
     }
 
     private void movePostIt(Postit currentPostIt)

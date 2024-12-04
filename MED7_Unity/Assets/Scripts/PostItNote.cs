@@ -20,6 +20,11 @@ public class PostItNote : NetworkBehaviour
     {
         networkTransform = GetComponent<NetworkTransform>();
     }
+    private void Update()
+    {
+        SetText(gameObject.transform.position.ToString());
+    }
+
 
     /*// Method to request moving the note
     public void RequestMove(Vector3 newPosition)
@@ -37,7 +42,7 @@ public class PostItNote : NetworkBehaviour
         transform.position = newPosition;
         networkTransform.SetState(transform.position, transform.rotation, transform.localScale);
     }*/
-    
+
     // Send the note data to the server
     /*public void SendNoteData(string noteText, Color noteColor)
     {
@@ -46,7 +51,7 @@ public class PostItNote : NetworkBehaviour
             SendNoteDataServerRpc(noteText, noteColor);
         }
     }*/
-    
+
     // Method to change the colour of the note
     public void SetColour(Color newColour)
     {

@@ -193,7 +193,7 @@ GameObject:
   - component: {fileID: 8157072493330048188}
   m_Layer: 0
   m_Name: Post-it Note
-  m_TagString: Untagged
+  m_TagString: Post-it
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -297,7 +297,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 3832543363
+  GlobalObjectIdHash: 195468648
   InScenePlacedSourceGlobalObjectIdHash: 0
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
