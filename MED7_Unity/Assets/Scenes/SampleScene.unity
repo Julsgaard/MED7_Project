@@ -10502,6 +10502,11 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 6639321112772850458, guid: 6d6b964097745184cbd1b4a8ca1c712a,
+        type: 3}
+      propertyPath: ConnectionData.Address
+      value: 192.168.50.141
+      objectReference: {fileID: 0}
     - target: {fileID: 7212579694864407152, guid: 6d6b964097745184cbd1b4a8ca1c712a,
         type: 3}
       propertyPath: m_Name
@@ -11834,7 +11839,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cd51fa6bc2841c64394a79e77d0a4d73, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  defaultIpAddress: 192.168.50.141
+  defaultIpAddress: 
   ipAddressInputField: {fileID: 2132021173}
   connectUIObject: {fileID: 1232902817}
   introUIObject: {fileID: 832707599}
@@ -13484,23 +13489,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   applicantAmount: 3
   currentApplicantIndex: 0
-  applicants:
-  - applicantNumber: 0
-    applicantColour: {r: 1, g: 0, b: 0, a: 0}
-    notes:
-    - test
-    - test2
-  - applicantNumber: 1
-    applicantColour: {r: 0, g: 1, b: 0.13166785, a: 0}
-    notes:
-    - test3
-    - test4
-  - applicantNumber: 2
-    applicantColour: {r: 0, g: 0.10399532, b: 1, a: 0}
-    notes:
-    - test5
-    - test6
-    - test7
+  applicants: []
   possibleApplicantColours:
   - {r: 0.99607843, g: 1, b: 0.6117647, a: 1}
   - {r: 1, g: 0.49411765, b: 0.7254902, a: 1}

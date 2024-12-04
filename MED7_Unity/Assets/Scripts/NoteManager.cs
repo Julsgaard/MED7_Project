@@ -27,4 +27,12 @@ public class NoteManager : MonoBehaviour
             note.RequestMoveNote();
         }
     }
+    
+    // public void SetNoteData()
+    // {
+    //     foreach (var note in notes)
+    //     {
+    //         note.SetNoteData("Test", Color.white);
+    //     }
+    // }
 }

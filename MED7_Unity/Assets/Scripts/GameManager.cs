@@ -8,7 +8,7 @@ public class GameManager : MonoBehaviour
 {
     //[SerializeField] private GameObject arSessionObject;
     //[SerializeField] private ARSession arSession;
-    [SerializeField] private string defaultIpAddress = "192.168.50.141";
+    [SerializeField] private string defaultIpAddress; //TODO: Does not work for some reason - It connects to NetworkManager IP
     [SerializeField] private TMP_InputField ipAddressInputField;
     //[SerializeField] private TMP_InputField portInputField;
     [SerializeField] private GameObject connectUIObject, introUIObject, createApplicantUIObject, blackBackgroundUI, arSettingsUI;
@@ -28,7 +28,7 @@ public class GameManager : MonoBehaviour
         //TODO: Disable the Camera. Right now the blackBackgroundUI is used to hide the camera view
         //arSession.enabled = false;
         
-        //ShowIntroUI();
+        ShowIntroUI();
     }
     
     private void ShowIntroUI()
@@ -74,12 +74,13 @@ public class GameManager : MonoBehaviour
     private void MoveAllNotesUp()
     {
         NoteManager.Instance.MoveAllNotes();
+        //NoteManager.Instance.SetNoteData();
     }
     
     // Method for connecting to the server. Used in the NetworkManagerUI script
     private void ConnectToServer()
     {
-        SetIPAddress();
+        // SetIPAddress(); //TODO: Does not work right now - Uses the network manager IP
         
         // Connect to the server
         NetworkManager.Singleton.StartClient();
@@ -149,7 +150,7 @@ public class GameManager : MonoBehaviour
         Debug.Log($"Client {clientId} disconnected");
     }
     
-    private void SpawnPostItNote()
+    private void SpawnPostItNote() //TODO: I think this does not send the notes to the server. The server just uses the applicants that i already have. Maybe use Rpc for this?
     {
         foreach (var applicant in applicantNotes.applicants)
         {
@@ -161,12 +162,21 @@ public class GameManager : MonoBehaviour
                 postItNoteObj.transform.position = new Vector3(0, 0, 0);
 
                 // Set the text for the note
-                // TextMeshProUGUI textMeshPro = postItNoteObj.GetComponentInChildren<TextMeshProUGUI>();
+                // TextMeshPro textMeshPro = postItNoteObj.GetComponentInChildren<TextMeshPro>();
                 // textMeshPro.text = noteText;
                 //
                 // // Set the color for the note
                 // Renderer renderer = postItNoteObj.GetComponent<Renderer>();
                 // renderer.material.color = applicant.applicantColour;
+                //
+                // Debug.Log("Spawned note: " + noteText + " for applicant: " + applicant.applicantNumber + 
+                //           " with color: " + applicant.applicantColour);
+                
+                PostItNoteNetwork postItNoteNetwork = postItNoteObj.GetComponent<PostItNoteNetwork>();
+                Debug.Log("PostItNoteNetwork: " + postItNoteNetwork);
+                postItNoteNetwork.SetNoteData(noteText, applicant.applicantColour);
+                // Debug.Log("Set note data: " + noteText + " for applicant: " + applicant.applicantNumber + 
+                //           " with color: " + applicant.applicantColour);
             }
         }
     }
