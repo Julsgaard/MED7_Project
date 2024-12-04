@@ -1,21 +1,20 @@
-using System.Net;
 using TMPro;
+using Unity.Collections;
 using Unity.Netcode;
+using Unity.Netcode.Transports.UTP;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class GameManager : MonoBehaviour
+public class GameManager : NetworkBehaviour
 {
-    //[SerializeField] private GameObject arSessionObject;
-    //[SerializeField] private ARSession arSession;
     [SerializeField] private string defaultIpAddress; //TODO: Does not work for some reason - It connects to NetworkManager IP
     [SerializeField] private TMP_InputField ipAddressInputField;
     //[SerializeField] private TMP_InputField portInputField;
     [SerializeField] private GameObject connectUIObject, introUIObject, createApplicantUIObject, blackBackgroundUI, arSettingsUI;
     [SerializeField] private Button nextButton, connectToServerButton, connectToServerButtonOptions, serverButton, moveAllNotesUpButton;
     [SerializeField] private ApplicantNotes applicantNotes;
-    //[SerializeField] private SharedNetworking sharedNetworking;
     [SerializeField] private GameObject postItNotePrefab;
+    private bool _notesSentToServer = false;
     
     // Set the default IP address for the UI input field
     private void Awake()
@@ -26,7 +25,6 @@ public class GameManager : MonoBehaviour
         ipAddressInputField.text = defaultIpAddress;
         
         //TODO: Disable the Camera. Right now the blackBackgroundUI is used to hide the camera view
-        //arSession.enabled = false;
         
         ShowIntroUI();
     }
@@ -77,58 +75,29 @@ public class GameManager : MonoBehaviour
         //NoteManager.Instance.SetNoteData();
     }
     
-    // Method for connecting to the server. Used in the NetworkManagerUI script
+    // Method for connecting to the server
     private void ConnectToServer()
     {
-        // SetIPAddress(); //TODO: Does not work right now - Uses the network manager IP
+        SetIPAddress(); 
         
         // Connect to the server
         NetworkManager.Singleton.StartClient();
         
-        // Check if the client is connected to the server
-        if (NetworkManager.Singleton.IsClient)
-        {
-            Debug.Log("Connected to server");
-            
-            // Disable the connect to server UI
-            connectUIObject.SetActive(false);
-            blackBackgroundUI.SetActive(false);
-            
-            // Enable the AR settings UI
-            arSettingsUI.SetActive(true);
-            
-            //arSession.enabled = true;
-            //arSession.Reset(); 
-            
-            //applicantNotes.SendToServer();
-            // sharedNetworking.ClientToServerRpc();
-        }
-        else
-        {
-            Debug.LogWarning("Failed to connect to server");
-        }
+        // Subscribe to the client connected and disconnected events
+        NetworkManager.Singleton.OnClientConnectedCallback += OnClientConnected;
+        NetworkManager.Singleton.OnClientDisconnectCallback += OnClientDisconnected;
     }
     
     private void SetIPAddress()
     {
-        // Get the IP address from the input field
-        string ipAddress = ipAddressInputField.text;
+        // Get the transport
+        var transport = NetworkManager.Singleton.GetComponent<UnityTransport>();
         
-        //TODO: DOES NOT WORK YET
-        // Check if the IP address is valid (NOT SURE IF WORKING!)
-        if (!IPAddress.TryParse(ipAddress, out _))
-        {
-            Debug.LogWarning("Invalid IP address");
-            return;
-        }
-            
-        // Convert IP address to bytes
-        byte[] ipAddressBytes = IPAddress.Parse(ipAddress).GetAddressBytes();
-        
-        // Set the IP address
-        NetworkManager.Singleton.NetworkConfig.ConnectionData = ipAddressBytes;
+        // Set the IP address (Overwrites the default IP address in the network manager)
+        transport.ConnectionData.Address = ipAddressInputField.text;
     }
     
+    // Method for starting the server
     private void StartServer()
     {
         NetworkManager.Singleton.OnClientConnectedCallback += OnClientConnected;
@@ -137,48 +106,113 @@ public class GameManager : MonoBehaviour
         // Start the server
         NetworkManager.Singleton.StartServer();
         Debug.Log("Server started");
+        
+        // Disable the connect UI
+        connectUIObject.SetActive(false);
+        blackBackgroundUI.SetActive(false);
     }
 
     private void OnClientConnected(ulong clientId)
     {
-        Debug.Log($"Client {clientId} connected");
-        SpawnPostItNote();
+        if (IsClient && NetworkManager.Singleton.IsConnectedClient)
+        {
+            Debug.Log($"Client {clientId} connected to the server");
+            
+            // Disable the connect UI
+            connectUIObject.SetActive(false);
+            blackBackgroundUI.SetActive(false);
+            
+            // Enable AR settings UI 
+            arSettingsUI.SetActive(true);
+
+            if (!_notesSentToServer)
+            {
+                // Send all applicant notes to the server
+                SendAllNotesToServer();
+            }
+            
+            // Unsubscribe from the callback to prevent multiple subscriptions
+            NetworkManager.Singleton.OnClientConnectedCallback -= OnClientConnected;
+        }
+
+        if (IsServer)
+        {
+            Debug.Log($"Client {clientId} connected to the server");
+        }
     }
 
     private void OnClientDisconnected(ulong clientId)
     {
-        Debug.Log($"Client {clientId} disconnected");
+        if (IsClient && !NetworkManager.Singleton.IsConnectedClient)
+        {
+            Debug.Log($"Client {clientId} disconnected from the server");
+
+            //TODO: Handle UI updates or reconnection if the client disconnects
+            
+            // Unsubscribe from the callback
+            NetworkManager.Singleton.OnClientDisconnectCallback -= OnClientDisconnected;
+        }
+
+        if (IsServer)
+        {
+            Debug.Log($"Client {clientId} disconnected from the server");
+        }
     }
-    
-    private void SpawnPostItNote() //TODO: I think this does not send the notes to the server. The server just uses the applicants that i already have. Maybe use Rpc for this?
+
+    private void SendAllNotesToServer()
     {
         foreach (var applicant in applicantNotes.applicants)
         {
             foreach (var noteText in applicant.notes)
             {
-                GameObject postItNoteObj = Instantiate(postItNotePrefab);
-                NetworkObject networkObject = postItNoteObj.GetComponent<NetworkObject>();
-                networkObject.Spawn();
-                postItNoteObj.transform.position = new Vector3(0, 0, 0);
-
-                // Set the text for the note
-                // TextMeshPro textMeshPro = postItNoteObj.GetComponentInChildren<TextMeshPro>();
-                // textMeshPro.text = noteText;
-                //
-                // // Set the color for the note
-                // Renderer renderer = postItNoteObj.GetComponent<Renderer>();
-                // renderer.material.color = applicant.applicantColour;
-                //
-                // Debug.Log("Spawned note: " + noteText + " for applicant: " + applicant.applicantNumber + 
-                //           " with color: " + applicant.applicantColour);
-                
-                PostItNoteNetwork postItNoteNetwork = postItNoteObj.GetComponent<PostItNoteNetwork>();
-                Debug.Log("PostItNoteNetwork: " + postItNoteNetwork);
-                postItNoteNetwork.SetNoteData(noteText, applicant.applicantColour);
-                // Debug.Log("Set note data: " + noteText + " for applicant: " + applicant.applicantNumber + 
-                //           " with color: " + applicant.applicantColour);
+                if (noteText != "" && noteText != null)
+                {
+                    CreateNoteServerRpc(noteText, applicant.applicantColour, applicant.applicantNumber);
+                    Debug.Log($"Note sent to server: {noteText}");
+                }
             }
         }
     }
+    
+    [ServerRpc(RequireOwnership = false)]
+    public void CreateNoteServerRpc(string text, Color color, int applicantNumber, ServerRpcParams rpcParams = default)
+    {
+        GameObject postItNoteObject = Instantiate(postItNotePrefab);
+        
+        postItNoteObject.transform.position = GetNotePosition(applicantNumber);
+        
+        PostItNoteNetwork postItNoteNetwork = postItNoteObject.GetComponent<PostItNoteNetwork>();
+        
+        if (postItNoteNetwork != null)
+        {
+            // Set the note data directly on the server
+            postItNoteNetwork.noteText.Value = new FixedString512Bytes(text);
+            postItNoteNetwork.noteColor.Value = color;
+        }
+        else
+        {
+            Debug.LogError("PostItNoteNetwork component is missing on the postItNotePrefab.");
+        }
+        
+        NetworkObject networkObject = postItNoteObject.GetComponent<NetworkObject>();
 
+        if (networkObject != null)
+        {
+            networkObject.Spawn();
+        }
+        else
+        {
+            Debug.LogError("NetworkObject component is missing on the postItNotePrefab.");
+        }
+    }
+
+    // TODO: LORD LINUS!
+    private Vector3 GetNotePosition(int applicantNumber)
+    {
+        ulong clientId = NetworkManager.Singleton.LocalClientId;
+        Debug.Log($"Client ID: {clientId}");
+        
+        return new Vector3(0, 0, 0);
+    }
+    
 }

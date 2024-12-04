@@ -5,20 +5,26 @@ using UnityEngine;
 
 public class PostItNoteNetwork : NetworkBehaviour //TODO: DOES NOT WORK, IT JUST SPAWNS THE NOTE INFO FROM THE SERVER
 {
-    [SerializeField] private NetworkVariable<Vector3> notePosition = new NetworkVariable<Vector3>();
-    [SerializeField] private NetworkVariable<FixedString512Bytes> noteText = new NetworkVariable<FixedString512Bytes>();
-    [SerializeField] private NetworkVariable<Color> noteColor = new NetworkVariable<Color>();
+    public  NetworkVariable<Vector3> notePosition = new NetworkVariable<Vector3>();
+    public  NetworkVariable<FixedString512Bytes> noteText = new NetworkVariable<FixedString512Bytes>();
+    public  NetworkVariable<Color> noteColor = new NetworkVariable<Color>();
 
     public override void OnNetworkSpawn()
     {
+        // Subscribe to value changes
         notePosition.OnValueChanged += OnPositionChanged;
-        OnPositionChanged(Vector3.zero, notePosition.Value);
         noteText.OnValueChanged += OnTextChanged;
-        OnTextChanged(new FixedString512Bytes(), noteText.Value);
         noteColor.OnValueChanged += OnColorChanged;
+
+        // Initialize with current values
+        OnPositionChanged(Vector3.zero, notePosition.Value);
+        OnTextChanged(new FixedString512Bytes(), noteText.Value);
         OnColorChanged(Color.magenta, noteColor.Value);
-        
-        NoteManager.Instance.RegisterNote(this);
+
+        if (IsServer)
+        {
+            NoteManager.Instance.RegisterNote(this);
+        }
     }
 
     private void OnPositionChanged(Vector3 oldPosition, Vector3 newPosition)
@@ -39,40 +45,8 @@ public class PostItNoteNetwork : NetworkBehaviour //TODO: DOES NOT WORK, IT JUST
         Renderer renderer = GetComponent<Renderer>();
         renderer.material.color = newColor;
         
-        Debug.Log("Set note color: " + newColor);
+        //Debug.Log("Set note color: " + newColor);
     }
-    
-    public void SetNoteData(string textData, Color colorData)
-    {
-        if (IsClient)
-        {
-            // noteText.Value = new FixedString512Bytes(textData);
-            
-            // Clients request the server to set the note data
-            SetNoteDataServerRpc(textData, colorData);
-            Debug.Log("CLIENT SET NOTE DATA" + textData);
-        }
-
-        if (IsServer)
-        {
-            // Set the note text and colour
-            // Convert string to FixedString512Bytes
-            // FixedString512Bytes fixedString = new FixedString512Bytes();
-            // fixedString.CopyFrom(textData);
-            //
-            // // Set the note text
-            // noteText.Value = fixedString;
-            //
-            // // Set the note colour
-            // noteColor.Value = colorData;
-            //
-            // Debug.Log("SERVER SET NOTE DATA");
-        }
-    }
-    // private string ConvertFixedString512BytesToString(FixedString512Bytes fixedString)
-    // {
-    //     return fixedString.ToString();
-    // }
 
     public void RequestMoveNote()
     {
@@ -83,11 +57,11 @@ public class PostItNoteNetwork : NetworkBehaviour //TODO: DOES NOT WORK, IT JUST
             RequestMoveServerRpc(newPosition);
         }
 
-        if (IsServer)
+        /*if (IsServer)
         {
             Vector3 newPosition = GenerateRandomPosition();
             notePosition.Value = newPosition;
-        }
+        }*/
     }
 
     [ServerRpc(RequireOwnership = false)]
@@ -96,23 +70,6 @@ public class PostItNoteNetwork : NetworkBehaviour //TODO: DOES NOT WORK, IT JUST
         // Server updates the note position
         notePosition.Value = newPosition;
         Debug.Log($"Server moved note to {newPosition} for client {rpcParams.Receive.SenderClientId}");
-    }
-    
-    [ServerRpc(RequireOwnership = false)]
-    private void SetNoteDataServerRpc(string newText, Color newColor, ServerRpcParams rpcParams = default)
-    {
-        // Set the note text and colour
-        Debug.Log($"Server set note text to {newText} and colour to {newColor} for client {rpcParams.Receive.SenderClientId}");
-        
-        // Convert string to FixedString512Bytes
-        FixedString512Bytes fixedString = new FixedString512Bytes();
-        fixedString.CopyFrom(newText);
-        
-        // Set the note text
-        noteText.Value = fixedString;
-        
-        // Set the note colour
-        noteColor.Value = newColor;
     }
 
     private Vector3 GenerateRandomPosition()

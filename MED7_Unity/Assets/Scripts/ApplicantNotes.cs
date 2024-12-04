@@ -23,8 +23,8 @@ public class Applicant
 
 public class ApplicantNotes : MonoBehaviour
 {
-    [SerializeField] private int applicantAmount = 3;
-    [SerializeField] private int currentApplicantIndex = 0;
+    [SerializeField] private int applicantAmount;
+    [SerializeField] private int currentApplicantIndex;
     [SerializeField] public List<Applicant> applicants;
     [SerializeField] private Color[] possibleApplicantColours; // Possible colours for the applicants - #FEFF9C, #FF7EB9, #7AFCFF, #7AFF7A, #FFA87A
 
@@ -45,22 +45,28 @@ public class ApplicantNotes : MonoBehaviour
         // Find the GameManager object in the scene
         _gameManager = FindObjectOfType<GameManager>();
         
-        //Initialize the applicants list 
-        applicants = new List<Applicant>(); 
-        
-        // Loop through the amount of applicants and create a new Applicant object for each one
-        for (int i = 0; i < applicantAmount; i++)
-        {
-            Color applicantColor = possibleApplicantColours[i];
-            Applicant newApplicant = new Applicant(i + 1, applicantColor);
-            applicants.Add(newApplicant);
-        }
-        
+        // Initialize the applicants
+        InitializeApplicants(applicantAmount);
+
         // Add listeners to the UI buttons
         AddListenersToUI();
         
         // Update the UI to show the first applicant
         UpdateApplicantUI();
+    }
+
+    private void InitializeApplicants(int amount)
+    {
+        //Initialize the applicants list 
+        applicants = new List<Applicant>();
+
+        // Loop through the amount of applicants and create a new Applicant object for each one
+        for (int i = 0; i < amount; i++)
+        {
+            Color applicantColor = possibleApplicantColours[i];
+            Applicant newApplicant = new Applicant(i + 1, applicantColor);
+            applicants.Add(newApplicant);
+        }
     }
 
     private void AddListenersToUI()
