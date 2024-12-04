@@ -116,9 +116,10 @@ public class GameManager : NetworkBehaviour
         NetworkManager.Singleton.StartServer();
         Debug.Log("Server started");
         
-        // Disable the connect UI
         connectUIObject.SetActive(false);
         blackBackgroundUI.SetActive(false);
+        introUIObject.SetActive(false);
+        arSettingsUI.SetActive(true);
     }
 
     private void OnClientConnected(ulong clientId)
