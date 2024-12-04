@@ -11,9 +11,9 @@ using System.IO;
 public class EditorScripts : MonoBehaviour
 {
 
-    [PostProcessBuild(999)]
-    public static void OnPostProcessBuild(BuildTarget buildTarget, string path)
-    {
+	[PostProcessBuild (999)]
+	public static void OnPostProcessBuild (BuildTarget buildTarget, string path)
+	{
 #if UNITY_IOS
 
         if (buildTarget == BuildTarget.iOS)
@@ -52,50 +52,4 @@ public class EditorScripts : MonoBehaviour
 #endif
     }
 }
-
-// ensure class initializer is called whenever scripts recompile
-[InitializeOnLoadAttribute]
-public static class PlayModeStateChangedExample
-{
-    // register an event handler when the class is initialized
-    static PlayModeStateChangedExample()
-    {
-#if !UNITY_STANDALONE
-        EditorApplication.playModeStateChanged += LogPlayModeState;
-#else
-        EditorApplication.playModeStateChanged -= LogPlayModeState;
-#endif
-
-    }
-
-    private static void LogPlayModeState(PlayModeStateChange state)
-    {
-        if (UnityEditor.EditorApplication.isPlayingOrWillChangePlaymode)
-        {
-            string title = "Editor execution not available";
-            string content = "ManoMotion SDK does not support in Editor functionality on Android platform. try windows x64 platform. Please compile your project for either iOS or Android. For more help, please visit our documentation.";
-
-            string ok_button = "OK";
-            string cancel_button = "Continue anyway";
-            string alt_button = "Take me there";
-            int ans = EditorUtility.DisplayDialogComplex(title, content, ok_button, cancel_button, alt_button);
-            switch (ans)
-            {
-                case 0://ok
-                    UnityEditor.EditorApplication.isPlaying = false;
-
-                    break;
-                case 1://cancel
-                    break;
-                case 2://continue
-                    Application.OpenURL("https://www.manomotion.com/documentation/#quickstart-4");
-
-                    UnityEditor.EditorApplication.isPlaying = false;
-
-                    break;
-                default:
-                    break;
-            }
-        }
-    }
-}
+ 

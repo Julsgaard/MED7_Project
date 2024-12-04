@@ -2,8 +2,9 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+
 /// <summary>
-/// Used for visualization of camera image
+/// Used for visualization
 /// </summary>
 public struct VisualizationInfo
 {
@@ -12,8 +13,5 @@ public struct VisualizationInfo
     /// </summary>
     public Texture2D rgb_image;
 
-    /// <summary>
-    /// The Texture 2D information of the cutout image.
-    /// </summary>
-    public Texture2D occlusion_rgb;
+    public Texture2D occlussion_rgb;
 }

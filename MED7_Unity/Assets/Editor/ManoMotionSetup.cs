@@ -1,6 +1,5 @@
 ﻿using UnityEngine;
 using UnityEditor;
-using UnityEditor.Build.Content;
 #if UNITY_ANDROID
 using UnityEngine.Android;
 using System;
@@ -18,12 +17,17 @@ public class ManoMotionSetup
         Debug.Log("Setting up ManoMotion Library Requirements");
         PlayerSettings.Android.preferredInstallLocation = AndroidPreferredInstallLocation.PreferExternal;
         PlayerSettings.Android.forceInternetPermission = true;
+        PlayerSettings.Android.forceSDCardPermission = true;
         PlayerSettings.SetScriptingBackend(BuildTargetGroup.Android, ScriptingImplementation.IL2CPP);
         PlayerSettings.Android.targetArchitectures = AndroidArchitecture.ARM64;
         Debug.Log("Successfully set up ManoMotion Library Requirements");
 #endif
 #if UNITY_IOS
         int arm64Architecture = 1;
+        if (PlayerSettings.iOS.targetOSVersionString == "10.0")
+        {
+            PlayerSettings.iOS.targetOSVersionString = "11.0";
+        }
         PlayerSettings.SetArchitecture(BuildTargetGroup.iOS, arm64Architecture);
         if (PlayerSettings.iOS.cameraUsageDescription == "")
         {
@@ -31,14 +35,6 @@ public class ManoMotionSetup
         }
         PlayerSettings.SetScriptingBackend(BuildTargetGroup.iOS, ScriptingImplementation.IL2CPP);
         PlayerSettings.SetArchitecture(BuildTargetGroup.iOS, arm64Architecture);
-#endif
-#if UNITY_STANDALONE_WIN
-        if (EditorUserBuildSettings.activeBuildTarget != BuildTarget.StandaloneWindows64)
-        {
-            EditorUserBuildSettings.SwitchActiveBuildTarget(BuildTargetGroup.Standalone, BuildTarget.StandaloneWindows64);
-            Debug.Log("ManoMotion SDK needs to run with : " + BuildTarget.StandaloneWindows64);
-            Debug.Log("Build target changed to " + EditorUserBuildSettings.activeBuildTarget.ToString());
-        }
 #endif
     }
 }

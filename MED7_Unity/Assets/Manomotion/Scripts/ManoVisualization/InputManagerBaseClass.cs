@@ -1,27 +1,25 @@
 ﻿using System;
 using UnityEngine;
 using UnityEngine.Android;
-
-/// <summary>
-/// Base class for the input manager 
-/// </summary>
 public abstract class InputManagerBaseClass : MonoBehaviour
 {
 	public static Action<ManoMotionFrame> OnFrameUpdated;
 	public static Action<ManoMotionFrame> OnFrameInitialized;
 	public static Action<ManoMotionFrame> OnFrameResized;
 	public static Action<DeviceOrientation> OnOrientationChanged;
-	public static Action<AddOn> OnAddonSet;
-	public static Action OnChangeCamera;
+    public static Action<AddOn> OnAddonSet;
 
-	protected int rezMinValue;
+
+    protected int rezMinValue;
 	protected int rezMaxValue;
 
-	[HideInInspector]
-	public bool isFrontFacing;
-
-
 	protected virtual void ResizeCurrentFrameTexture(int width, int height) { }
+
+	/// <summary>
+	/// Initializes the values, such as width and height of the frame, in order to prepare a proper frame for ManoMotion tech to process.
+	/// </summary>
+	protected abstract void InitializeInputParameters();
+
 
 	/// <summary>
 	/// Forces the application to ask for camera permissions and external storage read and writte.
@@ -47,8 +45,23 @@ public abstract class InputManagerBaseClass : MonoBehaviour
 #endif
 	}
 
-	protected virtual void UpdateFrame<T>(T parameter) { }
+    public void StoragePermisionCheck()
+    {
+        if (!Permission.HasUserAuthorizedPermission(Permission.ExternalStorageWrite))
+        {
+            Permission.RequestUserPermission(Permission.ExternalStorageWrite);
+            Debug.Log("I dont have external write");
+        }
+        if (!Permission.HasUserAuthorizedPermission(Permission.ExternalStorageRead))
+        {
+            Permission.RequestUserPermission(Permission.ExternalStorageRead);
+            Debug.Log("I dont have external read");
+        }
+    }
+
+    protected virtual void UpdateFrame<T>(T parameter) { }
 	protected virtual void UpdateFrame() { }
+
 }
 
 

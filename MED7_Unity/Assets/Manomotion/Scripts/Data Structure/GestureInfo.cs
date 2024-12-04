@@ -57,14 +57,6 @@ public enum ManoGestureContinuous
 }
 ;
 
-
-public enum LeftOrRightHand
-{
-    NO_HAND = -1,
-    LEFT_HAND = 0,
-    RIGHT_HAND = 1
-};
-
 /// <summary>
 ///  Information about the gesture performed by the user.
 /// </summary>
@@ -234,7 +226,7 @@ public struct GestureInfo
     public HandSide hand_side;
 
     /// <summary>
-    /// Information if the hand visiable by the camera is right, left or no hand.
+    /// Information if the hand visiable by the camera is right or left hand.
     /// </summary>
-    public LeftOrRightHand left_right_hand;
+    public int is_right;
 }

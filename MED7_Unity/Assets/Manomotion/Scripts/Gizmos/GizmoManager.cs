@@ -472,7 +472,7 @@ public class GizmoManager : MonoBehaviour
         DisplayWristInformation();
         DisplayFingerInformation();
         DisplayContour();
-        DisplayLeftRight(gestureInfo.left_right_hand);
+        DisplayLeftRight(gestureInfo.is_right);
     }
 
     #region Display Methods
@@ -490,17 +490,9 @@ public class GizmoManager : MonoBehaviour
 
         wristInformationGizmo.SetActive(ShowWristInfo);
 
-        try
+        if (ShowWristInfo)
         {
-            if (ShowWristInfo)
-            {
-                wristInfoGizmo.ShowWristInformation();
-            }
-
-        }
-        catch (Exception)
-        {
-            Debug.Log("Cant show wrist information");
+            wristInfoGizmo.ShowWristInformation();
         }
     }
 
@@ -517,19 +509,10 @@ public class GizmoManager : MonoBehaviour
 
         fingerInformationGizmo.SetActive(ShowFingerInfo);
 
-        try
+        if (ShowFingerInfo)
         {
-            if (ShowFingerInfo)
-            {
-                fingerInfoGizmo.ShowFingerInformation();
-            }
+            fingerInfoGizmo.ShowFingerInformation();
         }
-
-        catch (Exception)
-        {
-
-        }
-
     }
 
     /// <summary>
@@ -538,17 +521,10 @@ public class GizmoManager : MonoBehaviour
     private void DisplayContour()
     {
         contourInformationGizmo.SetActive(ShowContour);
-        try
-        {
-            if (ShowContour)
-            {
-                contourGizmo.ShowContour();
-            }
-        }
 
-        catch (Exception)
+        if (ShowContour)
         {
-            Debug.Log("Cant show hand contour");
+            contourGizmo.ShowContour();
         }
     }
 
@@ -690,7 +666,7 @@ public class GizmoManager : MonoBehaviour
     /// Displays wich hand currently facing the camera.
     /// </summary>
     /// <param name="isRight">Requiers the isRight from Gesture Inforamtion</param>
-    void DisplayLeftRight(LeftOrRightHand isRight)
+    void DisplayLeftRight(int isRight)
     {
         leftRightGizmo.SetActive(ShowGestureAnalysis);
 
@@ -698,19 +674,16 @@ public class GizmoManager : MonoBehaviour
         {
             switch (isRight)
             {
-                case LeftOrRightHand.NO_HAND:
-                    leftRightText.text = "Hand: None";
-                    break;
-                case LeftOrRightHand.LEFT_HAND:
+                case 0:
                     leftRightText.text = "Hand: Left";
                     break;
-                case LeftOrRightHand.RIGHT_HAND:
-                    leftRightText.text = "Hand: Right";                
+                case 1:
+                    leftRightText.text = "Hand: Right";
                     break;
                 default:
                     leftRightText.text = "Hand: None";
                     break;
-            }       
+            }
         }
     }
 

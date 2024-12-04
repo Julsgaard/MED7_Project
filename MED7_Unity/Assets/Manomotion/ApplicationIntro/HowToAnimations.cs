@@ -96,8 +96,6 @@ public class HowToAnimations : MonoBehaviour
     string clickAnimationName = "ClickAnimation";
     string grabAnimationName = "GrabAnimation";
     string releaseAnimationName = "ReleaseAnimation";
-    string swipeRightAnimationName = "SwipeLeftAnimation";
-    string swipeLeftAnimationName = "SwipeRightAnimation";
 
     public void ShowHowToPick()
     {
@@ -107,17 +105,6 @@ public class HowToAnimations : MonoBehaviour
     public void ShowHowToDrop()
     {
         gestureAnimator.Play(dropAnimationName);
-    }
-
-    public void ShowHowToSwipeRight()
-    {
-        gestureAnimator.Play(swipeRightAnimationName);
-    }
-
-
-    public void ShowHowToSwipeLeft()
-    {
-        gestureAnimator.Play(swipeLeftAnimationName);
     }
 
     public void ShowHowToClick()

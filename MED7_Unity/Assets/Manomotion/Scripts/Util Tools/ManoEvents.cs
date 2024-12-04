@@ -43,6 +43,8 @@ public class ManoEvents : MonoBehaviour
 	[SerializeField]
 	private Animator lowPowerAnimator;
 
+	private string debugMessage = "";
+
 	private void Awake()
 	{
 		if (!_instance)

@@ -28,7 +28,6 @@ namespace ManoMotion.RunTime
         private bool showReleaseTriggerGesture;
         private bool showSmoothingSlider;
         private bool showDepthEstimation;
-        private bool showBackground;
         private bool showSkeleton3d;
         private bool showGestures;
         private bool runFastMode;
@@ -171,19 +170,6 @@ namespace ManoMotion.RunTime
             {
                 Debug.Log("Cant find Category Manager");
             }
-        }
-
-        /// <summary>
-        /// Sets the Background Visualization condition.
-        /// </summary>
-        /// <param name="condition">If set to <c>true</c> condition.</param>
-        public void ShouldShowBackground(bool condition)
-        {
-            if (!manoVisualization.enabled)
-            {
-                manoVisualization.enabled = true;
-            }
-            manoVisualization.ShowBackgroundLayer = condition;
         }
 
         /// <summary>
@@ -575,8 +561,7 @@ namespace ManoMotion.RunTime
             showClickTriggerGesture = gizmoManager.ShowClickTriggerGesture;
             showSwipeVerticalTriggerGesture = gizmoManager.ShowSwipeVerticalTriggerGesture;
             showSwipeHorizontalTriggerGesture = gizmoManager.ShowSwipeHorizontalTriggerGesture;
-            showGrabTriggerGesture = gizmoManager.ShowGrabTriggerGesture;
-            showBackground = manoVisualization.ShowBackgroundLayer;
+            showGrabTriggerGesture = gizmoManager.ShowGrabTriggerGesture;         
             showReleaseTriggerGesture = gizmoManager.ShowReleaseTriggerGesture;
             showSkeleton3d = gizmoManager.ShowSkeleton3d;
             showGestures = gizmoManager.ShowGestures;
@@ -650,10 +635,6 @@ namespace ManoMotion.RunTime
             {
                 defaultFunctionality.Add(UIIconBehavior.IconFunctionality.TriggerRelease);
             }
-            if (showBackground)
-            {
-                defaultFunctionality.Add(UIIconBehavior.IconFunctionality.Background);
-            }
             if (showSkeleton3d)
             {
                 defaultFunctionality.Add(UIIconBehavior.IconFunctionality.Skeleton3d);
@@ -698,7 +679,6 @@ namespace ManoMotion.RunTime
         private void SetManoMotionDefaultFeaturesToDisplay()
         {
             ShouldShowGestureAnalysis(showGestureAnalysis);
-            ShouldShowBackground(showBackground);
             ShouldShowHandSide(showHandSide);
             ShouldShowWarnings(showWarnings);
             ShouldShowManoclass(showManoClass);
