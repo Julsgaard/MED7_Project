@@ -1,6 +1,9 @@
+<<<<<<< HEAD
 using System;
 using System.Collections.Generic;
 using System.Net;
+=======
+>>>>>>> 959e8a58d800dc9724356324a1570980aa1e7c27
 using TMPro;
 using Unity.Collections;
 using Unity.Netcode;
@@ -16,14 +19,19 @@ public class GameManager : NetworkBehaviour
     [SerializeField] private GameObject connectUIObject, introUIObject, createApplicantUIObject, blackBackgroundUI, arSettingsUI;
     [SerializeField] private Button nextButton, connectToServerButton, connectToServerButtonOptions, serverButton, moveAllNotesUpButton;
     [SerializeField] private ApplicantNotes applicantNotes;
+<<<<<<< HEAD
+    //[SerializeField] private SharedNetworking sharedNetworking;
     
     [Header("PostIt Spawn Layout")]
     [SerializeField] private GameObject postItParent;
     [SerializeField] private GameObject postItNotePrefab;
-    private bool _notesSentToServer = false;
     [SerializeField] private float sameApplicantOffset = .03f;
     [SerializeField] private float diffApplicantOffset = .05f;
     
+=======
+    [SerializeField] private GameObject postItNotePrefab;
+    private bool _notesSentToServer = false;
+>>>>>>> 959e8a58d800dc9724356324a1570980aa1e7c27
     
     // Set the default IP address for the UI input field
     private void Awake()
@@ -123,6 +131,9 @@ public class GameManager : NetworkBehaviour
 
     private void OnClientConnected(ulong clientId)
     {
+<<<<<<< HEAD
+        Debug.Log($"Client {clientId} connected");
+=======
         if (IsClient && NetworkManager.Singleton.IsConnectedClient)
         {
             Debug.Log($"Client {clientId} connected to the server");
@@ -147,6 +158,7 @@ public class GameManager : NetworkBehaviour
         {
             Debug.Log($"Client {clientId} connected to the server");
         }
+>>>>>>> 959e8a58d800dc9724356324a1570980aa1e7c27
     }
 
     private void OnClientDisconnected(ulong clientId)
@@ -166,10 +178,27 @@ public class GameManager : NetworkBehaviour
             Debug.Log($"Client {clientId} disconnected from the server");
         }
     }
+<<<<<<< HEAD
+    
+    public void SpawnPostItNote()
+    {
+        List<GameObject> postItNotes = new List<GameObject>();
+        
+        float currentBaseOffsetX = 0;
+        float totalOffsetX = 0;
+        
+        float postItWidth = postItNotePrefab.transform.localScale.x;
+        float sameApplicantNoteOffset = postItWidth + (postItWidth * sameApplicantOffset);
+        
+        float applicantNum = 0;
+        float noteNum = 0;
+        
+=======
 
     private void SendAllNotesToServer()
     {
         // loop through all applicants and their notes
+>>>>>>> 959e8a58d800dc9724356324a1570980aa1e7c27
         foreach (var applicant in applicantNotes.applicants)
         {
             float currApplicantNumNotes = applicant.notes.Count;
@@ -181,6 +210,65 @@ public class GameManager : NetworkBehaviour
             
             foreach (var noteText in applicant.notes)
             {
+<<<<<<< HEAD
+                GameObject postItNoteObj = SetupNoteForNetwork();
+                
+                postItNotes.Add(postItNoteObj);
+                
+                postItNoteObj.transform.SetParent(postItParent.transform);
+                
+                // Calculate positions
+                float posX = currentBaseOffsetX + currNoteX * sameApplicantNoteOffset;
+                float posZ = currNoteY * sameApplicantNoteOffset;
+
+                postItNoteObj.transform.position = new Vector3(posX, 0, posZ);
+            
+                Debug.Log($"Note Position: ({posX}, {posZ})");
+
+                // Increment positions
+                currNoteX++;
+                if (currNoteX >= currApplicantNumCols) 
+                {
+                    currNoteX = 0;
+                    currNoteY++;
+                }
+                
+                // float posX = currentBaseOffsetX + currNoteX * sameApplicantNoteOffset + curr;
+                // float newZpos = currNoteY % currApplicantNumCols;
+                // Debug.Log($"NewZpos: {newZpos}");
+                // float posZ = newZpos * sameApplicantNoteOffset;
+                // //float posZ = (currNoteY % currApplicantNumCols) * sameApplicantNoteOffset + currNoteYLayer * sameApplicantNoteOffset;
+                // postItNoteObj.transform.position = new Vector3(posX, 0, posZ);
+                //
+                // //Debug.Log($"NoteX for Note {noteNum}: {currNoteX}");
+                //
+                // // if new line, we want x pos to be 0 again, otherwise increment
+                // if (currNoteY % currApplicantNumCols == 0)
+                // {
+                //     currNoteX = 0;
+                //     //currNoteYLayer++;
+                // }
+                // else
+                // {
+                //     currNoteX++;
+                // }
+                //
+                // currNoteY++;
+
+                // Set the text for the note
+                TextMeshPro textMeshPro = postItNoteObj.GetComponentInChildren<TextMeshPro>();
+                textMeshPro.text = noteText;
+                
+                // Set the color for the note
+                Renderer r = postItNoteObj.GetComponent<Renderer>();
+                r.material.color = applicant.applicantColour;
+                
+                Debug.Log($"Calculating pos for Note {noteNum}: ({posX},{posZ}) BaseOffset is {currentBaseOffsetX}) + noteX is {currNoteX}," +
+                          $"noteY is {currNoteY}, currYLayer is {currNoteYLayer}." +
+                          $"nulCols: {currApplicantNumCols}");
+
+                noteNum++;
+=======
                 // Check if the note text is note empty or null
                 if (noteText != "" && noteText != null)
                 {
@@ -188,7 +276,22 @@ public class GameManager : NetworkBehaviour
                     CreateNoteServerRpc(noteText, applicant.applicantColour, applicant.applicantNumber);
                     Debug.Log($"Note sent to server: {noteText}");
                 }
+>>>>>>> 959e8a58d800dc9724356324a1570980aa1e7c27
             }
+
+            totalOffsetX += (sameApplicantNoteOffset * currApplicantNumCols) // full width of current appl. notes
+                            - sameApplicantOffset;
+            
+            // if we want to add for another applicant, we set the new corner for where to begin by adding the offset
+            applicantNum++;
+            currentBaseOffsetX = totalOffsetX + (diffApplicantOffset * postItWidth * applicantNum);
+        }
+        
+        Vector3 offsetXVector = new Vector3(currentBaseOffsetX / 2, 0, 0);
+
+        foreach (var note in postItNotes)
+        {
+            note.gameObject.transform.position -= offsetXVector;
         }
     }
     
@@ -210,6 +313,16 @@ public class GameManager : NetworkBehaviour
         // Get the PostItNoteNetwork component from the PostItNoteObject
         PostItNoteNetwork postItNoteNetwork = postItNoteObject.GetComponent<PostItNoteNetwork>();
 
+<<<<<<< HEAD
+    private GameObject SetupNoteForNetwork()
+    {
+        GameObject postItNoteObj = Instantiate(postItNotePrefab);
+        NetworkObject networkObject = postItNoteObj.GetComponent<NetworkObject>();
+        networkObject.Spawn();
+        return postItNoteObj;
+    }
+
+=======
         // Set the note data directly on the server
         postItNoteNetwork.noteText.Value = new FixedString512Bytes(text);
         postItNoteNetwork.noteColor.Value = color;
@@ -223,4 +336,5 @@ public class GameManager : NetworkBehaviour
         
         return new Vector3(0, 0, 0);
     }
+>>>>>>> 959e8a58d800dc9724356324a1570980aa1e7c27
 }

@@ -12,9 +12,10 @@
       <change beforePath="$PROJECT_DIR$/Assets/Prefabs/Post-it Note.prefab" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Prefabs/Post-it Note.prefab" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Assets/Scenes/ARMarker.unity" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scenes/ARMarker.unity" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Assets/Scenes/PostItCanvas.unity" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scenes/PostItCanvas.unity" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Scenes/SampleScene.unity" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scenes/SampleScene.unity" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Prefabs/Applicant Notes InputField (TMP).prefab" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Prefabs/Applicant Notes InputField (TMP).prefab" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Assets/Scripts/GameManager.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/GameManager.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Settings/URP-Performant.asset" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Settings/URP-Performant.asset" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Scripts/NoteManager.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/NoteManager.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Scripts/PostItNoteNetwork.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/PostItNoteNetwork.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ProjectSettings/ProjectSettings.asset" beforeDir="false" afterPath="$PROJECT_DIR$/ProjectSettings/ProjectSettings.asset" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -42,6 +43,7 @@
 }</component>
   <component name="HighlightingSettingsPerFile">
     <setting file="file://$PROJECT_DIR$/Assets/scripts/ApplicantNotes.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Assets/Scripts/GameManager.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/scripts/PostItNoteNetwork.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Library/PackageCache/com.unity.netcode.gameobjects@1.11.0/Runtime/Core/NetworkManager.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Library/PackageCache/com.unity.netcode.gameobjects@1.11.0/Runtime/Core/NetworkObject.cs" root0="SKIP_HIGHLIGHTING" />
@@ -145,6 +147,12 @@
       <workItem from="1732602046236" duration="12594000" />
       <workItem from="1733019435784" duration="6561000" />
       <workItem from="1733198181776" duration="2776000" />
+      <workItem from="1733284901729" duration="62000" />
+      <workItem from="1733285182355" duration="75000" />
+      <workItem from="1733285293134" duration="147000" />
+      <workItem from="1733286504285" duration="252000" />
+      <workItem from="1733286974107" duration="128000" />
+      <workItem from="1733289831614" duration="6115000" />
       <workItem from="1733256595122" duration="8352000" />
     </task>
     <servers />

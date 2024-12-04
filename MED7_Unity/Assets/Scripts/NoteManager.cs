@@ -9,6 +9,12 @@ public class NoteManager : MonoBehaviour
     
     private void Awake()
     {
+        // Singleton
+        if (Instance != null && Instance != this)
+        {
+            Destroy(gameObject);
+            return;
+        }
         Instance = this;
     }
 
@@ -17,6 +23,7 @@ public class NoteManager : MonoBehaviour
         if (!notes.Contains(note))
         {
             notes.Add(note);
+            //Debug.Log("Note registered");
         }
     }
 
