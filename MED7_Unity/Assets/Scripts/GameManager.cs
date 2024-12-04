@@ -1,3 +1,5 @@
+using System;
+using System.Collections.Generic;
 using System.Net;
 using TMPro;
 using Unity.Netcode;
@@ -15,7 +17,13 @@ public class GameManager : MonoBehaviour
     [SerializeField] private Button nextButton, connectToServerButton, connectToServerButtonOptions, serverButton, moveAllNotesUpButton;
     [SerializeField] private ApplicantNotes applicantNotes;
     //[SerializeField] private SharedNetworking sharedNetworking;
+    
+    [Header("PostIt Spawn Layout")]
+    [SerializeField] private GameObject postItParent;
     [SerializeField] private GameObject postItNotePrefab;
+    [SerializeField] private float sameApplicantOffset = .03f;
+    [SerializeField] private float diffApplicantOffset = .05f;
+    
     
     // Set the default IP address for the UI input field
     private void Awake()
@@ -141,7 +149,6 @@ public class GameManager : MonoBehaviour
     private void OnClientConnected(ulong clientId)
     {
         Debug.Log($"Client {clientId} connected");
-        SpawnPostItNote();
     }
 
     private void OnClientDisconnected(ulong clientId)
@@ -149,26 +156,111 @@ public class GameManager : MonoBehaviour
         Debug.Log($"Client {clientId} disconnected");
     }
     
-    private void SpawnPostItNote()
+    public void SpawnPostItNote()
     {
+        List<GameObject> postItNotes = new List<GameObject>();
+        
+        float currentBaseOffsetX = 0;
+        float totalOffsetX = 0;
+        
+        float postItWidth = postItNotePrefab.transform.localScale.x;
+        float sameApplicantNoteOffset = postItWidth + (postItWidth * sameApplicantOffset);
+        
+        float applicantNum = 0;
+        float noteNum = 0;
+        
         foreach (var applicant in applicantNotes.applicants)
         {
+            float currApplicantNumNotes = applicant.notes.Count;
+            float currApplicantNumCols = (float)Math.Round(Math.Sqrt(currApplicantNumNotes));
+
+            float currNoteX = 0;
+            float currNoteY = 0;
+            float currNoteYLayer = 0;
+            
             foreach (var noteText in applicant.notes)
             {
-                GameObject postItNoteObj = Instantiate(postItNotePrefab);
-                NetworkObject networkObject = postItNoteObj.GetComponent<NetworkObject>();
-                networkObject.Spawn();
-                postItNoteObj.transform.position = new Vector3(0, 0, 0);
+                GameObject postItNoteObj = SetupNoteForNetwork();
+                
+                postItNotes.Add(postItNoteObj);
+                
+                postItNoteObj.transform.SetParent(postItParent.transform);
+                
+                // Calculate positions
+                float posX = currentBaseOffsetX + currNoteX * sameApplicantNoteOffset;
+                float posZ = currNoteY * sameApplicantNoteOffset;
+
+                postItNoteObj.transform.position = new Vector3(posX, 0, posZ);
+            
+                Debug.Log($"Note Position: ({posX}, {posZ})");
+
+                // Increment positions
+                currNoteX++;
+                if (currNoteX >= currApplicantNumCols) 
+                {
+                    currNoteX = 0;
+                    currNoteY++;
+                }
+                
+                // float posX = currentBaseOffsetX + currNoteX * sameApplicantNoteOffset + curr;
+                // float newZpos = currNoteY % currApplicantNumCols;
+                // Debug.Log($"NewZpos: {newZpos}");
+                // float posZ = newZpos * sameApplicantNoteOffset;
+                // //float posZ = (currNoteY % currApplicantNumCols) * sameApplicantNoteOffset + currNoteYLayer * sameApplicantNoteOffset;
+                // postItNoteObj.transform.position = new Vector3(posX, 0, posZ);
+                //
+                // //Debug.Log($"NoteX for Note {noteNum}: {currNoteX}");
+                //
+                // // if new line, we want x pos to be 0 again, otherwise increment
+                // if (currNoteY % currApplicantNumCols == 0)
+                // {
+                //     currNoteX = 0;
+                //     //currNoteYLayer++;
+                // }
+                // else
+                // {
+                //     currNoteX++;
+                // }
+                //
+                // currNoteY++;
 
                 // Set the text for the note
-                // TextMeshProUGUI textMeshPro = postItNoteObj.GetComponentInChildren<TextMeshProUGUI>();
-                // textMeshPro.text = noteText;
-                //
-                // // Set the color for the note
-                // Renderer renderer = postItNoteObj.GetComponent<Renderer>();
-                // renderer.material.color = applicant.applicantColour;
+                TextMeshPro textMeshPro = postItNoteObj.GetComponentInChildren<TextMeshPro>();
+                textMeshPro.text = noteText;
+                
+                // Set the color for the note
+                Renderer r = postItNoteObj.GetComponent<Renderer>();
+                r.material.color = applicant.applicantColour;
+                
+                Debug.Log($"Calculating pos for Note {noteNum}: ({posX},{posZ}) BaseOffset is {currentBaseOffsetX}) + noteX is {currNoteX}," +
+                          $"noteY is {currNoteY}, currYLayer is {currNoteYLayer}." +
+                          $"nulCols: {currApplicantNumCols}");
+
+                noteNum++;
             }
+
+            totalOffsetX += (sameApplicantNoteOffset * currApplicantNumCols) // full width of current appl. notes
+                            - sameApplicantOffset;
+            
+            // if we want to add for another applicant, we set the new corner for where to begin by adding the offset
+            applicantNum++;
+            currentBaseOffsetX = totalOffsetX + (diffApplicantOffset * postItWidth * applicantNum);
         }
+        
+        Vector3 offsetXVector = new Vector3(currentBaseOffsetX / 2, 0, 0);
+
+        foreach (var note in postItNotes)
+        {
+            note.gameObject.transform.position -= offsetXVector;
+        }
+    }
+
+    private GameObject SetupNoteForNetwork()
+    {
+        GameObject postItNoteObj = Instantiate(postItNotePrefab);
+        NetworkObject networkObject = postItNoteObj.GetComponent<NetworkObject>();
+        networkObject.Spawn();
+        return postItNoteObj;
     }
 
 }
