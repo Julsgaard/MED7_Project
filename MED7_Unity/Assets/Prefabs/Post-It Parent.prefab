@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 4727038436850642606}
   - component: {fileID: 405066775424205574}
   - component: {fileID: 5037368199805456328}
-  m_Layer: 0
+  m_Layer: 2
   m_Name: Post-It Parent
   m_TagString: Post-it
   m_Icon: {fileID: 0}
@@ -132,7 +132,12 @@ PrefabInstance:
     - target: {fileID: -458700418956170796, guid: 84fa2a5ce9505694a99d354030f5980b,
         type: 3}
       propertyPath: GlobalObjectIdHash
-      value: 3661129062
+      value: 2607240870
+      objectReference: {fileID: 0}
+    - target: {fileID: 2037536391496986482, guid: 84fa2a5ce9505694a99d354030f5980b,
+        type: 3}
+      propertyPath: m_Layer
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 4817498718479513028, guid: 84fa2a5ce9505694a99d354030f5980b,
         type: 3}
@@ -203,6 +208,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: Post-it Note
+      objectReference: {fileID: 0}
+    - target: {fileID: 8494581529409893070, guid: 84fa2a5ce9505694a99d354030f5980b,
+        type: 3}
+      propertyPath: m_Layer
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

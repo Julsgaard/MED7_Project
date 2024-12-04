@@ -69,4 +69,13 @@ public class PostItNote : NetworkBehaviour
         // Change the text of the note
         GetComponentInChildren<TextMeshPro>().text = note;
     }
+
+    public void updatePosition(Vector3 movement)
+    {
+        GetComponent<Renderer>().material.color = Color.green;
+        Transform orgParent = GetComponent<Transform>().parent;
+        GetComponent<Transform>().parent = null;
+        gameObject.transform.localPosition += movement;
+        GetComponent<Transform>().parent = orgParent;
+    }
 }
