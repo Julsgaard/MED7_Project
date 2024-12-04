@@ -183,6 +183,9 @@ public class ApplicantNotes : MonoBehaviour
             inputFieldComponent.onValueChanged.AddListener((text) =>
             {
                 currentApplicant.notes[index] = text;
+                
+                // Update the size of the input field
+                LayoutRebuilder.ForceRebuildLayoutImmediate(notesParent.GetComponent<RectTransform>());
             });
         }
     }
