@@ -37,7 +37,6 @@ public class ApplicantNotes : MonoBehaviour
     [SerializeField] private GameObject addAndRemoveNotesObject;
     [SerializeField] private GameObject applicantInputFieldPrefab;
     [SerializeField] private Button yesButton, noButton;
-    
     private GameManager _gameManager;
     
     private void Awake()
@@ -187,7 +186,4 @@ public class ApplicantNotes : MonoBehaviour
             });
         }
     }
-    
-    
-    
 }

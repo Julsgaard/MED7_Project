@@ -56,12 +56,11 @@ public class PostItNoteNetwork : NetworkBehaviour //TODO: DOES NOT WORK, IT JUST
             Vector3 newPosition = GenerateRandomPosition();
             RequestMoveServerRpc(newPosition);
         }
-
-        /*if (IsServer)
+        if (IsServer)
         {
             Vector3 newPosition = GenerateRandomPosition();
             notePosition.Value = newPosition;
-        }*/
+        }
     }
 
     [ServerRpc(RequireOwnership = false)]

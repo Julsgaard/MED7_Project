@@ -23,7 +23,7 @@ public class NoteManager : MonoBehaviour
         if (!notes.Contains(note))
         {
             notes.Add(note);
-            Debug.Log("Note registered");
+            //Debug.Log("Note registered");
         }
     }
 

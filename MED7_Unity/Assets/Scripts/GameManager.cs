@@ -134,7 +134,6 @@ public class GameManager : NetworkBehaviour
             // Unsubscribe from the callback to prevent multiple subscriptions
             NetworkManager.Singleton.OnClientConnectedCallback -= OnClientConnected;
         }
-
         if (IsServer)
         {
             Debug.Log($"Client {clientId} connected to the server");
@@ -143,16 +142,16 @@ public class GameManager : NetworkBehaviour
 
     private void OnClientDisconnected(ulong clientId)
     {
-        if (IsClient && !NetworkManager.Singleton.IsConnectedClient)
+        if (IsClient)
         {
             Debug.Log($"Client {clientId} disconnected from the server");
 
-            //TODO: Handle UI updates or reconnection if the client disconnects
+            // Enable the connect UI
+            connectUIObject.SetActive(true); 
             
             // Unsubscribe from the callback
             NetworkManager.Singleton.OnClientDisconnectCallback -= OnClientDisconnected;
         }
-
         if (IsServer)
         {
             Debug.Log($"Client {clientId} disconnected from the server");
@@ -161,12 +160,15 @@ public class GameManager : NetworkBehaviour
 
     private void SendAllNotesToServer()
     {
+        // loop through all applicants and their notes
         foreach (var applicant in applicantNotes.applicants)
         {
             foreach (var noteText in applicant.notes)
             {
+                // Check if the note text is note empty or null
                 if (noteText != "" && noteText != null)
                 {
+                    // Send the note to the server
                     CreateNoteServerRpc(noteText, applicant.applicantColour, applicant.applicantNumber);
                     Debug.Log($"Note sent to server: {noteText}");
                 }
@@ -174,36 +176,27 @@ public class GameManager : NetworkBehaviour
         }
     }
     
+    // Server RPC method for creating the note on the server, it is called by the client when connected to the server
+    // RequireOnwership is set to false, it allows the client to create the note on the server
     [ServerRpc(RequireOwnership = false)]
     public void CreateNoteServerRpc(string text, Color color, int applicantNumber, ServerRpcParams rpcParams = default)
     {
+        // Creating the note GameObject
         GameObject postItNoteObject = Instantiate(postItNotePrefab);
         
+        // Set the position of the note
         postItNoteObject.transform.position = GetNotePosition(applicantNumber);
         
-        PostItNoteNetwork postItNoteNetwork = postItNoteObject.GetComponent<PostItNoteNetwork>();
-        
-        if (postItNoteNetwork != null)
-        {
-            // Set the note data directly on the server
-            postItNoteNetwork.noteText.Value = new FixedString512Bytes(text);
-            postItNoteNetwork.noteColor.Value = color;
-        }
-        else
-        {
-            Debug.LogError("PostItNoteNetwork component is missing on the postItNotePrefab.");
-        }
-        
+        // Get NetworkObject and spawn it
         NetworkObject networkObject = postItNoteObject.GetComponent<NetworkObject>();
+        networkObject.Spawn();
+        
+        // Get the PostItNoteNetwork component from the PostItNoteObject
+        PostItNoteNetwork postItNoteNetwork = postItNoteObject.GetComponent<PostItNoteNetwork>();
 
-        if (networkObject != null)
-        {
-            networkObject.Spawn();
-        }
-        else
-        {
-            Debug.LogError("NetworkObject component is missing on the postItNotePrefab.");
-        }
+        // Set the note data directly on the server
+        postItNoteNetwork.noteText.Value = new FixedString512Bytes(text);
+        postItNoteNetwork.noteColor.Value = color;
     }
 
     // TODO: LORD LINUS!
@@ -214,5 +207,4 @@ public class GameManager : NetworkBehaviour
         
         return new Vector3(0, 0, 0);
     }
-    
 }
