@@ -68,10 +68,11 @@ public class FingerCollider : MonoBehaviour
     {
         thisMaterial.color = Color.yellow;
         Vector3 screenPoint = Camera.main.WorldToScreenPoint(gameObject.transform.position);
+        Vector3 realRay = gameObject.transform.position - screenPoint;
         Debug.Log(screenPoint);
         GetComponentInChildren<TextMeshPro>().text = screenPoint.ToString();
         Ray cameraRay = Camera.main.ScreenPointToRay(screenPoint);
-        RaycastHit[] hits = Physics.RaycastAll(cameraRay, Mathf.Infinity, 3);
+        RaycastHit[] hits = Physics.RaycastAll(screenPoint, realRay, 10000, 3);
         Debug.DrawLine(Camera.main.WorldToScreenPoint(gameObject.transform.position), gameObject.transform.position, Color.blue);
         if (hits.Length == 0)
         {
