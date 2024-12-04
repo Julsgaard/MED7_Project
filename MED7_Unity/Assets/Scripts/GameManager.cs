@@ -79,7 +79,6 @@ public class GameManager : NetworkBehaviour
     private void MoveAllNotesUp()
     {
         NoteManager.Instance.MoveAllNotes();
-        //NoteManager.Instance.SetNoteData();
     }
     
     // Method for connecting to the server

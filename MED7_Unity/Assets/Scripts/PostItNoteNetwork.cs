@@ -20,11 +20,8 @@ public class PostItNoteNetwork : NetworkBehaviour //TODO: DOES NOT WORK, IT JUST
         OnPositionChanged(Vector3.zero, notePosition.Value);
         OnTextChanged(new FixedString512Bytes(), noteText.Value);
         OnColorChanged(Color.magenta, noteColor.Value);
-
-        if (IsServer)
-        {
-            NoteManager.Instance.RegisterNote(this);
-        }
+        
+        NoteManager.Instance.RegisterNote(this);
     }
 
     private void OnPositionChanged(Vector3 oldPosition, Vector3 newPosition)
@@ -64,7 +61,7 @@ public class PostItNoteNetwork : NetworkBehaviour //TODO: DOES NOT WORK, IT JUST
     }
 
     [ServerRpc(RequireOwnership = false)]
-    private void RequestMoveServerRpc(Vector3 newPosition, ServerRpcParams rpcParams = default)
+    public void RequestMoveServerRpc(Vector3 newPosition, ServerRpcParams rpcParams = default)
     {
         // Server updates the note position
         notePosition.Value = newPosition;
