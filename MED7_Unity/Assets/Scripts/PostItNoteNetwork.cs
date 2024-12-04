@@ -57,16 +57,16 @@ public class PostItNoteNetwork : NetworkBehaviour //TODO: DOES NOT WORK, IT JUST
         {
             // Set the note text and colour
             // Convert string to FixedString512Bytes
-            FixedString512Bytes fixedString = new FixedString512Bytes();
-            fixedString.CopyFrom(textData);
-        
-            // Set the note text
-            noteText.Value = fixedString;
-            
-            // Set the note colour
-            noteColor.Value = colorData;
-            
-            Debug.Log("SERVER SET NOTE DATA");
+            // FixedString512Bytes fixedString = new FixedString512Bytes();
+            // fixedString.CopyFrom(textData);
+            //
+            // // Set the note text
+            // noteText.Value = fixedString;
+            //
+            // // Set the note colour
+            // noteColor.Value = colorData;
+            //
+            // Debug.Log("SERVER SET NOTE DATA");
         }
     }
     // private string ConvertFixedString512BytesToString(FixedString512Bytes fixedString)

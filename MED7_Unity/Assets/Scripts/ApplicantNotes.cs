@@ -45,16 +45,16 @@ public class ApplicantNotes : MonoBehaviour
         // Find the GameManager object in the scene
         _gameManager = FindObjectOfType<GameManager>();
         
-        // Initialize the applicants list 
-        // applicants = new List<Applicant>(); //TODO: REMEMBER TO UNCOMMENT THIS - IT IS ONLY FOR TESTING - IT USES THE INFO IN THE INSPECTOR INSTEAD
-        //
-        // // Loop through the amount of applicants and create a new Applicant object for each one
-        // for (int i = 0; i < applicantAmount; i++)
-        // {
-        //     Color applicantColor = possibleApplicantColours[i];
-        //     Applicant newApplicant = new Applicant(i + 1, applicantColor);
-        //     applicants.Add(newApplicant);
-        // }
+        //Initialize the applicants list 
+        applicants = new List<Applicant>(); 
+        
+        // Loop through the amount of applicants and create a new Applicant object for each one
+        for (int i = 0; i < applicantAmount; i++)
+        {
+            Color applicantColor = possibleApplicantColours[i];
+            Applicant newApplicant = new Applicant(i + 1, applicantColor);
+            applicants.Add(newApplicant);
+        }
         
         // Add listeners to the UI buttons
         AddListenersToUI();
