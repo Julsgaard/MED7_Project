@@ -102,7 +102,7 @@ public class FingerCollider : MonoBehaviour
 
     private void movePostIt(PostItNoteNetwork currentPostIt)
     {
-        Vector3 movePos = oldPos - gameObject.transform.position;
+        Vector3 movePos = gameObject.transform.position - oldPos;
         movePos = new Vector3(movePos.x, 0, movePos.z);
         currentPostIt.RequestMoveNote(movePos);
         oldPos = gameObject.transform.position;
