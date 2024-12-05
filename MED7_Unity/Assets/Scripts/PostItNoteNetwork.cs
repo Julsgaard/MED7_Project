@@ -3,7 +3,7 @@ using Unity.Collections;
 using Unity.Netcode;
 using UnityEngine;
 
-public class PostItNoteNetwork : NetworkBehaviour //TODO: DOES NOT WORK, IT JUST SPAWNS THE NOTE INFO FROM THE SERVER
+public class PostItNoteNetwork : NetworkBehaviour
 {
     public  NetworkVariable<Vector3> notePosition = new NetworkVariable<Vector3>();
     public  NetworkVariable<FixedString512Bytes> noteText = new NetworkVariable<FixedString512Bytes>();

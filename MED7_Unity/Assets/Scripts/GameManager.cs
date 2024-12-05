@@ -4,16 +4,19 @@ using Unity.Collections;
 using Unity.Netcode;
 using Unity.Netcode.Transports.UTP;
 using UnityEngine;
+using UnityEngine.Serialization;
 using UnityEngine.UI;
 
 public class GameManager : NetworkBehaviour
 {
-    [SerializeField] private string defaultIpAddress; //TODO: Does not work for some reason - It connects to NetworkManager IP
+    [Header("Network Manager IP")]
+    [SerializeField] private string defaultIpAddress;
+    
+    [Header("UI Objects")]
     [SerializeField] private TMP_InputField ipAddressInputField;
-    //[SerializeField] private TMP_InputField portInputField;
     [SerializeField] private GameObject connectUIObject, introUIObject, createApplicantUIObject, blackBackgroundUI, arSettingsUI;
     [SerializeField] private Button nextButton, connectToServerButton, connectToServerButtonOptions, serverButton, moveAllNotesUpButton;
-    [SerializeField] private ApplicantNotes applicantNotes;
+    [SerializeField] private GameObject xrOrigin, arSession, windowsCamera;
     
     [Header("PostIt Spawn Layout")]
     [SerializeField] private GameObject postItParent;
@@ -21,6 +24,9 @@ public class GameManager : NetworkBehaviour
     private bool _notesSentToServer = false;
     [SerializeField] private float sameApplicantOffset = .03f;
     [SerializeField] private float diffApplicantOffset = .05f;
+    
+    [Header("Script References")]
+    [SerializeField] private ApplicantNotes applicantNotes;
     
     
     // Set the default IP address for the UI input field
@@ -30,8 +36,6 @@ public class GameManager : NetworkBehaviour
         
         // Set the input field text to the default IP address
         ipAddressInputField.text = defaultIpAddress;
-        
-        //TODO: Disable the Camera. Right now the blackBackgroundUI is used to hide the camera view
         
         ShowIntroUI();
     }
@@ -43,6 +47,20 @@ public class GameManager : NetworkBehaviour
         createApplicantUIObject.SetActive(false);
         arSettingsUI.SetActive(false);
         connectUIObject.SetActive(false);
+        
+        // Changes based on platform
+#if UNITY_ANDROID && !UNITY_EDITOR
+        // Android specific changes not in editor
+        serverButton.gameObject.SetActive(false);
+        xrOrigin.SetActive(true);
+        arSession.SetActive(true);
+        windowsCamera.SetActive(false);
+#else
+        serverButton.gameObject.SetActive(true);
+        xrOrigin.SetActive(false);
+        arSession.SetActive(false);
+        windowsCamera.SetActive(true);
+#endif
     }
     
     private void NextButtonIntro()
