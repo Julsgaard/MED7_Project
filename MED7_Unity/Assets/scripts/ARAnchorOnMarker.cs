@@ -25,7 +25,7 @@ public class ARAnchorOnMarker : MonoBehaviour
     private void OnTrackedImagesChanged(ARTrackedImagesChangedEventArgs args)
     {
         // When a new image is detected
-        foreach (ARTrackedImage trackedImage in args.added)
+        foreach (ARTrackedImage trackedImage in args.added) 
         {
                 AnchorContent(trackedImage.transform.position, prefabToPlace);
         }
