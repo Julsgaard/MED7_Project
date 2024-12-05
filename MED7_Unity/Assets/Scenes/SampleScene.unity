@@ -4038,7 +4038,7 @@ PrefabInstance:
         type: 3}
       propertyPath: contourGizmo
       value: 
-      objectReference: {fileID: 0}
+      objectReference: {fileID: 1984195435}
     - target: {fileID: 114578675002002822, guid: 84b17eee54c744578b650ff304284bda,
         type: 3}
       propertyPath: _showPickDrop
@@ -4069,7 +4069,7 @@ PrefabInstance:
         type: 3}
       propertyPath: contourInformationGizmo
       value: 
-      objectReference: {fileID: 0}
+      objectReference: {fileID: 1984195433}
     - target: {fileID: 114578675002002822, guid: 84b17eee54c744578b650ff304284bda,
         type: 3}
       propertyPath: _showClickTriggerGesture
@@ -16060,6 +16060,24 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1976923995}
   m_CullTransparentMesh: 1
+--- !u!1 &1984195433 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 4111831609420844691, guid: 79f57eb7ac9662044893b12e40602b18,
+    type: 3}
+  m_PrefabInstance: {fileID: 1680414559}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &1984195435 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 4111831609420844688, guid: 79f57eb7ac9662044893b12e40602b18,
+    type: 3}
+  m_PrefabInstance: {fileID: 1680414559}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1984195433}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4cd4b04adcca1024ab2743df9ee4247c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!114 &2001374502 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 6402244310720262706, guid: 48cb3fb68c91eb94999fd99957eb0cae,
