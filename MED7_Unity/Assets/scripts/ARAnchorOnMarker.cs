@@ -15,10 +15,13 @@ public class ARAnchorOnMarker : MonoBehaviour
     private ARTrackedImageManager trackedImageManager;
 
     private GameObject markerCoordinateSystem;
-    //private NetworkObject networkObject;
+    private NetworkObject networkPlane;
     //private PostItParentNetwork planeNetwork;
 
     public bool isMarkerFound;
+
+    private XROrigin xrOrigin;
+    private ARAnchor newAnchor;
 
     //private GameObject instance;
     public GameObject GetMarkerCoordinateSystem()
@@ -32,13 +35,17 @@ public class ARAnchorOnMarker : MonoBehaviour
 
     private void Start()
     {
-        //networkObject = planeInstance.GetComponent<NetworkObject>();
+        xrOrigin = FindObjectOfType<XROrigin>();
+        anchorManager = FindObjectOfType<ARAnchorManager>();
+        
+        networkPlane = planeInstance.GetComponent<NetworkObject>();
         //networkObject.Spawn();
         
         //planeNetwork = planeInstance.GetComponent<PostItParentNetwork>();
         
         markerCoordinateSystem = new GameObject("Marker Coordinate System");
         markerCoordinateSystem.transform.SetPositionAndRotation(planeInstance.transform.position, planeInstance.transform.rotation);
+        
     }
 
     void OnEnable()
@@ -52,26 +59,54 @@ public class ARAnchorOnMarker : MonoBehaviour
         foreach (ARTrackedImage trackedImage in args.added) 
         {
             //AnchorContent(trackedImage.transform.position, prefabToPlace);
-            AnchorContent(trackedImage.transform.position, planeInstance);
+            AnchorContent(trackedImage.transform);
             isMarkerFound = true;
         }
         foreach (var updatedImage in args.updated)
         {
+            if (NetworkManager.Singleton.IsHost)
+                return;
+            
             //instance.transform.position = updatedImage.transform.position;
-            planeInstance.transform.position = updatedImage.transform.position;
-            markerCoordinateSystem.transform.SetPositionAndRotation(planeInstance.transform.position, planeInstance.transform.rotation);
+            Debug.Log($"Setting planeInstance (name: {planeInstance.name}) position (from: {planeInstance.transform.position}) to updatedImage position ({updatedImage.transform.position}).");
+            // planeInstance.transform.position = updatedImage.transform.position;
+            planeInstance.transform.SetPositionAndRotation(updatedImage.transform.position, updatedImage.transform.rotation);
+            // markerCoordinateSystem.transform.SetPositionAndRotation(planeInstance.transform.position, planeInstance.transform.rotation);
+            AlignToMarker(updatedImage.transform);
         }
 
     }
-    private void AnchorContent(Vector3 position, GameObject plane)
+    
+    public void AlignToMarker(Transform markerTransform)
+    {
+        planeInstance.transform.position = markerTransform.position;
+        planeInstance.transform.rotation = markerTransform.rotation;
+        
+        networkPlane.transform.position = markerTransform.position;
+        networkPlane.transform.rotation = markerTransform.rotation;
+        // XROrigin xrOrigin = FindObjectOfType<XROrigin>();
+        //
+        // // Apply the offset directly to the XROrigin's transform
+        // xrOrigin.transform.position += markerTransform.position - xrOrigin.CameraFloorOffsetObject.transform.position;
+        //
+        // newAnchor.transform.position = markerTransform.position;
+    }
+
+    
+    private void AnchorContent(Transform markerTransform)
     {
         //instance = Instantiate(prefab, position, Quaternion.identity);
+        planeInstance.transform.position = markerTransform.position;
+        planeInstance.transform.rotation = markerTransform.rotation;
+        
+        networkPlane.transform.position = markerTransform.position;
+        networkPlane.transform.rotation = markerTransform.rotation;
         
         //if (instance.GetComponent<ARAnchor>() == null)
-        if (plane.GetComponent<ARAnchor>() == null)
+        if (planeInstance.GetComponent<ARAnchor>() == null)
         {
             //instance.AddComponent<ARAnchor>();
-            plane.AddComponent<ARAnchor>();
+            planeInstance.AddComponent<ARAnchor>();
         }
     }
     void OnDisable()
