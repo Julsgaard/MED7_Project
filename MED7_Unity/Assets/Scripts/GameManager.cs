@@ -1,5 +1,6 @@
 using System;
 using System.Linq;
+using System.Text;
 using TMPro;
 using Unity.Collections;
 using Unity.Netcode;
@@ -107,8 +108,14 @@ public class GameManager : NetworkBehaviour
     {
         SetIPAddress(); 
         
+        NetworkManager.Singleton.NetworkConfig.ConnectionData = Encoding.ASCII.GetBytes("MatchConfig");
+
+        
         // Connect to the server
         NetworkManager.Singleton.StartClient();
+        
+        
+        
         
         // Subscribe to the client connected and disconnected events
         NetworkManager.Singleton.OnClientConnectedCallback += OnClientConnected;

@@ -18125,7 +18125,7 @@ MonoBehaviour:
   m_MaxConnectAttempts: 60
   m_DisconnectTimeoutMS: 30000
   ConnectionData:
-    Address: SET IN GAMEMANAGER
+    Address: 100.77.147.101
     Port: 7777
     ServerListenAddress: 0.0.0.0
   DebugSimulator:
