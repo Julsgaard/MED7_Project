@@ -18,12 +18,12 @@ MonoBehaviour:
     m_Storage: []
   m_Images:
   - m_SerializedGuid:
-      m_GuidLow: 4789599689840949780
-      m_GuidHigh: 6775349625596442765
+      m_GuidLow: 5593655404036348104
+      m_GuidHigh: 9588362363827793039
     m_SerializedTextureGuid:
-      m_GuidLow: 1334400106206389461
-      m_GuidHigh: 17633927994614981800
-    m_Size: {x: 0.1722293, y: 0.120000005}
-    m_SpecifySize: 1
-    m_Name: background
+      m_GuidLow: 17993109229685605102
+      m_GuidHigh: 5724591378300010745
+    m_Size: {x: 0, y: 0}
+    m_SpecifySize: 0
+    m_Name: MarkerIcons01
     m_Texture: {fileID: 0}
