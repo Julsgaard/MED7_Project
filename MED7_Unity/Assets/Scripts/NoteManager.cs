@@ -5,7 +5,7 @@ public class NoteManager : MonoBehaviour
 {
     public static NoteManager Instance { get; private set; }
 
-    [SerializeField] private List<PostItNoteNetwork> notes = new List<PostItNoteNetwork>();
+    [SerializeField] public List<PostItNoteNetwork> notes = new List<PostItNoteNetwork>();
     
     private void Awake()
     {

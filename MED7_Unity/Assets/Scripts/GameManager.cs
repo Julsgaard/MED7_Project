@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using TMPro;
 using Unity.Collections;
 using Unity.Netcode;
@@ -17,6 +18,8 @@ public class GameManager : NetworkBehaviour
     [SerializeField] private GameObject connectUIObject, introUIObject, createApplicantUIObject, blackBackgroundUI, arSettingsUI;
     [SerializeField] private Button nextButton, connectToServerButton, connectToServerButtonOptions, serverButton, moveAllNotesUpButton;
     [SerializeField] private GameObject xrOrigin, arSession, windowsCamera;
+    
+    // NetworkObject networkObject;
     
     [Header("PostIt Spawn Layout")]
     [SerializeField] private GameObject postItParent;
@@ -141,7 +144,7 @@ public class GameManager : NetworkBehaviour
     {
         if (IsClient && NetworkManager.Singleton.IsConnectedClient)
         {
-            Debug.Log($"Client {clientId} connected to the server");
+            Debug.Log($"db: Client {clientId} connected to the server!");
             
             // Disable the connect UI
             connectUIObject.SetActive(false);
@@ -150,8 +153,11 @@ public class GameManager : NetworkBehaviour
             // Enable AR settings UI 
             arSettingsUI.SetActive(true);
 
+            Debug.Log($"db: isNotes Sent to server: {_notesSentToServer}");
             if (!_notesSentToServer)
             {
+                Debug.Log($"db: Sending notes to server! Calling 'SendAllNotesToServer()'");
+
                 // Send all applicant notes to the server
                 SendAllNotesToServer();
             }
@@ -185,43 +191,120 @@ public class GameManager : NetworkBehaviour
 
     private void SendAllNotesToServer()
     {
+        Debug.Log($"db: Entered 'SendAllNotesToServer()'");
+
+        
+        float currentBaseOffsetX = 0; // offset starts at 0
+        //float totalOffsetX = 0; // we also calculate a total offset to later be able to center all notes
+        
+        float postItWidth = postItNotePrefab.transform.localScale.x; // store the size we've given post its
+        float sameApplicantNoteOffset = postItWidth + (postItWidth * sameApplicantOffset); // calc offset based on size
+        
+        float applicantNum = 0; // numbers for indenting the offset between new applicant notes
+        
+        float totalCols = 0;
+        foreach (var applicant in applicantNotes.applicants)
+            totalCols += (float)Math.Round(Math.Sqrt(applicant.notes.Count));
+        float totalNotesWidth = totalCols * sameApplicantNoteOffset - (sameApplicantOffset * applicantNum) + diffApplicantOffset * (applicantNum-1);
+        float centerOffsetX = (totalNotesWidth / 2);
+        
         // loop through all applicants and their notes
         foreach (var applicant in applicantNotes.applicants)
         {
-            float currApplicantNumNotes = applicant.notes.Count;
-            float currApplicantNumCols = (float)Math.Round(Math.Sqrt(currApplicantNumNotes));
+            Debug.Log($"db: Entered first foreach for applicant {applicantNum}'.");
 
-            float currNoteX = 0;
-            float currNoteY = 0;
-            float currNoteYLayer = 0;
+            float currApplicantNumNotes = applicant.notes.Count; // the number of total notes for this applicant
+            float currApplicantNumCols = (float)Math.Round(Math.Sqrt(currApplicantNumNotes)); // sqrt for square layout
+
+            float currNoteX = 0; // keep track of current x pos
+            float currNoteY = 0; // same for y
             
             foreach (var noteText in applicant.notes)
             {
+                Debug.Log($"db: Entered seconds foreach for note {applicantNum}/'{noteText}'");
+
                 // Check if the note text is note empty or null
                 if (noteText != "" && noteText != null)
                 {
-                    // Send the note to the server
-                    CreateNoteServerRpc(noteText, applicant.applicantColour, applicant.applicantNumber);
-                    Debug.Log($"Note sent to server: {noteText}");
+                    Debug.Log($"db: Entered if statemetn meaning '{noteText}' is not null/empty!");
+                    // Create the note and send it to the server
+                    //postItNoteObject = Instantiate(postItNotePrefab);
+                    //Debug.Log($"is postItNoteObject null: {networkObject == null}");
+                    // GameObject postit = postItNetworkObject;
+                    
+                    // TODO: we might need to first set this when plane is spawned. Set "spawn post its" to a button which appears after plane is detected
+                    // postit.transform.SetParent(postItParent.transform); // set parent to the marker plane
+
+                    // calculate positions
+                    float posX = currentBaseOffsetX + currNoteX * sameApplicantNoteOffset - centerOffsetX;
+                    float posZ = currNoteY * sameApplicantNoteOffset;
+                    Vector3 newPos = new Vector3(posX, 0, posZ);
+
+                    Debug.Log($"db: Calling 'CreateNoteServerRpc()'");
+                    CreateNoteServerRpc(newPos, noteText, applicant.applicantColour, applicant.applicantNumber);
+                    Debug.Log($"db: Called 'CreateNoteServerRpc()'");
+                    
+                    // increment positions
+                    currNoteX++;
+                    if (currNoteX >= currApplicantNumCols) 
+                    {
+                        currNoteX = 0;
+                        currNoteY++;
+                    }
+                    
+                    // Set the text for the note
+                    //TextMeshPro textMeshPro = networkObject.GetComponentInChildren<TextMeshPro>();
+                    //textMeshPro.text = noteText;
+                
+                    // Set the color for the note
+                    //Renderer r = networkObject.GetComponent<Renderer>();
+                    //r.material.color = applicant.applicantColour;
+                    
+                    Debug.Log($"db: Note sent to server: with text \"{noteText}\",\nand position ({posX}, {posZ})");
                 }
+                
             }
+            
+            Debug.Log($"db: Finished notes for applicant {applicantNum}. Incrementing.");
+
+            
+            //totalOffsetX += (sameApplicantNoteOffset * currApplicantNumCols) // full width of current appl. notes
+            //                - sameApplicantOffset; // minus 1*offset which will be added on the end
+            
+            // if we want to add for another applicant, we set the new corner for where to begin by adding the offset
+            applicantNum++;
+            currentBaseOffsetX += (sameApplicantNoteOffset * currApplicantNumCols) + (diffApplicantOffset-sameApplicantOffset);
         }
+        
+        Vector3 offsetXVector = new Vector3(currentBaseOffsetX / 2, 0, 0);
+        Debug.Log($"db: Finished notes for ALL applicant. Fixing offset with offsetvector: {offsetXVector}");
+        
+        Debug.Log($"db: Countinr number of notes in NoteManager: {NoteManager.Instance.notes.Count()} !!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+        foreach (var note in NoteManager.Instance.notes)
+        {
+            Debug.Log($"db: Fixing offset for note {note}.");
+            note.notePosition.Value -= offsetXVector;
+        }
+        
+        Debug.Log($"db: COMPLETELY FISNISHED FIXING ALL NOTES' POSITIONS");
+
     }
     
     // Server RPC method for creating the note on the server, it is called by the client when connected to the server
     // RequireOnwership is set to false, it allows the client to create the note on the server
     [ServerRpc(RequireOwnership = false)]
-    public void CreateNoteServerRpc(string text, Color color, int applicantNumber, ServerRpcParams rpcParams = default)
+    public void CreateNoteServerRpc(Vector3 newPos, string text, Color color, int applicantNumber, ServerRpcParams rpcParams = default)
     {
         // Creating the note GameObject
         GameObject postItNoteObject = Instantiate(postItNotePrefab);
         
         // Set the position of the note
-        postItNoteObject.transform.position = GetNotePosition(applicantNumber);
+        //postItNoteObject.transform.position = newPos;
         
         // Get NetworkObject and spawn it
         NetworkObject networkObject = postItNoteObject.GetComponent<NetworkObject>();
         networkObject.Spawn();
+        // postItNetworkObject = networkObject;
         
         // Get the PostItNoteNetwork component from the PostItNoteObject
         PostItNoteNetwork postItNoteNetwork = postItNoteObject.GetComponent<PostItNoteNetwork>();
@@ -229,14 +312,8 @@ public class GameManager : NetworkBehaviour
         // Set the note data directly on the server
         postItNoteNetwork.noteText.Value = new FixedString512Bytes(text);
         postItNoteNetwork.noteColor.Value = color;
-    }
 
-    // TODO: LORD LINUS!
-    private Vector3 GetNotePosition(int applicantNumber)
-    {
-        ulong clientId = NetworkManager.Singleton.LocalClientId;
-        Debug.Log($"Client ID: {clientId}");
-        
-        return new Vector3(0, 0, 0);
+        postItNoteNetwork.notePosition.Value = newPos;
     }
+    
 }
