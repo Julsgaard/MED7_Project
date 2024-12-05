@@ -28,7 +28,7 @@ public class GameManager : NetworkBehaviour
     [SerializeField] private TextMeshProUGUI markerInstruction;
     private bool _isFindingMarker, _isNotesButtonClicked;
     
-  [Header("PostIt Spawn Layout")]
+    [Header("PostIt Spawn Layout")]
     [SerializeField] private GameObject postItParentLocal;
     [SerializeField] private GameObject postItNotePrefab;
     private bool _notesSentToServer = false;
@@ -164,7 +164,7 @@ public class GameManager : NetworkBehaviour
             blackBackgroundUI.SetActive(false);
             
             // Enable AR settings UI 
-            // arSettingsUI.SetActive(true);
+            arSettingsUI.SetActive(true);
 
             Debug.Log($"db: isNotes Sent to server: {_notesSentToServer}");
             if (!_notesSentToServer)
@@ -198,11 +198,15 @@ public class GameManager : NetworkBehaviour
         ARAnchorOnMarker anchor = FindObjectOfType<ARAnchorOnMarker>();
         
         findMarkerUI.SetActive(true);
+        //check if ui is active
+        Debug.Log($"is marker UI set to active: {findMarkerUI.activeSelf}");
+        if (findMarkerUI.activeSelf) Debug.Log($"Hi, I'm a fucking UI and I'm active ({findMarkerUI.activeSelf}) but I wont show will I? Why? Because I'm a fucking UI and I'm a fucking");
         
         CanvasGroup buttonCG = placeNotesButton.GetComponent<CanvasGroup>();
         buttonCG.alpha = 0;
         
         markerInstruction.text = "Find the marker and place it within view of the camera view";
+        Debug.Log($"db: Marker instruction set to: '{markerInstruction.text}'");
         
         // wait for user to find AR marker -- instruct user to find marker
         

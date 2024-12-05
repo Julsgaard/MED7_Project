@@ -469,8 +469,8 @@ public class GizmoManager : MonoBehaviour
         DisplayCurrentsmoothingValue(session);
         DisplaySmoothingSlider();
         DisplayDepthEstimation(trackingInfo.depth_estimation);
-        DisplayWristInformation();
-        DisplayFingerInformation();
+        //DisplayWristInformation();
+        //DisplayFingerInformation();
         DisplayContour();
         DisplayLeftRight(gestureInfo.is_right);
     }

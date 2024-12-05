@@ -33,6 +33,8 @@ public class PostItNoteNetwork : NetworkBehaviour
     };
     public override void OnNetworkSpawn()
     {
+        unityRenderer = GetComponent<Renderer>(); // fucking shit ass fuck
+        
         // Subscribe to value changes
         notePosition.OnValueChanged += OnPositionChanged;
         noteText.OnValueChanged += OnTextChanged;
@@ -44,7 +46,8 @@ public class PostItNoteNetwork : NetworkBehaviour
         OnColorChanged(Color.magenta, noteColor.Value);
 
         NoteManager.Instance.RegisterNote(this);
-        Renderer renderer = GetComponent<Renderer>();
+        
+        //Renderer renderer = GetComponent<Renderer>(); // what the shit
     }
 
     private void OnPositionChanged(Vector3 oldPosition, Vector3 newPosition)
@@ -61,6 +64,7 @@ public class PostItNoteNetwork : NetworkBehaviour
     }
     private void OnColorChanged(Color oldColor, Color newColor)
     {
+        Debug.Log($"unityRenderer");
         // Set the color for the note
         unityRenderer.material.SetColor(baseColor, newColor);
         //Debug.Log("Set note color: " + newColor);

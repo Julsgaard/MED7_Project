@@ -63,7 +63,7 @@ public class ManoEvents : MonoBehaviour
 		if (!statusAnimator)
 		{
 			GameObject.Find("statusAnimator").GetComponent<Animator>();
-			Debug.LogError("The application needs the ManoMotion canvas in order to display status messages through the animator");
+			//Debug.LogError("The application needs the ManoMotion canvas in order to display status messages through the animator");
 		}
 
 		HandleManomotionMessages();
@@ -81,6 +81,7 @@ public class ManoEvents : MonoBehaviour
 	/// </summary>
 	void HandleManomotionMessages()
 	{
+		return;
 		switch (ManomotionManager.Instance.Mano_License.license_status)
 		{
 			case LicenseAnswer.LICENSE_OK:
