@@ -108,9 +108,6 @@ public class GameManager : NetworkBehaviour
     {
         SetIPAddress(); 
         
-        NetworkManager.Singleton.NetworkConfig.ConnectionData = Encoding.ASCII.GetBytes("MatchConfig");
-
-        
         // Connect to the server
         NetworkManager.Singleton.StartClient();
         
