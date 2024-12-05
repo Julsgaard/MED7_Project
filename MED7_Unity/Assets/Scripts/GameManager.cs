@@ -28,9 +28,7 @@ public class GameManager : NetworkBehaviour
     [SerializeField] private TextMeshProUGUI markerInstruction;
     private bool _isFindingMarker, _isNotesButtonClicked;
     
-    [FormerlySerializedAs("postItParentLocalCoords")]
-    [FormerlySerializedAs("postItParent")]
-    [Header("PostIt Spawn Layout")]
+  [Header("PostIt Spawn Layout")]
     [SerializeField] private GameObject postItParentLocal;
     [SerializeField] private GameObject postItNotePrefab;
     private bool _notesSentToServer = false;
