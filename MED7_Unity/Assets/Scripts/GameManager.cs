@@ -1,12 +1,10 @@
 using System;
 using System.Linq;
-using System.Text;
 using TMPro;
 using Unity.Collections;
 using Unity.Netcode;
 using Unity.Netcode.Transports.UTP;
 using UnityEngine;
-using UnityEngine.Serialization;
 using UnityEngine.UI;
 
 public class GameManager : NetworkBehaviour
@@ -106,17 +104,18 @@ public class GameManager : NetworkBehaviour
     // Method for connecting to the server
     private void ConnectToServer()
     {
-        SetIPAddress(); 
+        SetIPAddress();
+
+        // Check if the client is already connected to prevent multiple connections from the same client when pressing the connect button quickly
+        if (!NetworkManager.Singleton.IsClient)
+        {
+            // Connect to the server
+            NetworkManager.Singleton.StartClient();
         
-        // Connect to the server
-        NetworkManager.Singleton.StartClient();
-        
-        
-        
-        
-        // Subscribe to the client connected and disconnected events
-        NetworkManager.Singleton.OnClientConnectedCallback += OnClientConnected;
-        NetworkManager.Singleton.OnClientDisconnectCallback += OnClientDisconnected;
+            // Subscribe to the client connected and disconnected events
+            NetworkManager.Singleton.OnClientConnectedCallback += OnClientConnected;
+            NetworkManager.Singleton.OnClientDisconnectCallback += OnClientDisconnected;
+        }
     }
     
     private void SetIPAddress()
