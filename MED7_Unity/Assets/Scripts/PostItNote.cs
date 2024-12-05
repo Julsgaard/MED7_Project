@@ -70,9 +70,5 @@ public class PostItNote : NetworkBehaviour
         GetComponentInChildren<TextMeshPro>().text = note;
     }
 
-    public void updatePosition(Vector3 movement)
-    {
-        GetComponent<Renderer>().material.color = Color.green;
-        gameObject.transform.localPosition += movement;
-    }
+    
 }

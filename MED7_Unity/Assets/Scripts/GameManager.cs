@@ -99,7 +99,7 @@ public class GameManager : NetworkBehaviour
     
     private void MoveAllNotesUp()
     {
-        NoteManager.Instance.MoveAllNotes();
+        //NoteManager.Instance.MoveAllNotes();
     }
     
     // Method for connecting to the server

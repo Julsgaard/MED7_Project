@@ -8,7 +8,7 @@ using UnityEngine.XR.ARFoundation;
 
 public class FingerCollider : MonoBehaviour
 {
-    public static PostItNote postIt = null;
+    public static PostItNoteNetwork postIt = null;
     private Vector3 oldPos;
     Material thisMaterial;
     private LineRenderer lineRenderer;
@@ -89,7 +89,7 @@ public class FingerCollider : MonoBehaviour
             
             if (hit.collider.gameObject.tag == "Post-it")
             {
-                postIt = hit.collider.gameObject.GetComponent<PostItNote>();
+                postIt = hit.collider.gameObject.GetComponent<PostItNoteNetwork>();
                 if (postIt != null)
                 {
                     GetComponentInChildren<TextMeshPro>().text = postIt.gameObject.name;
@@ -100,11 +100,11 @@ public class FingerCollider : MonoBehaviour
         
     }
 
-    private void movePostIt(PostItNote currentPostIt)
+    private void movePostIt(PostItNoteNetwork currentPostIt)
     {
         Vector3 movePos = oldPos - gameObject.transform.position;
         movePos = new Vector3(movePos.x, 0, movePos.z);
-        currentPostIt.updatePosition(movePos);
+        currentPostIt.RequestMoveNote(movePos);
         oldPos = gameObject.transform.position;
     }
 }

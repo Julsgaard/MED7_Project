@@ -45,19 +45,11 @@ public class PostItNoteNetwork : NetworkBehaviour
         //Debug.Log("Set note color: " + newColor);
     }
 
-    public void RequestMoveNote()
+    public void RequestMoveNote(Vector3 movement)
     {
-        // Clients request the server to move the note
-        if (IsClient)
-        {
-            Vector3 newPosition = GenerateRandomPosition();
+            GetComponent<Renderer>().material.color = Color.green;
+            Vector3 newPosition = gameObject.transform.localPosition + movement;
             RequestMoveServerRpc(newPosition);
-        }
-        if (IsServer)
-        {
-            Vector3 newPosition = GenerateRandomPosition();
-            notePosition.Value = newPosition;
-        }
     }
 
     [ServerRpc(RequireOwnership = false)]
@@ -68,8 +60,4 @@ public class PostItNoteNetwork : NetworkBehaviour
         Debug.Log($"Server moved note to {newPosition} for client {rpcParams.Receive.SenderClientId}");
     }
 
-    private Vector3 GenerateRandomPosition()
-    {
-        return new Vector3(Random.Range(-0.2f, 0.2f), 0.1f, Random.Range(-0.2f, 0.2f));
-    }
 }

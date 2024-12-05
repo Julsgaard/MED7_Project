@@ -26,12 +26,4 @@ public class NoteManager : MonoBehaviour
             //Debug.Log("Note registered");
         }
     }
-
-    public void MoveAllNotes()
-    {
-        foreach (var note in notes)
-        {
-            note.RequestMoveNote();
-        }
-    }
 }
