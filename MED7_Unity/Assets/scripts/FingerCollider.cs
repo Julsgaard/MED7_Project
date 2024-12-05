@@ -12,6 +12,7 @@ public class FingerCollider : MonoBehaviour
     private Vector3 oldPos;
     Material thisMaterial;
     private LineRenderer lineRenderer;
+    Camera camera;
 
     //ManomotionManager manomotionManager;
     // Start is called before the first frame update
@@ -23,7 +24,7 @@ public class FingerCollider : MonoBehaviour
         lineRenderer = GetComponent<LineRenderer>();
         lineRenderer.startWidth = 0.01f; // Width at the start of the line
         lineRenderer.endWidth = 0.01f;   // Width at the end of the line
-
+        camera = Camera.main;
     }
 
     // Update is called once per frame
@@ -78,11 +79,11 @@ public class FingerCollider : MonoBehaviour
     private void catchPostIt()
     {
         thisMaterial.color = Color.yellow;
-        Vector3 screenPoint = Camera.main.WorldToScreenPoint(gameObject.transform.position);
-        Ray cameraRay = Camera.main.ScreenPointToRay(screenPoint);
-        RaycastHit[] hits = Physics.RaycastAll(cameraRay, 1000,3);
+        Vector3 screenPoint = camera.WorldToScreenPoint(gameObject.transform.position);
+        Ray cameraRay = camera.ScreenPointToRay(screenPoint);
+        RaycastHit[] hits = Physics.RaycastAll(cameraRay, 1000,6);
         lineRenderer.positionCount = 2;
-        lineRenderer.SetPosition(0, cameraRay.origin); // Start point of the ray
+        lineRenderer.SetPosition(0, cameraRay.origin);
         lineRenderer.SetPosition(1, cameraRay.origin + cameraRay.direction * 10000);
         foreach (RaycastHit hit in hits) {
             GetComponentInChildren<TextMeshPro>().text = hit.collider.gameObject.tag;
@@ -102,9 +103,20 @@ public class FingerCollider : MonoBehaviour
 
     private void movePostIt(PostItNoteNetwork currentPostIt)
     {
+        Vector3 screenPoint = camera.WorldToScreenPoint(gameObject.transform.position);
+        Ray cameraRay = camera.ScreenPointToRay(screenPoint);
+        RaycastHit hit;
+        if (Physics.Raycast(cameraRay, out hit, 1000, 6))
+        {
+            currentPostIt.RequestMoveNote(hit.transform.position);
+        }
+     
+        /*
+         * Old Movement logic
         Vector3 movePos = gameObject.transform.position - oldPos;
-        movePos = new Vector3(movePos.x, 0, movePos.z);
+        movePos = new Vector3(movePos.x, 0, movePos.z) * (Vector3.Distance(camera.transform.position, currentPostIt.transform.position)/Vector3.Distance(camera.transform.position, gameObject.transform.position));
         currentPostIt.RequestMoveNote(movePos);
         oldPos = gameObject.transform.position;
+        */
     }
 }
