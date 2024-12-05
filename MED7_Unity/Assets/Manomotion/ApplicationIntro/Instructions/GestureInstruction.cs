@@ -133,7 +133,9 @@ public class GestureInstruction : Instruction
         _currentInstructionStep++;
         numberOfCompleteSetOfTriggersPerformed = 0;
 
+        #if UNITY_ANDROID
         Handheld.Vibrate();
+        #endif
         ApplicationManager.Instance.howToInstructor.triggerAnimations.HighlightImagesUpToStep(numberOfCompleteSetOfTriggersPerformed);
         UpdateRequestedTrigger();
         UpdateTriggerGestureDescription();
@@ -158,7 +160,9 @@ public class GestureInstruction : Instruction
 
             StopResponding();
 
+            #if UNITY_ANDROID
             Handheld.Vibrate();
+            #endif
             string endMessage = "Great! You are ready to see more features. Tap on the thumbs up icon.";
             currentDescription = endMessage;
 

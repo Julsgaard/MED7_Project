@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
+using Unity.Netcode;
 using UnityEngine.UI;
 
 // Applicant class to store variables for each applicant (number, colour, notes)
@@ -22,13 +23,13 @@ public class Applicant
 
 public class ApplicantNotes : MonoBehaviour
 {
-    [SerializeField] private int applicantAmount = 3;
-    [SerializeField] private int currentApplicantIndex = 0;
-    [SerializeField] private List<Applicant> applicants;
+    [SerializeField] private int applicantAmount;
+    [SerializeField] private int currentApplicantIndex;
+    [SerializeField] public List<Applicant> applicants;
     [SerializeField] private Color[] possibleApplicantColours; // Possible colours for the applicants - #FEFF9C, #FF7EB9, #7AFCFF, #7AFF7A, #FFA87A
 
     // UI
-    [SerializeField] private GameObject areYouSureUI;
+    [SerializeField] private GameObject areYouSureUI, createApplicantUIObject;
     [SerializeField] private TextMeshProUGUI currentApplicantNumberText;
     [SerializeField] private Image currentApplicantColorImage;
     [SerializeField] private Button nextButton, previousButton, doneButton, addNoteButton, removeNoteButton;
@@ -36,30 +37,35 @@ public class ApplicantNotes : MonoBehaviour
     [SerializeField] private GameObject addAndRemoveNotesObject;
     [SerializeField] private GameObject applicantInputFieldPrefab;
     [SerializeField] private Button yesButton, noButton;
-    
     private GameManager _gameManager;
     
     private void Awake()
     {
         // Find the GameManager object in the scene
         _gameManager = FindObjectOfType<GameManager>();
+        
+        // Initialize the applicants
+        InitializeApplicants(applicantAmount);
 
-        // Initialize the applicants list
-        applicants = new List<Applicant>();
-        
-        // Loop through the amount of applicants and create a new Applicant object for each one
-        for (int i = 0; i < applicantAmount; i++)
-        {
-            Color applicantColor = possibleApplicantColours[i];
-            Applicant newApplicant = new Applicant(i + 1, applicantColor);
-            applicants.Add(newApplicant);
-        }
-        
         // Add listeners to the UI buttons
         AddListenersToUI();
         
         // Update the UI to show the first applicant
         UpdateApplicantUI();
+    }
+
+    private void InitializeApplicants(int amount)
+    {
+        //Initialize the applicants list 
+        applicants = new List<Applicant>();
+
+        // Loop through the amount of applicants and create a new Applicant object for each one
+        for (int i = 0; i < amount; i++)
+        {
+            Color applicantColor = possibleApplicantColours[i];
+            Applicant newApplicant = new Applicant(i + 1, applicantColor);
+            applicants.Add(newApplicant);
+        }
     }
 
     private void AddListenersToUI()
@@ -76,7 +82,7 @@ public class ApplicantNotes : MonoBehaviour
         yesButton.onClick.AddListener(() =>
         {
             areYouSureUI.SetActive(false);
-            gameObject.SetActive(false);
+            createApplicantUIObject.SetActive(false);
             _gameManager.ShowConnectUI();
         });
         noButton.onClick.AddListener(() =>
@@ -90,7 +96,7 @@ public class ApplicantNotes : MonoBehaviour
         // Move to the next applicant
         currentApplicantIndex = (currentApplicantIndex + 1) % applicantAmount;
         
-        Debug.Log($"Next applicant, current number: {currentApplicantIndex}");
+        // Debug.Log($"Next applicant, current number: {currentApplicantIndex}");
         
         // Update UI
         UpdateApplicantUI();
@@ -101,7 +107,7 @@ public class ApplicantNotes : MonoBehaviour
         // Move to the previous applicant
         currentApplicantIndex = (currentApplicantIndex - 1 + applicantAmount) % applicantAmount;
         
-        Debug.Log($"Previous applicant, current number: {currentApplicantIndex}");
+        // Debug.Log($"Previous applicant, current number: {currentApplicantIndex}");
         
         // Update UI
         UpdateApplicantUI();
@@ -177,6 +183,9 @@ public class ApplicantNotes : MonoBehaviour
             inputFieldComponent.onValueChanged.AddListener((text) =>
             {
                 currentApplicant.notes[index] = text;
+                
+                // Update the size of the input field
+                LayoutRebuilder.ForceRebuildLayoutImmediate(notesParent.GetComponent<RectTransform>());
             });
         }
     }

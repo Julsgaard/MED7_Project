@@ -1,37 +1,72 @@
-using System.Net;
+using System;
+using System.Linq;
 using TMPro;
+using Unity.Collections;
 using Unity.Netcode;
+using Unity.Netcode.Transports.UTP;
 using UnityEngine;
+using UnityEngine.Serialization;
+using UnityEngine.UI;
 
-public class GameManager : MonoBehaviour
+public class GameManager : NetworkBehaviour
 {
-    [SerializeField] private GameObject arSessionObject;
-    [SerializeField] private string defaultIpAddress = "192.168.50.141";
+    [Header("Network Manager IP")]
+    [SerializeField] private string defaultIpAddress;
+    
+    [Header("UI Objects")]
     [SerializeField] private TMP_InputField ipAddressInputField;
-    [SerializeField] private TMP_InputField portInputField;
-    [SerializeField] private GameObject connectUIObject;
-    [SerializeField] private GameObject introUIObject;
-    [SerializeField] private GameObject createApplicantUIObject;
+    [SerializeField] private GameObject connectUIObject, introUIObject, createApplicantUIObject, blackBackgroundUI, arSettingsUI;
+    [SerializeField] private Button nextButton, connectToServerButton, connectToServerButtonOptions, serverButton, moveAllNotesUpButton;
+    [SerializeField] private GameObject xrOrigin, arSession, windowsCamera;
+    
+    // NetworkObject networkObject;
+    
+    [Header("PostIt Spawn Layout")]
+    [SerializeField] private GameObject postItParent;
+    [SerializeField] private GameObject postItNotePrefab;
+    private bool _notesSentToServer = false;
+    [SerializeField] private float sameApplicantOffset = .03f;
+    [SerializeField] private float diffApplicantOffset = .05f;
+    
+    [Header("Script References")]
+    [SerializeField] private ApplicantNotes applicantNotes;
+    
     
     // Set the default IP address for the UI input field
     private void Awake()
     {
+        AddListenersToUI();
+        
         // Set the input field text to the default IP address
         ipAddressInputField.text = defaultIpAddress;
         
-        // Disable the AR session object for the beginning
-    //    arSessionObject.SetActive(false);
-        createApplicantUIObject.SetActive(false);
-        
-    //    ShowIntroUI();
+        ShowIntroUI();
     }
     
     private void ShowIntroUI()
     {
         introUIObject.SetActive(true);
+        blackBackgroundUI.SetActive(true);
+        createApplicantUIObject.SetActive(false);
+        arSettingsUI.SetActive(false);
+        connectUIObject.SetActive(false);
+        
+        // Changes based on platform
+#if UNITY_ANDROID && !UNITY_EDITOR
+        // Android specific changes not in editor
+        serverButton.gameObject.SetActive(false);
+        xrOrigin.SetActive(true);
+        arSession.SetActive(true);
+        windowsCamera.SetActive(false);
+#else
+        serverButton.gameObject.SetActive(true);
+        xrOrigin.SetActive(false);
+        arSession.SetActive(false);
+        windowsCamera.SetActive(true);
+#endif
     }
     
-    public void NextButtonIntro()
+    private void NextButtonIntro()
     {
         // Disable the intro UI
         introUIObject.SetActive(false);
@@ -47,49 +82,238 @@ public class GameManager : MonoBehaviour
         if (connectUIObject)
         {
             connectUIObject.SetActive(true);
-            Debug.Log("Connect UI enabled");
+            //Debug.Log("Connect UI enabled");
         }
     }
     
-    // Method for connecting to the server. Used in the NetworkManagerUI script
-    public void ConnectToServer()
+    private void AddListenersToUI()
     {
-        SetIPAddress();
+        // Add listeners to the buttons
+        connectToServerButton.onClick.AddListener(ConnectToServer);
+        connectToServerButtonOptions.onClick.AddListener(ConnectToServer);
+        nextButton.onClick.AddListener(NextButtonIntro);
+        
+        serverButton.onClick.AddListener(StartServer);
+        moveAllNotesUpButton.onClick.AddListener(MoveAllNotesUp);
+    }
+    
+    private void MoveAllNotesUp()
+    {
+        NoteManager.Instance.MoveAllNotes();
+    }
+    
+    // Method for connecting to the server
+    private void ConnectToServer()
+    {
+        SetIPAddress(); 
         
         // Connect to the server
         NetworkManager.Singleton.StartClient();
         
-        // Check if the client is connected to the server
-        if (NetworkManager.Singleton.IsClient)
-        {
-            Debug.Log("Connected to server");
-        }
-        
-        // Disable the connect to server UI
-        if (connectUIObject)
-        {
-            connectUIObject.SetActive(false);
-            Debug.Log("Connect UI disabled");
-        }
+        // Subscribe to the client connected and disconnected events
+        NetworkManager.Singleton.OnClientConnectedCallback += OnClientConnected;
+        NetworkManager.Singleton.OnClientDisconnectCallback += OnClientDisconnected;
     }
     
     private void SetIPAddress()
     {
-        // Get the IP address from the input field
-        string ipAddress = ipAddressInputField.text;
+        // Get the transport
+        var transport = NetworkManager.Singleton.GetComponent<UnityTransport>();
         
-        //TODO: DOES NOT WORK YET
-        // Check if the IP address is valid (NOT SURE IF WORKING!)
-        if (!IPAddress.TryParse(ipAddress, out _))
-        {
-            Debug.LogWarning("Invalid IP address");
-            return;
-        }
-            
-        // Convert IP address to bytes
-        byte[] ipAddressBytes = IPAddress.Parse(ipAddress).GetAddressBytes();
-        
-        // Set the IP address
-        NetworkManager.Singleton.NetworkConfig.ConnectionData = ipAddressBytes;
+        // Set the IP address (Overwrites the default IP address in the network manager)
+        transport.ConnectionData.Address = ipAddressInputField.text;
     }
+    
+    // Method for starting the server
+    private void StartServer()
+    {
+        NetworkManager.Singleton.OnClientConnectedCallback += OnClientConnected;
+        NetworkManager.Singleton.OnClientDisconnectCallback += OnClientDisconnected;
+        
+        // Start the server
+        NetworkManager.Singleton.StartServer();
+        Debug.Log("Server started");
+        
+        connectUIObject.SetActive(false);
+        blackBackgroundUI.SetActive(false);
+        introUIObject.SetActive(false);
+        arSettingsUI.SetActive(true);
+    }
+
+    private void OnClientConnected(ulong clientId)
+    {
+        if (IsClient && NetworkManager.Singleton.IsConnectedClient)
+        {
+            Debug.Log($"db: Client {clientId} connected to the server!");
+            
+            // Disable the connect UI
+            connectUIObject.SetActive(false);
+            blackBackgroundUI.SetActive(false);
+            
+            // Enable AR settings UI 
+            arSettingsUI.SetActive(true);
+
+            Debug.Log($"db: isNotes Sent to server: {_notesSentToServer}");
+            if (!_notesSentToServer)
+            {
+                Debug.Log($"db: Sending notes to server! Calling 'SendAllNotesToServer()'");
+
+                // Send all applicant notes to the server
+                SendAllNotesToServer();
+            }
+            
+            // Unsubscribe from the callback to prevent multiple subscriptions
+            NetworkManager.Singleton.OnClientConnectedCallback -= OnClientConnected;
+        }
+        if (IsServer)
+        {
+            Debug.Log($"Client {clientId} connected to the server");
+        }
+    }
+
+    private void OnClientDisconnected(ulong clientId)
+    {
+        if (IsClient)
+        {
+            Debug.Log($"Client {clientId} disconnected from the server");
+
+            // Enable the connect UI
+            connectUIObject.SetActive(true); 
+            
+            // Unsubscribe from the callback
+            NetworkManager.Singleton.OnClientDisconnectCallback -= OnClientDisconnected;
+        }
+        if (IsServer)
+        {
+            Debug.Log($"Client {clientId} disconnected from the server");
+        }
+    }
+
+    private void SendAllNotesToServer()
+    {
+        Debug.Log($"db: Entered 'SendAllNotesToServer()'");
+
+        
+        float currentBaseOffsetX = 0; // offset starts at 0
+        //float totalOffsetX = 0; // we also calculate a total offset to later be able to center all notes
+        
+        float postItWidth = postItNotePrefab.transform.localScale.x; // store the size we've given post its
+        float sameApplicantNoteOffset = postItWidth + (postItWidth * sameApplicantOffset); // calc offset based on size
+        
+        float applicantNum = 0; // numbers for indenting the offset between new applicant notes
+        
+        float totalCols = 0;
+        foreach (var applicant in applicantNotes.applicants)
+            totalCols += (float)Math.Round(Math.Sqrt(applicant.notes.Count));
+        float totalNotesWidth = totalCols * sameApplicantNoteOffset - (sameApplicantOffset * applicantNum) + diffApplicantOffset * (applicantNum-1);
+        float centerOffsetX = (totalNotesWidth / 2);
+        
+        // loop through all applicants and their notes
+        foreach (var applicant in applicantNotes.applicants)
+        {
+            Debug.Log($"db: Entered first foreach for applicant {applicantNum}'.");
+
+            float currApplicantNumNotes = applicant.notes.Count; // the number of total notes for this applicant
+            float currApplicantNumCols = (float)Math.Round(Math.Sqrt(currApplicantNumNotes)); // sqrt for square layout
+
+            float currNoteX = 0; // keep track of current x pos
+            float currNoteY = 0; // same for y
+            
+            foreach (var noteText in applicant.notes)
+            {
+                Debug.Log($"db: Entered seconds foreach for note {applicantNum}/'{noteText}'");
+
+                // Check if the note text is note empty or null
+                if (noteText != "" && noteText != null)
+                {
+                    Debug.Log($"db: Entered if statemetn meaning '{noteText}' is not null/empty!");
+                    // Create the note and send it to the server
+                    //postItNoteObject = Instantiate(postItNotePrefab);
+                    //Debug.Log($"is postItNoteObject null: {networkObject == null}");
+                    // GameObject postit = postItNetworkObject;
+                    
+                    // TODO: we might need to first set this when plane is spawned. Set "spawn post its" to a button which appears after plane is detected
+                    // postit.transform.SetParent(postItParent.transform); // set parent to the marker plane
+
+                    // calculate positions
+                    float posX = currentBaseOffsetX + currNoteX * sameApplicantNoteOffset - centerOffsetX;
+                    float posZ = currNoteY * sameApplicantNoteOffset;
+                    Vector3 newPos = new Vector3(posX, 0, posZ);
+
+                    Debug.Log($"db: Calling 'CreateNoteServerRpc()'");
+                    CreateNoteServerRpc(newPos, noteText, applicant.applicantColour, applicant.applicantNumber);
+                    Debug.Log($"db: Called 'CreateNoteServerRpc()'");
+                    
+                    // increment positions
+                    currNoteX++;
+                    if (currNoteX >= currApplicantNumCols) 
+                    {
+                        currNoteX = 0;
+                        currNoteY++;
+                    }
+                    
+                    // Set the text for the note
+                    //TextMeshPro textMeshPro = networkObject.GetComponentInChildren<TextMeshPro>();
+                    //textMeshPro.text = noteText;
+                
+                    // Set the color for the note
+                    //Renderer r = networkObject.GetComponent<Renderer>();
+                    //r.material.color = applicant.applicantColour;
+                    
+                    Debug.Log($"db: Note sent to server: with text \"{noteText}\",\nand position ({posX}, {posZ})");
+                }
+                
+            }
+            
+            Debug.Log($"db: Finished notes for applicant {applicantNum}. Incrementing.");
+
+            
+            //totalOffsetX += (sameApplicantNoteOffset * currApplicantNumCols) // full width of current appl. notes
+            //                - sameApplicantOffset; // minus 1*offset which will be added on the end
+            
+            // if we want to add for another applicant, we set the new corner for where to begin by adding the offset
+            applicantNum++;
+            currentBaseOffsetX += (sameApplicantNoteOffset * currApplicantNumCols) + (diffApplicantOffset-sameApplicantOffset);
+        }
+        
+        Vector3 offsetXVector = new Vector3(currentBaseOffsetX / 2, 0, 0);
+        Debug.Log($"db: Finished notes for ALL applicant. Fixing offset with offsetvector: {offsetXVector}");
+        
+        Debug.Log($"db: Countinr number of notes in NoteManager: {NoteManager.Instance.notes.Count()} !!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+        foreach (var note in NoteManager.Instance.notes)
+        {
+            Debug.Log($"db: Fixing offset for note {note}.");
+            note.notePosition.Value -= offsetXVector;
+        }
+        
+        Debug.Log($"db: COMPLETELY FISNISHED FIXING ALL NOTES' POSITIONS");
+
+    }
+    
+    // Server RPC method for creating the note on the server, it is called by the client when connected to the server
+    // RequireOnwership is set to false, it allows the client to create the note on the server
+    [ServerRpc(RequireOwnership = false)]
+    public void CreateNoteServerRpc(Vector3 newPos, string text, Color color, int applicantNumber, ServerRpcParams rpcParams = default)
+    {
+        // Creating the note GameObject
+        GameObject postItNoteObject = Instantiate(postItNotePrefab);
+        
+        // Set the position of the note
+        //postItNoteObject.transform.position = newPos;
+        
+        // Get NetworkObject and spawn it
+        NetworkObject networkObject = postItNoteObject.GetComponent<NetworkObject>();
+        networkObject.Spawn();
+        // postItNetworkObject = networkObject;
+        
+        // Get the PostItNoteNetwork component from the PostItNoteObject
+        PostItNoteNetwork postItNoteNetwork = postItNoteObject.GetComponent<PostItNoteNetwork>();
+
+        // Set the note data directly on the server
+        postItNoteNetwork.noteText.Value = new FixedString512Bytes(text);
+        postItNoteNetwork.noteColor.Value = color;
+
+        postItNoteNetwork.notePosition.Value = newPos;
+    }
+    
 }
