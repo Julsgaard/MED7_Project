@@ -107,7 +107,9 @@ public class ARCubeInteraction : MonoBehaviour
         if (other.gameObject.tag == handTag)
         {
             cubeRenderer.sharedMaterial = arCubeMaterial[1];
+            #if UNITY_ANDROID
             Handheld.Vibrate();
+            #endif
         }
     }
 

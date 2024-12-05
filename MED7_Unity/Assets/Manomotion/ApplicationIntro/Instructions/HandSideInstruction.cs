@@ -63,7 +63,9 @@ public class HandSideInstruction : Instruction
     override public void ProgressWithInstructionStep()
     {
         _currentInstructionStep++;
+        #if UNITY_ANDROID
         Handheld.Vibrate();
+        #endif
         UpdateHandSideNeeded();
         currentFramesDetected = 0;
         if (_currentInstructionStep == _instructionSteps - 1)
