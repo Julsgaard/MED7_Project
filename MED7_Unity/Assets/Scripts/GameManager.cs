@@ -154,7 +154,7 @@ public class GameManager : NetworkBehaviour
             blackBackgroundUI.SetActive(false);
             
             // Enable AR settings UI 
-            arSettingsUI.SetActive(true);
+            // arSettingsUI.SetActive(true);
 
             Debug.Log($"db: isNotes Sent to server: {_notesSentToServer}");
             if (!_notesSentToServer)
