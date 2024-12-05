@@ -388,6 +388,7 @@ public class GameManager : NetworkBehaviour
         postItNoteNetwork.noteColor.Value = color;
 
         postItNoteNetwork.notePosition.Value = newPos;
+        postItNoteNetwork.newClient(NetworkManager.Singleton.LocalClientId);
     }
     
 }

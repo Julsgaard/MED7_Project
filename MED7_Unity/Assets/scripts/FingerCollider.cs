@@ -39,46 +39,28 @@ public class FingerCollider : MonoBehaviour
         {
             if(postIt == null)
             {
-                thisMaterial.color = Color.green;
                 catchPostIt();
                 oldPos = gameObject.transform.position;
-            }
-            else
-            {
-                
             }
         }
         else if (handInfo.gesture_info.mano_gesture_trigger == ManoGestureTrigger.DROP)
         {
-            thisMaterial.color = Color.red;
+            thisMaterial.color = Color.blue;
 
             if (postIt != null)
             {
+
                 postIt = null;
             }
         }
         if (postIt != null)
         {
-            thisMaterial.color = Color.cyan;
+            thisMaterial.color = Color.green;
             movePostIt(postIt);
         }
     }
-    private void OnTriggerEnter(Collider other)
-    {
-        if (other.gameObject.tag == "Post-it")
-        {
-            thisMaterial.color = Color.green;
-        }
-
-    }
-
-    private void OnTriggerStay(Collider other)
-    {
-
-    }
     private void catchPostIt()
     {
-        thisMaterial.color = Color.yellow;
         Vector3 screenPoint = camera.WorldToScreenPoint(gameObject.transform.position);
         Ray cameraRay = camera.ScreenPointToRay(screenPoint);
         RaycastHit[] hits = Physics.RaycastAll(cameraRay, 1000,6);
@@ -100,6 +82,11 @@ public class FingerCollider : MonoBehaviour
         }
         
     }
+    private void stopMovingPostIt(PostItNoteNetwork currentPostIt)
+    {
+
+    }
+
 
     private void movePostIt(PostItNoteNetwork currentPostIt)
     {
