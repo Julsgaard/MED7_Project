@@ -1,4 +1,6 @@
 using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.Linq;
 using TMPro;
 using Unity.Collections;
@@ -19,9 +21,17 @@ public class GameManager : NetworkBehaviour
     [SerializeField] private GameObject xrOrigin, arSession, windowsCamera;
     
     // NetworkObject networkObject;
+
+    [Header("Guide user to find marker")] 
+    [SerializeField] private GameObject findMarkerUI;
+    [SerializeField] private Button placeNotesButton;
+    [SerializeField] private TextMeshProUGUI markerInstruction;
+    private bool _isFindingMarker, _isNotesButtonClicked;
     
+    [FormerlySerializedAs("postItParentLocalCoords")]
+    [FormerlySerializedAs("postItParent")]
     [Header("PostIt Spawn Layout")]
-    [SerializeField] private GameObject postItParent;
+    [SerializeField] private GameObject postItParentLocal;
     [SerializeField] private GameObject postItNotePrefab;
     private bool _notesSentToServer = false;
     [SerializeField] private float sameApplicantOffset = .03f;
@@ -49,6 +59,8 @@ public class GameManager : NetworkBehaviour
         createApplicantUIObject.SetActive(false);
         arSettingsUI.SetActive(false);
         connectUIObject.SetActive(false);
+        findMarkerUI.SetActive(false);
+        
         
         // Changes based on platform
 #if UNITY_ANDROID && !UNITY_EDITOR
@@ -159,10 +171,12 @@ public class GameManager : NetworkBehaviour
             Debug.Log($"db: isNotes Sent to server: {_notesSentToServer}");
             if (!_notesSentToServer)
             {
-                Debug.Log($"db: Sending notes to server! Calling 'SendAllNotesToServer()'");
+                Debug.Log($"db: Sending notes to server! Starting Coroutine");
 
                 // Send all applicant notes to the server
-                SendAllNotesToServer();
+                StartCoroutine(UserToFindMarkerBeforeSpawnNotes());
+
+                //SendAllNotesToServer();
             }
             
             // Unsubscribe from the callback to prevent multiple subscriptions
@@ -172,6 +186,69 @@ public class GameManager : NetworkBehaviour
         {
             Debug.Log($"Client {clientId} connected to the server");
         }
+    }
+
+    private IEnumerator UserToFindMarkerBeforeSpawnNotes()
+    {
+        Debug.Log($"db: Coroutine started. Checking if user is finding marker: {_isFindingMarker}'.");
+
+        if (_isFindingMarker) yield break;
+        _isFindingMarker = true;
+        
+        Debug.Log($"db: User wasn't user is now finding marker: {_isFindingMarker}'.");
+        
+        ARAnchorOnMarker anchor = FindObjectOfType<ARAnchorOnMarker>();
+        
+        findMarkerUI.SetActive(true);
+        
+        CanvasGroup buttonCG = placeNotesButton.GetComponent<CanvasGroup>();
+        buttonCG.alpha = 0;
+        
+        markerInstruction.text = "Find the marker and place it within view of the camera view";
+        
+        // wait for user to find AR marker -- instruct user to find marker
+        
+        Debug.Log($"db: Showing UI. Is now waiting for anchor.isMarkerFound: {anchor.isMarkerFound}.");
+        
+        yield return new WaitUntil(() => anchor.isMarkerFound);
+        
+        Debug.Log($"db: Marker found: (anchor.isMarkerfound: {anchor.isMarkerFound}). Setting found plane as parent.");
+
+        postItParentLocal = anchor.GetMarkerCoordinateSystem();
+        
+        Debug.Log($"db: Plane set as posItParent: {postItParentLocal}.");
+
+        markerInstruction.text = "Position yourself around the table. When you're ready, place your notes.";
+        buttonCG.alpha = 1;
+        
+        Debug.Log($"db: Adding listener to button.");
+
+
+        placeNotesButton.onClick.AddListener(SendAllNotesToServer);
+        
+        Debug.Log($"db: Waiting until button has been clicked: {_isNotesButtonClicked}.");
+
+        
+        yield return new WaitUntil(() => _isNotesButtonClicked);
+        
+        
+        Debug.Log($"db: Button clicked ({_isNotesButtonClicked}) ! Sending notes to server.");
+
+        buttonCG.alpha = 0;
+        markerInstruction.text = "Creating your notes...";
+
+        yield return new WaitUntil(() => _notesSentToServer);
+        
+        
+        Debug.Log($"db: Notes were sent to server: {_notesSentToServer}. Closing UI.");
+
+        
+        markerInstruction.text = "Succes!";
+
+        yield return new WaitForSeconds(1f);
+        
+        findMarkerUI.SetActive(false);
+        
     }
 
     private void OnClientDisconnected(ulong clientId)
@@ -185,6 +262,8 @@ public class GameManager : NetworkBehaviour
             
             // Unsubscribe from the callback
             NetworkManager.Singleton.OnClientDisconnectCallback -= OnClientDisconnected;
+            
+            StopAllCoroutines();
         }
         if (IsServer)
         {
@@ -194,6 +273,7 @@ public class GameManager : NetworkBehaviour
 
     private void SendAllNotesToServer()
     {
+        _isNotesButtonClicked = true;
         Debug.Log($"db: Entered 'SendAllNotesToServer()'");
 
         
@@ -234,9 +314,6 @@ public class GameManager : NetworkBehaviour
                     //postItNoteObject = Instantiate(postItNotePrefab);
                     //Debug.Log($"is postItNoteObject null: {networkObject == null}");
                     // GameObject postit = postItNetworkObject;
-                    
-                    // TODO: we might need to first set this when plane is spawned. Set "spawn post its" to a button which appears after plane is detected
-                    // postit.transform.SetParent(postItParent.transform); // set parent to the marker plane
 
                     // calculate positions
                     float posX = currentBaseOffsetX + currNoteX * sameApplicantNoteOffset - centerOffsetX;
@@ -278,18 +355,8 @@ public class GameManager : NetworkBehaviour
             applicantNum++;
             currentBaseOffsetX += (sameApplicantNoteOffset * currApplicantNumCols) + (diffApplicantOffset-sameApplicantOffset);
         }
-        
-        Vector3 offsetXVector = new Vector3(currentBaseOffsetX / 2, 0, 0);
-        Debug.Log($"db: Finished notes for ALL applicant. Fixing offset with offsetvector: {offsetXVector}");
-        
-        Debug.Log($"db: Countinr number of notes in NoteManager: {NoteManager.Instance.notes.Count()} !!!!!!!!!!!!!!!!!!!!!!!!!!!!");
-        foreach (var note in NoteManager.Instance.notes)
-        {
-            Debug.Log($"db: Fixing offset for note {note}.");
-            note.notePosition.Value -= offsetXVector;
-        }
-        
-        Debug.Log($"db: COMPLETELY FISNISHED FIXING ALL NOTES' POSITIONS");
+
+        _notesSentToServer = true;
 
     }
     
@@ -299,7 +366,7 @@ public class GameManager : NetworkBehaviour
     public void CreateNoteServerRpc(Vector3 newPos, string text, Color color, int applicantNumber, ServerRpcParams rpcParams = default)
     {
         // Creating the note GameObject
-        GameObject postItNoteObject = Instantiate(postItNotePrefab);
+        GameObject postItNoteObject = Instantiate(postItNotePrefab, postItParentLocal.transform);
         
         // Set the position of the note
         //postItNoteObject.transform.position = newPos;
@@ -311,6 +378,12 @@ public class GameManager : NetworkBehaviour
         
         // Get the PostItNoteNetwork component from the PostItNoteObject
         PostItNoteNetwork postItNoteNetwork = postItNoteObject.GetComponent<PostItNoteNetwork>();
+        
+        Debug.Log($"db: Setting post-it parent!");
+        // TODO: we might need to first set this when plane is spawned. Set "spawn post its" to a button which appears after plane is detected
+        //networkObject.transform.SetParent(postItParentLocalCoords.transform); // set parent to the marker plane
+        Debug.Log($"db: Post-it parent was set successfully! (SKIPPING THIS STEP NOW)");
+
 
         // Set the note data directly on the server
         postItNoteNetwork.noteText.Value = new FixedString512Bytes(text);
