@@ -671,6 +671,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 114578675002002822, guid: 84b17eee54c744578b650ff304284bda,
         type: 3}
+      propertyPath: skeleton3d
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 114578675002002822, guid: 84b17eee54c744578b650ff304284bda,
+        type: 3}
       propertyPath: contourGizmo
       value: 
       objectReference: {fileID: 1740349960}
@@ -1521,6 +1526,11 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 331264287}
     m_Modifications:
+    - target: {fileID: 4111831609420844689, guid: 79f57eb7ac9662044893b12e40602b18,
+        type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 4111831609420844689, guid: 79f57eb7ac9662044893b12e40602b18,
         type: 3}
       propertyPath: m_SortingOrder

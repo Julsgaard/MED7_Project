@@ -11,7 +11,7 @@ public class FingerCollider : MonoBehaviour
     public static PostItNote postIt = null;
     private Vector3 oldPos;
     Material thisMaterial;
-    private LineRenderer lineRenderer;
+   // private LineRenderer lineRenderer;
 
     //ManomotionManager manomotionManager;
     // Start is called before the first frame update
@@ -20,9 +20,9 @@ public class FingerCollider : MonoBehaviour
         thisMaterial = gameObject.GetComponent<Renderer>().material;
         //manomotionManager = ManomotionManager.Instance;
         thisMaterial.color = Color.blue;
-        lineRenderer = GetComponent<LineRenderer>();
-        lineRenderer.startWidth = 0.01f; // Width at the start of the line
-        lineRenderer.endWidth = 0.01f;   // Width at the end of the line
+       // lineRenderer = GetComponent<LineRenderer>();
+       // lineRenderer.startWidth = 0.01f; // Width at the start of the line
+       // lineRenderer.endWidth = 0.01f;   // Width at the end of the line
 
     }
 
@@ -81,9 +81,9 @@ public class FingerCollider : MonoBehaviour
         Vector3 screenPoint = Camera.main.WorldToScreenPoint(gameObject.transform.position);
         Ray cameraRay = Camera.main.ScreenPointToRay(screenPoint);
         RaycastHit[] hits = Physics.RaycastAll(cameraRay, 1000,3);
-        lineRenderer.positionCount = 2;
-        lineRenderer.SetPosition(0, cameraRay.origin); // Start point of the ray
-        lineRenderer.SetPosition(1, cameraRay.origin + cameraRay.direction * 10000);
+        //lineRenderer.positionCount = 2;
+        //lineRenderer.SetPosition(0, cameraRay.origin); // Start point of the ray
+        //lineRenderer.SetPosition(1, cameraRay.origin + cameraRay.direction * 10000);
         foreach (RaycastHit hit in hits) {
             GetComponentInChildren<TextMeshPro>().text = hit.collider.gameObject.tag;
             
