@@ -15,7 +15,7 @@ public class PostItNoteNetwork : NetworkBehaviour
         notePosition.OnValueChanged += OnPositionChanged;
         noteText.OnValueChanged += OnTextChanged;
         noteColor.OnValueChanged += OnColorChanged;
-
+        
         // Initialize with current values
         OnPositionChanged(Vector3.zero, notePosition.Value);
         OnTextChanged(new FixedString512Bytes(), noteText.Value);

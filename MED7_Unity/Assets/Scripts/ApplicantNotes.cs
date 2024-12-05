@@ -96,7 +96,7 @@ public class ApplicantNotes : MonoBehaviour
         // Move to the next applicant
         currentApplicantIndex = (currentApplicantIndex + 1) % applicantAmount;
         
-        Debug.Log($"Next applicant, current number: {currentApplicantIndex}");
+        // Debug.Log($"Next applicant, current number: {currentApplicantIndex}");
         
         // Update UI
         UpdateApplicantUI();
@@ -107,7 +107,7 @@ public class ApplicantNotes : MonoBehaviour
         // Move to the previous applicant
         currentApplicantIndex = (currentApplicantIndex - 1 + applicantAmount) % applicantAmount;
         
-        Debug.Log($"Previous applicant, current number: {currentApplicantIndex}");
+        // Debug.Log($"Previous applicant, current number: {currentApplicantIndex}");
         
         // Update UI
         UpdateApplicantUI();
