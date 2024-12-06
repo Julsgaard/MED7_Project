@@ -13,7 +13,7 @@ public class ManoMotionSetup
     /// </summary>
     static ManoMotionSetup()
     {
-#if UNITY_ANDROID
+#if UNITY_ANDROID && !UNITY_EDITOR
         Debug.Log("Setting up ManoMotion Library Requirements");
         PlayerSettings.Android.preferredInstallLocation = AndroidPreferredInstallLocation.PreferExternal;
         PlayerSettings.Android.forceInternetPermission = true;

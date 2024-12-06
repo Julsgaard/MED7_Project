@@ -1945,6 +1945,12 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 3b19460acec7fad4baeab3db2a8268e1, type: 3}
+--- !u!1 &247568459 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 1627255014069736, guid: 3b19460acec7fad4baeab3db2a8268e1,
+    type: 3}
+  m_PrefabInstance: {fileID: 247568458}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &262424124
 GameObject:
   m_ObjectHideFlags: 0
@@ -2306,6 +2312,12 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: f00faf9a7a7689d4ba5c0d869ea6966e, type: 3}
+--- !u!1 &293565486 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 5728444179365643887, guid: f00faf9a7a7689d4ba5c0d869ea6966e,
+    type: 3}
+  m_PrefabInstance: {fileID: 293565485}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &317522749
 GameObject:
   m_ObjectHideFlags: 0
@@ -4449,6 +4461,12 @@ PrefabInstance:
 --- !u!1 &578744502 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 3740225894944346961, guid: 84b17eee54c744578b650ff304284bda,
+    type: 3}
+  m_PrefabInstance: {fileID: 578744501}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1 &578744503 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 1374944095837672, guid: 84b17eee54c744578b650ff304284bda,
     type: 3}
   m_PrefabInstance: {fileID: 578744501}
   m_PrefabAsset: {fileID: 0}
@@ -12556,6 +12574,7 @@ GameObject:
   - component: {fileID: 1477298637}
   - component: {fileID: 1477298638}
   - component: {fileID: 1477298636}
+  - component: {fileID: 1477298639}
   m_Layer: 0
   m_Name: GameManager
   m_TagString: Untagged
@@ -12575,7 +12594,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cd51fa6bc2841c64394a79e77d0a4d73, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  defaultIpAddress: 100.77.147.101
+  defaultIpAddress: 127.0.0.1
   ipAddressInputField: {fileID: 2132021173}
   connectUIObject: {fileID: 1232902817}
   introUIObject: {fileID: 832707599}
@@ -12587,14 +12606,16 @@ MonoBehaviour:
   connectToServerButtonOptions: {fileID: 1489929592}
   serverButton: {fileID: 832517151}
   moveAllNotesUpButton: {fileID: 1412956166}
-  xrOrigin: {fileID: 920326166}
-  arSession: {fileID: 702413256}
-  windowsCamera: {fileID: 1941622489}
   findMarkerUI: {fileID: 1624105737}
   placeNotesButton: {fileID: 188148739}
   markerInstruction: {fileID: 608830357}
-  postItParentLocal: {fileID: 4218618458727912268, guid: 1c411ce284b8b8b4d80c992fb4b4b29b,
-    type: 3}
+  xrOrigin: {fileID: 920326166}
+  arSession: {fileID: 702413256}
+  windowsCamera: {fileID: 1941622489}
+  manomotionManager: {fileID: 247568459}
+  gizmoCanvas: {fileID: 578744503}
+  skeletonManager: {fileID: 293565486}
+  postItParentLocal: {fileID: 0}
   postItNotePrefab: {fileID: 8494581529409893070, guid: 84fa2a5ce9505694a99d354030f5980b,
     type: 3}
   sameApplicantOffset: 0.03
@@ -12636,6 +12657,18 @@ MonoBehaviour:
   SpawnWithObservers: 1
   DontDestroyWithOwner: 0
   AutoObjectParentSync: 1
+--- !u!114 &1477298639
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1477298635}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 65f59d2a98d04d61a82c84b8d6a61010, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1477498276
 GameObject:
   m_ObjectHideFlags: 0
@@ -18859,7 +18892,7 @@ MonoBehaviour:
   m_MaxConnectAttempts: 60
   m_DisconnectTimeoutMS: 30000
   ConnectionData:
-    Address: 100.77.147.101
+    Address: 0
     Port: 7777
     ServerListenAddress: 0.0.0.0
   DebugSimulator:

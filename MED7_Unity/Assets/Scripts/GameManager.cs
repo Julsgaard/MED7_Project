@@ -1,7 +1,5 @@
 using System;
 using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
 using TMPro;
 using Unity.Collections;
 using Unity.Netcode;
@@ -18,15 +16,16 @@ public class GameManager : NetworkBehaviour
     [SerializeField] private TMP_InputField ipAddressInputField;
     [SerializeField] private GameObject connectUIObject, introUIObject, createApplicantUIObject, blackBackgroundUI, arSettingsUI;
     [SerializeField] private Button nextButton, connectToServerButton, connectToServerButtonOptions, serverButton, moveAllNotesUpButton;
-    [SerializeField] private GameObject xrOrigin, arSession, windowsCamera;
-    
-    // NetworkObject networkObject;
 
     [Header("Guide user to find marker")] 
     [SerializeField] private GameObject findMarkerUI;
     [SerializeField] private Button placeNotesButton;
     [SerializeField] private TextMeshProUGUI markerInstruction;
     private bool _isFindingMarker, _isNotesButtonClicked;
+
+    [Header("Android Specific GameObjects")]
+    [SerializeField] private GameObject xrOrigin;
+    [SerializeField] private GameObject arSession, windowsCamera, manomotionManager, gizmoCanvas, skeletonManager;
     
     [Header("PostIt Spawn Layout")]
     [SerializeField] private GameObject postItParentLocal;
@@ -38,8 +37,6 @@ public class GameManager : NetworkBehaviour
     [Header("Script References")]
     [SerializeField] private ApplicantNotes applicantNotes;
     
-    
-    // Set the default IP address for the UI input field
     private void Awake()
     {
         AddListenersToUI();
@@ -72,6 +69,9 @@ public class GameManager : NetworkBehaviour
         xrOrigin.SetActive(false);
         arSession.SetActive(false);
         windowsCamera.SetActive(true);
+        manomotionManager.SetActive(false);
+        gizmoCanvas.SetActive(false);
+        skeletonManager.SetActive(false);
 #endif
     }
     
@@ -143,9 +143,9 @@ public class GameManager : NetworkBehaviour
         NetworkManager.Singleton.OnClientConnectedCallback += OnClientConnected;
         NetworkManager.Singleton.OnClientDisconnectCallback += OnClientDisconnected;
         
-        // Start the server
+        // Start the server and log it
         NetworkManager.Singleton.StartServer();
-        Debug.Log("Server started");
+        DataLogger.instance.LogServerStarted();
         
         connectUIObject.SetActive(false);
         blackBackgroundUI.SetActive(false);
@@ -182,7 +182,8 @@ public class GameManager : NetworkBehaviour
         }
         if (IsServer)
         {
-            Debug.Log($"Client {clientId} connected to the server");
+            // Log client connected
+            DataLogger.instance.LogClientConnected(clientId);
         }
     }
 
@@ -269,7 +270,8 @@ public class GameManager : NetworkBehaviour
         }
         if (IsServer)
         {
-            Debug.Log($"Client {clientId} disconnected from the server");
+            // Log client disconnected
+            DataLogger.instance.LogClientDisconnected(clientId);
         }
     }
 
@@ -357,13 +359,11 @@ public class GameManager : NetworkBehaviour
             applicantNum++;
             currentBaseOffsetX += (sameApplicantNoteOffset * currApplicantNumCols) + (diffApplicantOffset-sameApplicantOffset);
         }
-
+        
         _notesSentToServer = true;
-
     }
     
-    // Server RPC method for creating the note on the server, it is called by the client when connected to the server
-    // RequireOnwership is set to false, it allows the client to create the note on the server
+    // Server RPC method for creating the note on the server. RequireOnwership is set to false, it allows the client to create the note on the server
     [ServerRpc(RequireOwnership = false)]
     public void CreateNoteServerRpc(Vector3 newPos, string text, Color color, int applicantNumber, ServerRpcParams rpcParams = default)
     {
@@ -390,9 +390,11 @@ public class GameManager : NetworkBehaviour
         // Set the note data directly on the server
         postItNoteNetwork.noteText.Value = new FixedString512Bytes(text);
         postItNoteNetwork.noteColor.Value = color;
-
         postItNoteNetwork.notePosition.Value = newPos;
+        
         postItNoteNetwork.newClient(NetworkManager.Singleton.LocalClientId);
+        
+        // Log the note creation
+        DataLogger.instance.LogPostItNoteCreated(newPos, text, color, 0); //TODO: needs the correct client id
     }
-    
 }

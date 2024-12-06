@@ -3,19 +3,19 @@ using UnityEngine;
 
 public class NoteManager : MonoBehaviour
 {
-    public static NoteManager Instance { get; private set; }
+    public static NoteManager instance { get; private set; }
 
     [SerializeField] public List<PostItNoteNetwork> notes = new List<PostItNoteNetwork>();
     
     private void Awake()
     {
         // Singleton
-        if (Instance != null && Instance != this)
+        if (instance != null && instance != this)
         {
             Destroy(gameObject);
             return;
         }
-        Instance = this;
+        instance = this;
     }
 
     public void RegisterNote(PostItNoteNetwork note)

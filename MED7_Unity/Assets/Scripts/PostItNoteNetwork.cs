@@ -45,7 +45,7 @@ public class PostItNoteNetwork : NetworkBehaviour
         OnTextChanged(new FixedString512Bytes(), noteText.Value);
         OnColorChanged(Color.magenta, noteColor.Value);
 
-        NoteManager.Instance.RegisterNote(this);
+        NoteManager.instance.RegisterNote(this);
         
         //Renderer renderer = GetComponent<Renderer>(); // what the shit
     }

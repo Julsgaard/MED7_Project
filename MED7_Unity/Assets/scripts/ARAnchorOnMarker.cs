@@ -1,9 +1,6 @@
-using System;
 using Unity.Netcode;
-using Unity.XR.CoreUtils;
 using UnityEngine;
 using UnityEngine.XR.ARFoundation;
-using UnityEngine.XR.ARSubsystems;
 
 public class ARAnchorOnMarker : MonoBehaviour
 {
@@ -33,13 +30,12 @@ public class ARAnchorOnMarker : MonoBehaviour
         planePositionNetwork = planeInstance.GetComponent<PostItParentNetwork>();
         
         networkPlane = planeInstance.GetComponent<NetworkObject>();
-        networkPlane.Spawn();
         
         markerCoordinateSystem = new GameObject("Marker Coordinate System");
         markerCoordinateSystem.transform.SetPositionAndRotation(planeInstance.transform.position, planeInstance.transform.rotation);
     }
 
-    void OnEnable()
+    private void OnEnable()
     {
         trackedImageManager.trackedImagesChanged += OnTrackedImagesChanged;
     }
@@ -51,6 +47,8 @@ public class ARAnchorOnMarker : MonoBehaviour
         {
             AnchorContent(trackedImage.transform);
             isMarkerFound = true;
+            
+            networkPlane.Spawn(); // Spawn the plane on the network
         }
         
         // CALLED EVERY FRAME AFTERWARD: WHEN MARKER IS BEING TRACKED AS IT MOVES
