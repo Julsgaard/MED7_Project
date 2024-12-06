@@ -18,6 +18,7 @@ public class ImageNetworkAnchorer : NetworkBehaviour
 
     [SerializeField]
     private XROrigin XROrigin; 
+    private GameObject XROriginGameObject;
 
     private PostItParentNetwork postItParent;
 
@@ -44,6 +45,8 @@ public class ImageNetworkAnchorer : NetworkBehaviour
     {
             if (IsServer) { return; }
             imageManager.trackedImagesChanged += OnTrackedImagesChanged;
+
+            XROriginGameObject = XROrigin.gameObject;
     }
 
     private void OnTrackedImagesChanged(ARTrackedImagesChangedEventArgs args)
@@ -57,21 +60,30 @@ public class ImageNetworkAnchorer : NetworkBehaviour
                 {
                     SpawnParentServerRpc(trackedImage.transform.position, trackedImage.transform.rotation);
                     postItParent = GetPostItParent();
+                    
+                    if (GetPostItParent().gameObject.GetComponent<ARAnchor>() == null)
+                    {
+                        GetPostItParent().gameObject.AddComponent<ARAnchor>();
+                    }
+                    
+                    // SetWorldOriginServerRpc(trackedImage.transform.position, trackedImage.transform.rotation);
                 }
                 
             }
-            HandleTrackedImageUpdate(trackedImage.transform);
+            // HandleTrackedImageUpdate(trackedImage.transform);
         }
 
         foreach (var trackedImage in args.updated)
         {
-            HandleTrackedImageUpdate(trackedImage.transform);
+            // HandleTrackedImageUpdate(trackedImage.transform);
+            SetWorldOriginServerRpc(trackedImage.transform.position, trackedImage.transform.rotation);
         }
     }
     private void HandleTrackedImageUpdate(Transform markerTransform)
     {
         tableUpdatePositionServerRpc(markerTransform.position, markerTransform.rotation);
     }
+    
     [ServerRpc(RequireOwnership = false)]
     private void tableUpdatePositionServerRpc(Vector3 position, Quaternion rotation)
     {
@@ -95,22 +107,13 @@ public class ImageNetworkAnchorer : NetworkBehaviour
     [ServerRpc(RequireOwnership = false)]
     private void SetWorldOriginServerRpc(Vector3 position, Quaternion rotation)
     {
-        foreach (var client in NetworkManager.Singleton.ConnectedClientsList)
-        {
-            SetWorldOriginClientRpc(position, rotation, client.ClientId);
-        }
+        SetWorldOriginClientRpc(position, rotation);
     }
 
     [ClientRpc]
-    private void SetWorldOriginClientRpc(Vector3 originPosition, Quaternion originRotation, ulong clientId)
+    private void SetWorldOriginClientRpc(Vector3 originPosition, Quaternion originRotation)
     {
-        if (NetworkManager.Singleton.LocalClientId == clientId)
-        {
-            if (IsServer) { return; }
-            XROrigin.transform.position = originPosition;
-            XROrigin.transform.rotation = originRotation;
-        }
+        XROriginGameObject.transform.position = originPosition;
+        XROriginGameObject.transform.rotation = originRotation;
     }
-
-
 }
