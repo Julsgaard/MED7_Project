@@ -22,13 +22,15 @@ public class GameManager : NetworkBehaviour
     [SerializeField] private Button placeNotesButton;
     [SerializeField] private TextMeshProUGUI markerInstruction;
     private bool _isFindingMarker, _isNotesButtonClicked;
+    private Vector3 _anchorPos = Vector3.zero;
+    private Quaternion _anchorRot = Quaternion.identity;
 
     [Header("Android Specific GameObjects")]
     [SerializeField] private GameObject xrOrigin;
     [SerializeField] private GameObject arSession, windowsCamera, manomotionManager, gizmoCanvas, skeletonManager;
     
     [Header("PostIt Spawn Layout")]
-    [SerializeField] private GameObject postItParentLocal;
+    // [SerializeField] private GameObject postItParentLocal;
     [SerializeField] private GameObject postItNotePrefab;
     private bool _notesSentToServer = false;
     [SerializeField] private float sameApplicantOffset = .03f;
@@ -189,69 +191,36 @@ public class GameManager : NetworkBehaviour
 
     private IEnumerator UserToFindMarkerBeforeSpawnNotes()
     {
-        Debug.Log($"db: Coroutine started. Checking if user is finding marker: {_isFindingMarker}'.");
-
-        if (_isFindingMarker) yield break;
-        _isFindingMarker = true;
-        
-        Debug.Log($"db: User wasn't user is now finding marker: {_isFindingMarker}'.");
-        
         ARAnchorOnMarker anchor = FindObjectOfType<ARAnchorOnMarker>();
         
         findMarkerUI.SetActive(true);
-        //check if ui is active
-        Debug.Log($"is marker UI set to active: {findMarkerUI.activeSelf}");
-        if (findMarkerUI.activeSelf) Debug.Log($"Hi, I'm a fucking UI and I'm active ({findMarkerUI.activeSelf}) but I wont show will I? Why? Because I'm a fucking UI and I'm a fucking");
-        
         CanvasGroup buttonCG = placeNotesButton.GetComponent<CanvasGroup>();
         buttonCG.alpha = 0;
-        
-        markerInstruction.text = "Find the marker and place it within view of the camera view";
-        Debug.Log($"db: Marker instruction set to: '{markerInstruction.text}'");
+        markerInstruction.text = "Look at the marker with the camera";
         
         // wait for user to find AR marker -- instruct user to find marker
         
-        Debug.Log($"db: Showing UI. Is now waiting for anchor.isMarkerFound: {anchor.isMarkerFound}.");
-        
         yield return new WaitUntil(() => anchor.isMarkerFound);
-        
-        Debug.Log($"db: Marker found: (anchor.isMarkerfound: {anchor.isMarkerFound}). Setting found plane as parent.");
 
-        postItParentLocal = anchor.GetMarkerCoordinateSystem();
+        // Marker found
+        _anchorPos = anchor.GetMarkerWorldPosition();
+        _anchorRot = anchor.GetMarkerWorldRotation();
         
-        Debug.Log($"db: Plane set as posItParent: {postItParentLocal}.");
-
-        markerInstruction.text = "Position yourself around the table. When you're ready, place your notes.";
+        markerInstruction.text = "Position yourself. When ready, place your notes.";
         buttonCG.alpha = 1;
         
-        Debug.Log($"db: Adding listener to button.");
-
-
         placeNotesButton.onClick.AddListener(SendAllNotesToServer);
-        
-        Debug.Log($"db: Waiting until button has been clicked: {_isNotesButtonClicked}.");
-
         
         yield return new WaitUntil(() => _isNotesButtonClicked);
         
-        
-        Debug.Log($"db: Button clicked ({_isNotesButtonClicked}) ! Sending notes to server.");
-
-        buttonCG.alpha = 0;
+        // buttonCG.alpha = 0;
         markerInstruction.text = "Creating your notes...";
 
         yield return new WaitUntil(() => _notesSentToServer);
         
-        
-        Debug.Log($"db: Notes were sent to server: {_notesSentToServer}. Closing UI.");
-
-        
         markerInstruction.text = "Succes!";
-
         yield return new WaitForSeconds(1f);
-        
         findMarkerUI.SetActive(false);
-        
     }
 
     private void OnClientDisconnected(ulong clientId)
@@ -311,9 +280,9 @@ public class GameManager : NetworkBehaviour
                 Debug.Log($"db: Entered seconds foreach for note {applicantNum}/'{noteText}'");
 
                 // Check if the note text is note empty or null
-                if (noteText != "" && noteText != null)
+                if (!string.IsNullOrEmpty(noteText))
                 {
-                    Debug.Log($"db: Entered if statemetn meaning '{noteText}' is not null/empty!");
+                    Debug.Log($"db: Entered if statement meaning '{noteText}' is not null/empty!");
                     // Create the note and send it to the server
                     //postItNoteObject = Instantiate(postItNotePrefab);
                     //Debug.Log($"is postItNoteObject null: {networkObject == null}");
@@ -322,11 +291,14 @@ public class GameManager : NetworkBehaviour
                     // calculate positions
                     float posX = currentBaseOffsetX + currNoteX * sameApplicantNoteOffset - centerOffsetX;
                     float posZ = currNoteY * sameApplicantNoteOffset;
-                    Vector3 newPos = new Vector3(posX, 0, posZ);
+                    Vector3 offset = new Vector3(posX, 0, posZ);
+                    
+                    Vector3 rotatedOffset = _anchorRot * offset; // rotate the offset by the anchor rotation
+                    Vector3 newPos = _anchorPos + rotatedOffset; // world space position
 
-                    Debug.Log($"db: Calling 'CreateNoteServerRpc()'");
+                    // Debug.Log($"db: Calling 'CreateNoteServerRpc()'");
                     CreateNoteServerRpc(newPos, noteText, applicant.applicantColour, applicant.applicantNumber);
-                    Debug.Log($"db: Called 'CreateNoteServerRpc()'");
+                    // Debug.Log($"db: Called 'CreateNoteServerRpc()'");
                     
                     // increment positions
                     currNoteX++;
@@ -368,31 +340,21 @@ public class GameManager : NetworkBehaviour
     public void CreateNoteServerRpc(Vector3 newPos, string text, Color color, int applicantNumber, ServerRpcParams rpcParams = default)
     {
         // Creating the note GameObject
-        GameObject postItNoteObject = Instantiate(postItNotePrefab, postItParentLocal.transform);
-        
-        // Set the position of the note
-        //postItNoteObject.transform.position = newPos;
+        GameObject postItNoteObject = Instantiate(postItNotePrefab, newPos, Quaternion.identity);
         
         // Get NetworkObject and spawn it
         NetworkObject networkObject = postItNoteObject.GetComponent<NetworkObject>();
         networkObject.Spawn();
-        // postItNetworkObject = networkObject;
         
         // Get the PostItNoteNetwork component from the PostItNoteObject
         PostItNoteNetwork postItNoteNetwork = postItNoteObject.GetComponent<PostItNoteNetwork>();
         
-        Debug.Log($"db: Setting post-it parent!");
-        // TODO: we might need to first set this when plane is spawned. Set "spawn post its" to a button which appears after plane is detected
-        //networkObject.transform.SetParent(postItParentLocalCoords.transform); // set parent to the marker plane
-        Debug.Log($"db: Post-it parent was set successfully! (SKIPPING THIS STEP NOW)");
-
-
         // Set the note data directly on the server
         postItNoteNetwork.noteText.Value = new FixedString512Bytes(text);
         postItNoteNetwork.noteColor.Value = color;
         postItNoteNetwork.notePosition.Value = newPos;
         
-        postItNoteNetwork.newClient(NetworkManager.Singleton.LocalClientId);
+        // postItNoteNetwork.newClient(NetworkManager.Singleton.LocalClientId);
         
         // Log the note creation
         DataLogger.instance.LogPostItNoteCreated(newPos, text, color, 0); //TODO: needs the correct client id
