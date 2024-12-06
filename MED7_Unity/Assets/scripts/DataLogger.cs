@@ -30,7 +30,7 @@ public class DataLogger : NetworkBehaviour
         
         // Create a new .csv file and write the header
         string header = "Timestamp;EventType;Position;Text;Color;ClientId";
-        System.IO.File.WriteAllText(_savePath, header + "\n");
+        System.IO.File.WriteAllText(_savePath, header + "\n"); //TODO: If the note text contains a ; or a newline, this will break
         
         Debug.Log("Log file created at: " + _savePath);
     }
