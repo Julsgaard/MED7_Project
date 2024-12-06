@@ -33,6 +33,7 @@ public class GameManager : NetworkBehaviour
     private bool _notesSentToServer = false;
     [SerializeField] private float sameApplicantOffset = .03f;
     [SerializeField] private float diffApplicantOffset = .05f;
+    private ARAnchorOnMarker anchor;
     
     [Header("Script References")]
     [SerializeField] private ApplicantNotes applicantNotes;
@@ -46,7 +47,13 @@ public class GameManager : NetworkBehaviour
         
         ShowIntroUI();
     }
-    
+
+    private void Start()
+    {
+        anchor = FindObjectOfType<ARAnchorOnMarker>();
+        postItParentLocal = anchor.GetMarkerCoordinateSystem();
+    }
+
     private void ShowIntroUI()
     {
         introUIObject.SetActive(true);
@@ -196,8 +203,6 @@ public class GameManager : NetworkBehaviour
         
         Debug.Log($"db: User wasn't user is now finding marker: {_isFindingMarker}'.");
         
-        ARAnchorOnMarker anchor = FindObjectOfType<ARAnchorOnMarker>();
-        
         findMarkerUI.SetActive(true);
         //check if ui is active
         Debug.Log($"is marker UI set to active: {findMarkerUI.activeSelf}");
@@ -216,8 +221,6 @@ public class GameManager : NetworkBehaviour
         yield return new WaitUntil(() => anchor.isMarkerFound);
         
         Debug.Log($"db: Marker found: (anchor.isMarkerfound: {anchor.isMarkerFound}). Setting found plane as parent.");
-
-        postItParentLocal = anchor.GetMarkerCoordinateSystem();
         
         Debug.Log($"db: Plane set as posItParent: {postItParentLocal}.");
 
@@ -367,13 +370,13 @@ public class GameManager : NetworkBehaviour
     [ServerRpc(RequireOwnership = false)]
     public void CreateNoteServerRpc(Vector3 newPos, string text, Color color, int applicantNumber, ServerRpcParams rpcParams = default)
     {
-        Debug.Log($"db: Is postItParentLocal null?: {postItParentLocal == null}");
-        if (postItParentLocal == null)
-        {
-            postItParentLocal = FindObjectOfType<ARAnchorOnMarker>().GetMarkerCoordinateSystem();
-            Debug.Log($"db: postItParentLocal was null! Tried to set it to an instance again: {postItParentLocal == null}");
-
-        }
+        // Debug.Log($"db: Is postItParentLocal null?: {postItParentLocal == null}");
+        // if (postItParentLocal == null)
+        // {
+        //     postItParentLocal = FindObjectOfType<ARAnchorOnMarker>().GetMarkerCoordinateSystem();
+        //     Debug.Log($"db: postItParentLocal was null! Tried to set it to an instance again: {postItParentLocal == null}");
+        //
+        // }
         
         // Creating the note GameObject
         GameObject postItNoteObject = Instantiate(postItNotePrefab, postItParentLocal.transform);
