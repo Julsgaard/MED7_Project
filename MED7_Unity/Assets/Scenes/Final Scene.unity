@@ -9731,13 +9731,11 @@ PrefabInstance:
     - {fileID: 6793537831567543838, guid: 1c411ce284b8b8b4d80c992fb4b4b29b, type: 3}
     - {fileID: 5054116811005267767, guid: 1c411ce284b8b8b4d80c992fb4b4b29b, type: 3}
     - {fileID: 2621023940380400790, guid: 1c411ce284b8b8b4d80c992fb4b4b29b, type: 3}
-    m_RemovedGameObjects: []
+    - {fileID: 5037368199805456328, guid: 1c411ce284b8b8b4d80c992fb4b4b29b, type: 3}
+    m_RemovedGameObjects:
+    - {fileID: 3731526423262505556, guid: 1c411ce284b8b8b4d80c992fb4b4b29b, type: 3}
     m_AddedGameObjects: []
-    m_AddedComponents:
-    - targetCorrespondingSourceObject: {fileID: 6515886133237413864, guid: 1c411ce284b8b8b4d80c992fb4b4b29b,
-        type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 0}
+    m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 1c411ce284b8b8b4d80c992fb4b4b29b, type: 3}
 --- !u!1 &1105516733 stripped
 GameObject:
@@ -12577,7 +12575,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cd51fa6bc2841c64394a79e77d0a4d73, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  defaultIpAddress: 127.0.0.1
+  defaultIpAddress: 192.168.50.141
   ipAddressInputField: {fileID: 2132021173}
   connectUIObject: {fileID: 1232902817}
   introUIObject: {fileID: 832707599}
@@ -18373,7 +18371,7 @@ MonoBehaviour:
     EnableNetworkLogs: 1
     OldPrefabList: []
   RunInBackground: 1
-  LogLevel: 0
+  LogLevel: 1
 --- !u!1001 &891726464977617767
 PrefabInstance:
   m_ObjectHideFlags: 0
