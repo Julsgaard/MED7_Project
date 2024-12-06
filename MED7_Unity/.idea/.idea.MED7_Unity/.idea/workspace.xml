@@ -5,33 +5,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="05c6e882-459c-461a-a6db-dc6523f5c602" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/Assets/Scripts/DataLogger.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Scripts/DataLogger.cs.meta" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/.idea.MED7_Unity/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.MED7_Unity/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Editor/ManoMotionSetup.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Editor/ManoMotionSetup.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/ManoMotion Skeleton/Materials/SkeletonJointMaterial_3D_Blue.mat" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/ManoMotion Skeleton/Materials/SkeletonJointMaterial_3D_Blue.mat" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/ManoMotion Skeleton/Materials/SkeletonJointMaterial_3D_DarkGreen.mat" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/ManoMotion Skeleton/Materials/SkeletonJointMaterial_3D_DarkGreen.mat" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/ManoMotion Skeleton/Materials/SkeletonJointMaterial_3D_Green.mat" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/ManoMotion Skeleton/Materials/SkeletonJointMaterial_3D_Green.mat" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/ManoMotion Skeleton/Materials/SkeletonJointMaterial_3D_Purple.mat" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/ManoMotion Skeleton/Materials/SkeletonJointMaterial_3D_Purple.mat" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/ManoMotion Skeleton/Materials/SkeletonJointMaterial_3D_Red.mat" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/ManoMotion Skeleton/Materials/SkeletonJointMaterial_3D_Red.mat" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/ManoMotion Skeleton/Materials/SkeletonJointMaterial_3D_Yellow.mat" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/ManoMotion Skeleton/Materials/SkeletonJointMaterial_3D_Yellow.mat" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/PostItParentNetwork.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/PostItParentNetwork.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/PostItParentNetwork.cs.meta" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/PostItParentNetwork.cs.meta" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Scenes/SampleScene.unity" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scenes/SampleScene.unity" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Scripts/GameManager.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/GameManager.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Scripts/LayoutNotes.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Scripts/LayoutNotes.cs.meta" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Scripts/NoteManager.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/NoteManager.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Scripts/PostItNote.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Scripts/PostItNote.cs.meta" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Scripts/PostItNoteNetwork.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/PostItNoteNetwork.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Settings/URP-Performant.asset" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Settings/URP-Performant.asset" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/_ARMarker/Markers/ReferenceImageLibrary.asset" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/_ARMarker/Markers/ReferenceImageLibrary.asset" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/scripts/ARAnchorOnMarker.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/scripts/ARAnchorOnMarker.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/scripts/Postit.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/scripts/Postit.cs.meta" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/ProjectSettings/EditorBuildSettings.asset" beforeDir="false" afterPath="$PROJECT_DIR$/ProjectSettings/EditorBuildSettings.asset" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ProjectSettings/ProjectSettings.asset" beforeDir="false" afterPath="$PROJECT_DIR$/ProjectSettings/ProjectSettings.asset" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -175,7 +149,7 @@
       <workItem from="1733256595122" duration="8352000" />
       <workItem from="1733384975447" duration="1254000" />
       <workItem from="1733393689325" duration="1134000" />
-      <workItem from="1733451009118" duration="5895000" />
+      <workItem from="1733451009118" duration="6178000" />
     </task>
     <servers />
   </component>
