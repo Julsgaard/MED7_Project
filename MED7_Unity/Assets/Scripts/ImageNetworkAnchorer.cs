@@ -5,6 +5,7 @@ using Unity.Netcode;
 using UnityEngine.XR.ARFoundation;
 using System.Xml.Serialization;
 using UnityEngine.XR.ARSubsystems;
+using Unity.XR.CoreUtils;
 
 public class ImageNetworkAnchorer : NetworkBehaviour
 {
@@ -15,6 +16,8 @@ public class ImageNetworkAnchorer : NetworkBehaviour
     [SerializeField]
     private GameObject postItParentPrefab;
 
+    [SerializeField]
+    private XROrigin XROrigin; 
 
     private PostItParentNetwork postItParent;
 
@@ -88,5 +91,26 @@ public class ImageNetworkAnchorer : NetworkBehaviour
         postItParentNetwork.Spawn();
         SetPostItParentID(postItParentNetwork);
     }
-    
+
+    [ServerRpc(RequireOwnership = false)]
+    private void SetWorldOriginServerRpc(Vector3 position, Quaternion rotation)
+    {
+        foreach (var client in NetworkManager.Singleton.ConnectedClientsList)
+        {
+            SetWorldOriginClientRpc(position, rotation, client.ClientId);
+        }
+    }
+
+    [ClientRpc]
+    private void SetWorldOriginClientRpc(Vector3 originPosition, Quaternion originRotation, ulong clientId)
+    {
+        if (NetworkManager.Singleton.LocalClientId == clientId)
+        {
+            if (IsServer) { return; }
+            XROrigin.transform.position = originPosition;
+            XROrigin.transform.rotation = originRotation;
+        }
+    }
+
+
 }

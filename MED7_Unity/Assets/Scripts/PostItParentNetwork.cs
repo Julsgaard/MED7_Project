@@ -28,12 +28,12 @@ public class PostItParentNetwork : NetworkBehaviour
 
     private void OnRotationChanged(Quaternion previousvalue, Quaternion newvalue)
     {
-        gameObject.transform.localRotation = newvalue;
+        gameObject.transform.rotation = newvalue;
     }
 
     private void OnPositionChanged(Vector3 oldPosition, Vector3 newPosition)
     {
-        gameObject.transform.localPosition = newPosition;
+        gameObject.transform.position = newPosition;
     }
     
     public void RequestMoveNote(Vector3 movement)
