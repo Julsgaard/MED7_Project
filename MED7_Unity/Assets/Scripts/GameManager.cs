@@ -367,6 +367,14 @@ public class GameManager : NetworkBehaviour
     [ServerRpc(RequireOwnership = false)]
     public void CreateNoteServerRpc(Vector3 newPos, string text, Color color, int applicantNumber, ServerRpcParams rpcParams = default)
     {
+        Debug.Log($"db: Is postItParentLocal null?: {postItParentLocal == null}");
+        if (postItParentLocal == null)
+        {
+            postItParentLocal = FindObjectOfType<ARAnchorOnMarker>().GetMarkerCoordinateSystem();
+            Debug.Log($"db: postItParentLocal was null! Tried to set it to an instance again: {postItParentLocal == null}");
+
+        }
+        
         // Creating the note GameObject
         GameObject postItNoteObject = Instantiate(postItNotePrefab, postItParentLocal.transform);
         
