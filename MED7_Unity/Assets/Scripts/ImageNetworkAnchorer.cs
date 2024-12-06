@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using Unity.Netcode;
 using UnityEngine.XR.ARFoundation;
+using System.Xml.Serialization;
+using UnityEngine.XR.ARSubsystems;
 
 public class ImageNetworkAnchorer : NetworkBehaviour
 {
@@ -16,12 +18,29 @@ public class ImageNetworkAnchorer : NetworkBehaviour
 
     private PostItParentNetwork postItParent;
 
+    public NetworkVariable<ulong> PostItParentID = new NetworkVariable<ulong>();
+
+    public PostItParentNetwork GetPostItParent()
+    {
+        if (NetworkManager.Singleton.SpawnManager.SpawnedObjects.TryGetValue(PostItParentID.Value, out NetworkObject obj))
+        {
+            return obj.GetComponent<PostItParentNetwork>();
+        }
+        return null;
+    }
+
+    public void SetPostItParentID(NetworkObject obj)
+    {
+        if (IsServer)
+        {
+            PostItParentID.Value = obj.NetworkObjectId;
+        }
+    }
+
     private void Awake()
     {
-        if (imageManager != null)
-        {
+            if (IsServer) { return; }
             imageManager.trackedImagesChanged += OnTrackedImagesChanged;
-        }
     }
 
     private void OnTrackedImagesChanged(ARTrackedImagesChangedEventArgs args)
@@ -30,13 +49,11 @@ public class ImageNetworkAnchorer : NetworkBehaviour
         {
             if(postItParent == null)
             {
-                postItParent = FindAnyObjectByType<PostItParentNetwork>();
+                postItParent = GetPostItParent();
                 if(postItParent == null)
                 {
-                    GameObject newParent = Instantiate(postItParentPrefab,trackedImage.transform);
-                    NetworkObject postItParentNetwork = newParent.GetComponent<NetworkObject>();
-                    postItParentNetwork.Spawn();
-                    postItParent = FindAnyObjectByType<PostItParentNetwork>();
+                    SpawnParentServerRpc(trackedImage.transform.position, trackedImage.transform.rotation);
+                    postItParent = GetPostItParent();
                 }
                 
             }
@@ -50,17 +67,26 @@ public class ImageNetworkAnchorer : NetworkBehaviour
     }
     private void HandleTrackedImageUpdate(Transform markerTransform)
     {
-        AnchorContentServerRpc(markerTransform.position, markerTransform.rotation);
+        tableUpdatePositionServerRpc(markerTransform.position, markerTransform.rotation);
     }
     [ServerRpc(RequireOwnership = false)]
-    private void AnchorContentServerRpc(Vector3 position, Quaternion rotation)
+    private void tableUpdatePositionServerRpc(Vector3 position, Quaternion rotation)
     {
-        postItParent.planePos.Value = position;
-        postItParent.planeRot.Value = rotation;
+        GetPostItParent().planePos.Value = position;
+        GetPostItParent().planeRot.Value = rotation;
 
-        if (postItParent.gameObject.GetComponent<ARAnchor>() == null)
+        if (GetPostItParent().gameObject.GetComponent<ARAnchor>() == null)
         {
-            postItParent.gameObject.AddComponent<ARAnchor>();
+            GetPostItParent().gameObject.AddComponent<ARAnchor>();
         }
     }
+    [ServerRpc(RequireOwnership = false)]
+    private void SpawnParentServerRpc(Vector3 position, Quaternion roation)
+    {
+        GameObject newParent = Instantiate(postItParentPrefab, position, roation);
+        NetworkObject postItParentNetwork = newParent.GetComponent<NetworkObject>();
+        postItParentNetwork.Spawn();
+        SetPostItParentID(postItParentNetwork);
+    }
+    
 }
