@@ -56,7 +56,8 @@ public class FingerCollider : MonoBehaviour
         if (postIt != null)
         {
             thisMaterial.color = Color.green;
-            movePostIt(postIt);
+            // movePostIt(postIt); // TODO: TEMP WHILE I FIX ANCHOR, THIS MIGHT BE CAUSING ISSUES
+
         }
     }
     private void catchPostIt()
@@ -70,9 +71,9 @@ public class FingerCollider : MonoBehaviour
         foreach (RaycastHit hit in hits) {
             GetComponentInChildren<TextMeshPro>().text = hit.collider.gameObject.tag;
             
-            if (hit.collider.gameObject.tag == "Post-it")
+            if (hit.collider.gameObject.CompareTag("Post-it")) 
             {
-                postIt = hit.collider.gameObject.GetComponent<PostItNoteNetwork>();
+                postIt = hit.collider.gameObject.GetComponent<PostItNoteNetwork>(); //TODO: Very inefficient when called in update
                 if (postIt != null)
                 {
                     GetComponentInChildren<TextMeshPro>().text = postIt.gameObject.name;
@@ -87,15 +88,15 @@ public class FingerCollider : MonoBehaviour
 
     }
 
-
-    private void movePostIt(PostItNoteNetwork currentPostIt)
+    private void movePostIt(PostItNoteNetwork currentPostIt) 
     {
         Vector3 screenPoint = camera.WorldToScreenPoint(gameObject.transform.position);
         Ray cameraRay = camera.ScreenPointToRay(screenPoint);
         RaycastHit hit;
         if (Physics.Raycast(cameraRay, out hit, 1000, 6))
         {
-            currentPostIt.RequestMoveNote(hit.transform.position);
+            // currentPostIt.RequestMoveNote(hit.transform.position);
+            currentPostIt.RequestSetPosition(hit.point);
         }
      
         /*

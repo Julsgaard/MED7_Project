@@ -34,7 +34,7 @@ public class PostItNoteNetwork : NetworkBehaviour
         TextMeshPro textMeshPro = GetComponentInChildren<TextMeshPro>();
         textMeshPro.text = newText.ToString();
         
-        Debug.Log("Set note text: " + newText);
+        // Debug.Log("Set note text: " + newText);
     }
     private void OnColorChanged(Color oldColor, Color newColor)
     {
@@ -45,19 +45,32 @@ public class PostItNoteNetwork : NetworkBehaviour
         //Debug.Log("Set note color: " + newColor);
     }
 
-    public void RequestMoveNote(Vector3 movement)
+    // public void RequestMoveNote(Vector3 movement)
+    // {
+    //         GetComponent<Renderer>().material.color = Color.green;
+    //         Vector3 newPosition = gameObject.transform.localPosition + movement;
+    //         RequestMoveServerRpc(newPosition);
+    // }
+    //
+    // [ServerRpc(RequireOwnership = false)]
+    // private void RequestMoveServerRpc(Vector3 newPosition, ServerRpcParams rpcParams = default)
+    // {
+    //     // Server updates the note position
+    //     notePosition.Value = newPosition;
+    //     Debug.Log($"Server moved note to {newPosition} for client {rpcParams.Receive.SenderClientId}");
+    // }
+    
+    
+    public void RequestSetPosition(Vector3 absolutePosition)
     {
-            GetComponent<Renderer>().material.color = Color.green;
-            Vector3 newPosition = gameObject.transform.localPosition + movement;
-            RequestMoveServerRpc(newPosition);
+        // Call ServerRpc to set the note's position
+        RequestSetPositionServerRpc(absolutePosition);
     }
 
     [ServerRpc(RequireOwnership = false)]
-    private void RequestMoveServerRpc(Vector3 newPosition, ServerRpcParams rpcParams = default)
+    private void RequestSetPositionServerRpc(Vector3 absolutePosition, ServerRpcParams rpcParams = default)
     {
-        // Server updates the note position
-        notePosition.Value = newPosition;
-        Debug.Log($"Server moved note to {newPosition} for client {rpcParams.Receive.SenderClientId}");
+        notePosition.Value = absolutePosition;
     }
 
 }
