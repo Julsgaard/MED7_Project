@@ -15,6 +15,8 @@ public class PostItParentNetwork : NetworkBehaviour
     public  NetworkVariable<bool> isBeingMoved = new NetworkVariable<bool>();
     public  NetworkVariable<ulong> movingCLient = new NetworkVariable<ulong>();
 
+    private Vector3 serverPosition;
+    private Quaternion serverRotation;
     public override void OnNetworkSpawn()
     {
         // Subscribe to value changes
@@ -28,12 +30,14 @@ public class PostItParentNetwork : NetworkBehaviour
 
     private void OnRotationChanged(Quaternion previousvalue, Quaternion newvalue)
     {
-        gameObject.transform.localRotation = newvalue;
+        RequestServerPositionClientRpc();
+        gameObject.transform.localRotation = newvalue * serverRotation;
     }
 
     private void OnPositionChanged(Vector3 oldPosition, Vector3 newPosition)
     {
-        gameObject.transform.localPosition = newPosition;
+        RequestServerPositionClientRpc();
+        gameObject.transform.localPosition = newPosition + serverPosition;
     }
     
     public void RequestMoveNote(Vector3 movement)
@@ -69,4 +73,20 @@ public class PostItParentNetwork : NetworkBehaviour
         notePosition.Value = newPosition;
         Debug.Log($"Server moved note to {newPosition} for client {rpcParams.Receive.SenderClientId}");
     }
+    [ClientRpc]
+    public void RequestServerPositionClientRpc()
+    {
+        if (IsServer)
+        {
+            SendServerPositionToClientRpc(transform.position, transform.rotation);
+        }
+    }
+
+    [ClientRpc]
+    private void SendServerPositionToClientRpc(Vector3 position, Quaternion rotation)
+    {
+        serverPosition = position;
+        serverRotation = rotation;
+    }
+
 }

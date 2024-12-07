@@ -5,6 +5,7 @@ using Unity.Netcode;
 using UnityEngine.XR.ARFoundation;
 using System.Xml.Serialization;
 using UnityEngine.XR.ARSubsystems;
+using Unity.XR.CoreUtils;
 
 public class ImageNetworkAnchorer : NetworkBehaviour
 {
@@ -15,8 +16,9 @@ public class ImageNetworkAnchorer : NetworkBehaviour
     [SerializeField]
     private GameObject postItParentPrefab;
 
-
     private PostItParentNetwork postItParent;
+    private Vector3 serverPosition;
+    private Quaternion serverRotation;
 
     public NetworkVariable<ulong> PostItParentID = new NetworkVariable<ulong>();
 
@@ -72,8 +74,9 @@ public class ImageNetworkAnchorer : NetworkBehaviour
     [ServerRpc(RequireOwnership = false)]
     private void tableUpdatePositionServerRpc(Vector3 position, Quaternion rotation)
     {
-        GetPostItParent().planePos.Value = position;
-        GetPostItParent().planeRot.Value = rotation;
+        RequestServerPositionClientRpc();
+        GetPostItParent().planePos.Value = position - serverPosition;
+        GetPostItParent().planeRot.Value = rotation * Quaternion.Inverse(serverRotation);
 
         if (GetPostItParent().gameObject.GetComponent<ARAnchor>() == null)
         {
@@ -83,10 +86,27 @@ public class ImageNetworkAnchorer : NetworkBehaviour
     [ServerRpc(RequireOwnership = false)]
     private void SpawnParentServerRpc(Vector3 position, Quaternion roation)
     {
+        
         GameObject newParent = Instantiate(postItParentPrefab, position, roation);
         NetworkObject postItParentNetwork = newParent.GetComponent<NetworkObject>();
         postItParentNetwork.Spawn();
         SetPostItParentID(postItParentNetwork);
     }
-    
+
+    [ClientRpc]
+    public void RequestServerPositionClientRpc()
+    {
+        if (IsServer)
+        {
+            SendServerPositionToClientRpc(transform.position,transform.rotation);
+        }
+    }
+
+    [ClientRpc]
+    private void SendServerPositionToClientRpc(Vector3 position, Quaternion rotation)
+    {
+        serverPosition = position;
+        serverRotation = rotation;
+    }
+
 }
