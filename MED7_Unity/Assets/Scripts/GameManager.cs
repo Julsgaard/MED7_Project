@@ -21,24 +21,21 @@ public class GameManager : NetworkBehaviour
     [SerializeField] private GameObject findMarkerUI;
     [SerializeField] private Button placeNotesButton;
     [SerializeField] private TextMeshProUGUI markerInstruction;
-    private bool _isFindingMarker, _isNotesButtonClicked;
-    private Vector3 _anchorPos = Vector3.zero;
-    private Quaternion _anchorRot = Quaternion.identity;
 
     [Header("Android Specific GameObjects")]
     [SerializeField] private GameObject xrOrigin;
     [SerializeField] private GameObject arSession, windowsCamera, manomotionManager, gizmoCanvas, skeletonManager;
     
-    [Header("PostIt Spawn Layout")]
-    // [SerializeField] private GameObject postItParentLocal;
+    [Header("PostIt Spawn")]
     [SerializeField] private GameObject postItNotePrefab;
-    private bool _notesSentToServer = false;
     [SerializeField] private float sameApplicantOffset = .03f;
     [SerializeField] private float diffApplicantOffset = .05f;
+    private bool _notesSentToServer;
+    public bool markerFound;
     
     [Header("Script References")]
     [SerializeField] private ApplicantNotes applicantNotes;
-    
+
     private void Awake()
     {
         AddListenersToUI();
@@ -103,14 +100,7 @@ public class GameManager : NetworkBehaviour
         connectToServerButton.onClick.AddListener(ConnectToServer);
         connectToServerButtonOptions.onClick.AddListener(ConnectToServer);
         nextButton.onClick.AddListener(NextButtonIntro);
-        
         serverButton.onClick.AddListener(StartServer);
-        moveAllNotesUpButton.onClick.AddListener(MoveAllNotesUp);
-    }
-    
-    private void MoveAllNotesUp()
-    {
-        //NoteManager.Instance.MoveAllNotes();
     }
     
     // Method for connecting to the server
@@ -168,15 +158,10 @@ public class GameManager : NetworkBehaviour
             // Enable AR settings UI 
             arSettingsUI.SetActive(true);
 
-            Debug.Log($"db: isNotes Sent to server: {_notesSentToServer}");
             if (!_notesSentToServer)
             {
-                Debug.Log($"db: Sending notes to server! Starting Coroutine");
-
                 // Send all applicant notes to the server
                 StartCoroutine(UserToFindMarkerBeforeSpawnNotes());
-
-                //SendAllNotesToServer();
             }
             
             // Unsubscribe from the callback to prevent multiple subscriptions
@@ -191,35 +176,20 @@ public class GameManager : NetworkBehaviour
 
     private IEnumerator UserToFindMarkerBeforeSpawnNotes()
     {
-        ARAnchorOnMarker anchor = FindObjectOfType<ARAnchorOnMarker>();
-        
+        // Enable the find marker UI and set the instruction text
         findMarkerUI.SetActive(true);
-        CanvasGroup buttonCG = placeNotesButton.GetComponent<CanvasGroup>();
-        buttonCG.alpha = 0;
         markerInstruction.text = "Look at the marker with the camera";
         
-        // wait for user to find AR marker -- instruct user to find marker
+        // Wait until the marker is found
+        yield return new WaitUntil(() => markerFound);
+        SendAllNotesToServer();
         
-        yield return new WaitUntil(() => anchor.isMarkerFound);
-
-        // Marker found
-        _anchorPos = anchor.GetMarkerWorldPosition();
-        _anchorRot = anchor.GetMarkerWorldRotation();
-        
-        markerInstruction.text = "Position yourself. When ready, place your notes.";
-        buttonCG.alpha = 1;
-        
-        placeNotesButton.onClick.AddListener(SendAllNotesToServer);
-        
-        yield return new WaitUntil(() => _isNotesButtonClicked);
-        
-        // buttonCG.alpha = 0;
-        markerInstruction.text = "Creating your notes...";
-
+        // Send post-it notes to the server so they can be spawned
         yield return new WaitUntil(() => _notesSentToServer);
+        markerInstruction.text = "Your notes have been placed on the table!";
         
-        markerInstruction.text = "Succes!";
-        yield return new WaitForSeconds(1f);
+        // Wait for 5 seconds before disabling the find marker UI
+        yield return new WaitForSeconds(5f);
         findMarkerUI.SetActive(false);
     }
 
@@ -227,7 +197,7 @@ public class GameManager : NetworkBehaviour
     {
         if (IsClient)
         {
-            Debug.Log($"Client {clientId} disconnected from the server");
+            Debug.Log($"db: Client {clientId} disconnected from the server");
 
             // Enable the connect UI
             connectUIObject.SetActive(true); 
@@ -235,7 +205,8 @@ public class GameManager : NetworkBehaviour
             // Unsubscribe from the callback
             NetworkManager.Singleton.OnClientDisconnectCallback -= OnClientDisconnected;
             
-            StopAllCoroutines();
+            // Stop the coroutine to prevent the UserToFindMarkerBeforeSpawnNotes() coroutine from running multiple times
+            StopAllCoroutines(); 
         }
         if (IsServer)
         {
@@ -246,10 +217,6 @@ public class GameManager : NetworkBehaviour
 
     private void SendAllNotesToServer()
     {
-        _isNotesButtonClicked = true;
-        Debug.Log($"db: Entered 'SendAllNotesToServer()'");
-
-        
         float currentBaseOffsetX = 0; // offset starts at 0
         //float totalOffsetX = 0; // we also calculate a total offset to later be able to center all notes
         
@@ -267,8 +234,6 @@ public class GameManager : NetworkBehaviour
         // loop through all applicants and their notes
         foreach (var applicant in applicantNotes.applicants)
         {
-            Debug.Log($"db: Entered first foreach for applicant {applicantNum}'.");
-
             float currApplicantNumNotes = applicant.notes.Count; // the number of total notes for this applicant
             float currApplicantNumCols = (float)Math.Round(Math.Sqrt(currApplicantNumNotes)); // sqrt for square layout
 
@@ -277,12 +242,9 @@ public class GameManager : NetworkBehaviour
             
             foreach (var noteText in applicant.notes)
             {
-                Debug.Log($"db: Entered seconds foreach for note {applicantNum}/'{noteText}'");
-
                 // Check if the note text is note empty or null
                 if (!string.IsNullOrEmpty(noteText))
                 {
-                    Debug.Log($"db: Entered if statement meaning '{noteText}' is not null/empty!");
                     // Create the note and send it to the server
                     //postItNoteObject = Instantiate(postItNotePrefab);
                     //Debug.Log($"is postItNoteObject null: {networkObject == null}");
@@ -291,14 +253,9 @@ public class GameManager : NetworkBehaviour
                     // calculate positions
                     float posX = currentBaseOffsetX + currNoteX * sameApplicantNoteOffset - centerOffsetX;
                     float posZ = currNoteY * sameApplicantNoteOffset;
-                    Vector3 offset = new Vector3(posX, 0, posZ);
-                    
-                    Vector3 rotatedOffset = _anchorRot * offset; // rotate the offset by the anchor rotation
-                    Vector3 newPos = _anchorPos + rotatedOffset; // world space position
+                    Vector3 newPos = new Vector3(posX, 0, posZ);
 
-                    // Debug.Log($"db: Calling 'CreateNoteServerRpc()'");
                     CreateNoteServerRpc(newPos, noteText, applicant.applicantColour, applicant.applicantNumber);
-                    // Debug.Log($"db: Called 'CreateNoteServerRpc()'");
                     
                     // increment positions
                     currNoteX++;
@@ -307,23 +264,8 @@ public class GameManager : NetworkBehaviour
                         currNoteX = 0;
                         currNoteY++;
                     }
-                    
-                    // Set the text for the note
-                    //TextMeshPro textMeshPro = networkObject.GetComponentInChildren<TextMeshPro>();
-                    //textMeshPro.text = noteText;
-                
-                    // Set the color for the note
-                    //Renderer r = networkObject.GetComponent<Renderer>();
-                    //r.material.color = applicant.applicantColour;
-                    
-                    Debug.Log($"db: Note sent to server: with text \"{noteText}\",\nand position ({posX}, {posZ})");
                 }
-                
             }
-            
-            Debug.Log($"db: Finished notes for applicant {applicantNum}. Incrementing.");
-
-            
             //totalOffsetX += (sameApplicantNoteOffset * currApplicantNumCols) // full width of current appl. notes
             //                - sameApplicantOffset; // minus 1*offset which will be added on the end
             
@@ -331,13 +273,12 @@ public class GameManager : NetworkBehaviour
             applicantNum++;
             currentBaseOffsetX += (sameApplicantNoteOffset * currApplicantNumCols) + (diffApplicantOffset-sameApplicantOffset);
         }
-        
         _notesSentToServer = true;
     }
     
-    // Server RPC method for creating the note on the server. RequireOnwership is set to false, it allows the client to create the note on the server
+    // Server RPC method for creating the note on the server. RequireOwnership is set to false, it allows the client to create the note on the server
     [ServerRpc(RequireOwnership = false)]
-    public void CreateNoteServerRpc(Vector3 newPos, string text, Color color, int applicantNumber, ServerRpcParams rpcParams = default)
+    private void CreateNoteServerRpc(Vector3 newPos, string text, Color color, int applicantNumber, ServerRpcParams rpcParams = default)
     {
         // Creating the note GameObject
         GameObject postItNoteObject = Instantiate(postItNotePrefab, newPos, Quaternion.identity);
@@ -353,8 +294,6 @@ public class GameManager : NetworkBehaviour
         postItNoteNetwork.noteText.Value = new FixedString512Bytes(text);
         postItNoteNetwork.noteColor.Value = color;
         postItNoteNetwork.notePosition.Value = newPos;
-        
-        // postItNoteNetwork.newClient(NetworkManager.Singleton.LocalClientId);
         
         // Log the note creation
         DataLogger.instance.LogPostItNoteCreated(newPos, text, color, 0); //TODO: needs the correct client id

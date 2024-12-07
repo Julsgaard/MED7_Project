@@ -46,6 +46,8 @@ public class DataLogger : NetworkBehaviour
         string timeStamp = GetTimeStamp();
         string log = $"{timeStamp};{eventType};{position};{text};{color};{clientId}";
         System.IO.File.AppendAllText(_savePath, log + "\n");
+        
+        Debug.Log("Logged: " + log);
     }
 
     public void LogPostItNoteCreated(Vector3 position, string text, Color color, ulong clientId)

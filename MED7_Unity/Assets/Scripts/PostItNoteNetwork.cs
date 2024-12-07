@@ -8,7 +8,8 @@ public class PostItNoteNetwork : NetworkBehaviour
     public  NetworkVariable<Vector3> notePosition = new NetworkVariable<Vector3>();
     public  NetworkVariable<FixedString512Bytes> noteText = new NetworkVariable<FixedString512Bytes>();
     public  NetworkVariable<Color> noteColor = new NetworkVariable<Color>();
-
+    public Transform arPlane;
+    
     public override void OnNetworkSpawn()
     {
         // Subscribe to value changes
@@ -22,11 +23,17 @@ public class PostItNoteNetwork : NetworkBehaviour
         OnColorChanged(Color.magenta, noteColor.Value);
         
         //NoteManager.Instance.RegisterNote(this);
+        
+        // Find the ARPlane with tag "Table"
+        arPlane = GameObject.FindWithTag("Table").transform;
+        Debug.Log("Found ARPlane: " + arPlane);
+        
+        gameObject.transform.SetParent(arPlane);
     }
 
     private void OnPositionChanged(Vector3 oldPosition, Vector3 newPosition)
     {
-        transform.position = newPosition;
+        transform.localPosition = newPosition;
     }
     private void OnTextChanged(FixedString512Bytes oldText, FixedString512Bytes newText)
     {
@@ -72,5 +79,4 @@ public class PostItNoteNetwork : NetworkBehaviour
     {
         notePosition.Value = absolutePosition;
     }
-
 }
