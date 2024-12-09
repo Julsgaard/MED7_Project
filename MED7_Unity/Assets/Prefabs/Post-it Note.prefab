@@ -865,10 +865,12 @@ MonoBehaviour:
         byte0507: 0
         byte0508: 0
         byte0509: 0
-  applicantColor:
-    m_InternalValue: {r: 0, g: 0, b: 0, a: 0}
   noteColor:
     m_InternalValue: {r: 0, g: 0, b: 0, a: 0}
+  isBeingMoved:
+    m_InternalValue: 0
+  movingCLient:
+    m_InternalValue: 0
 --- !u!114 &8157072493330048188
 MonoBehaviour:
   m_ObjectHideFlags: 0
