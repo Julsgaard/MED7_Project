@@ -2,15 +2,14 @@ using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.XR.ARFoundation;
 
-public class ARAnchorOnMarker : MonoBehaviour
+public class ARAnchorOnMarker : NetworkBehaviour
 {
     [SerializeField] private ARAnchorManager anchorManager;
-    [SerializeField] private GameObject planeInstance; //prefabToPlace
+    [SerializeField] private GameObject planeInstance;
     [SerializeField] private ARTrackedImageManager trackedImageManager;
     
-    private GameObject markerCoordinateSystem;
-    private NetworkObject networkPlane;
-    private PostItParentNetwork planePositionNetwork;
+    private GameObject _arAnchorObject;
+    private NetworkObject _networkPlane;
 
     public bool isMarkerFound;
     
@@ -19,20 +18,16 @@ public class ARAnchorOnMarker : MonoBehaviour
         if (planeInstance != null)
             return planeInstance;
 
-        Debug.Log("Plane instance was null!");
         return null;
     }
 
-    private void Start()
+    public override void OnNetworkSpawn()
     {
         anchorManager = FindObjectOfType<ARAnchorManager>();
+        _networkPlane = planeInstance.GetComponent<NetworkObject>();
         
-        planePositionNetwork = planeInstance.GetComponent<PostItParentNetwork>();
-        
-        networkPlane = planeInstance.GetComponent<NetworkObject>();
-        
-        markerCoordinateSystem = new GameObject("Marker Coordinate System");
-        markerCoordinateSystem.transform.SetPositionAndRotation(planeInstance.transform.position, planeInstance.transform.rotation);
+        if (!_networkPlane.IsSpawned)
+            _networkPlane.Spawn();
     }
 
     private void OnEnable()
@@ -42,91 +37,51 @@ public class ARAnchorOnMarker : MonoBehaviour
     
     private void OnTrackedImagesChanged(ARTrackedImagesChangedEventArgs args)
     {
-        // CALLED ONLY ONCE: WHEN MARKER IS FIRST DETECTED
         foreach (var trackedImage in args.added) 
         {
-            AnchorContent(trackedImage.transform);
-            isMarkerFound = true;
+            var position = trackedImage.transform.position;
+            var rotation = trackedImage.transform.rotation;
             
-            networkPlane.Spawn(); // Spawn the plane on the network
+            RequestAlignToMarkerServerRpc(position, rotation);
+            CreateArAnchor(position, rotation);
+            
+            isMarkerFound = true;
         }
         
-        // CALLED EVERY FRAME AFTERWARD: WHEN MARKER IS BEING TRACKED AS IT MOVES
         foreach (var updatedImage in args.updated)
         {
-            /* TODO: SOME LOGIC TO MOVE THE PLANE INSTANCE TO THE UPDATED IMAGE POSITION
-             - either locally or on the network. doesn't work yet
-             - tried both but cant get it to work */
+            var position = updatedImage.transform.position;
+            var rotation = updatedImage.transform.rotation;            
             
-            Debug.Log($"Setting planeInstance (name: {planeInstance.name}) position (from: {planeInstance.transform.position}) to updatedImage position ({updatedImage.transform.position}).");
-            AlignToMarker(updatedImage.transform);
+            RequestAlignToMarkerServerRpc(position, rotation);
         }
     }
     
-    private void HandleTrackedImageUpdate(ARTrackedImage trackedImage)
+    [ServerRpc(RequireOwnership = false)]
+    public void RequestAlignToMarkerServerRpc(Vector3 position, Quaternion rotation, ServerRpcParams serverRpcParams = default)
     {
-        //if (!IsServer) return;
-
-        // Broadcast tracked image position and rotation to clients
-        Vector3 position = trackedImage.transform.position;
-        Quaternion rotation = trackedImage.transform.rotation;
-
-        UpdateTrackedImageClientRpc(trackedImage.referenceImage.name, position, rotation);
+        MovePlaneToMarkerClientRpc(position, rotation, serverRpcParams.Receive.SenderClientId);
     }
-
+    
     [ClientRpc]
-    private void UpdateTrackedImageClientRpc(string imageName, Vector3 position, Quaternion rotation)
+    private void MovePlaneToMarkerClientRpc(Vector3 position, Quaternion rotation, ulong clientId)
     {
-        // // Update the position and rotation on client devices
-        // var trackedObject = FindObjectOfType<YourTrackedObjectHandler>().GetObjectForImage(imageName);
-        // if (trackedObject != null)
-        // {
-        //     trackedObject.transform.position = position;
-        //     trackedObject.transform.rotation = rotation;
-        // }
-    }
-    
-    [ServerRpc(RequireOwnership = false)]
-    public void AlignToMarker(Transform markerTransform)
-    {
-        Debug.Log($"Is planeInstance null? {planeInstance == null}");
-        Debug.Log($"Is planePositionNetwork null? {planePositionNetwork == null}");
-        
-        RequestMoveNoteServerRpc(markerTransform.position);
-        
-        //planePositionNetwork.planePos.Value = markerTransform.position;
-        //planePositionNetwork.planeRot.Value = markerTransform.rotation;
-        
-        // planeInstance.transform.position = markerTransform.position;
-        // planeInstance.transform.rotation = markerTransform.rotation;
-        //
-        // networkPlane.transform.position = markerTransform.position;
-        // networkPlane.transform.rotation = markerTransform.rotation;
-        // XROrigin xrOrigin = FindObjectOfType<XROrigin>();
-        //
-        // // Apply the offset directly to the XROrigin's transform
-        // xrOrigin.transform.position += markerTransform.position - xrOrigin.CameraFloorOffsetObject.transform.position;
-        //
-        // newAnchor.transform.position = markerTransform.position;
-    }
-    
-    [ServerRpc(RequireOwnership = false)]
-    private void RequestMoveNoteServerRpc(Vector3 position)
-    {
-        planePositionNetwork.RequestMoveNote(position);
-    }
-    
-    [ServerRpc(RequireOwnership = false)]
-    private void AnchorContent(Transform markerTransform)
-    {
-        planePositionNetwork.planePos.Value = markerTransform.position;
-        planePositionNetwork.planeRot.Value = markerTransform.rotation;
-        
-        if (planeInstance.GetComponent<ARAnchor>() == null)
+        if (clientId == NetworkManager.Singleton.LocalClientId)
         {
-            planeInstance.AddComponent<ARAnchor>();
+            planeInstance.transform.position = position;
+            planeInstance.transform.rotation = rotation;
         }
     }
+    
+    private void CreateArAnchor(Vector3 position, Quaternion rotation)
+    {
+        if (!IsOwner) return;
+        
+        _arAnchorObject = new GameObject("ARAnchorObject");
+        _arAnchorObject.transform.SetPositionAndRotation(position, rotation);
+        _arAnchorObject.AddComponent<ARAnchor>();
+    }
+    
     void OnDisable()
     {
         trackedImageManager.trackedImagesChanged -= OnTrackedImagesChanged;
