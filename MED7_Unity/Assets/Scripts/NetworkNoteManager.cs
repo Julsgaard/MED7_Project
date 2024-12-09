@@ -1,9 +1,9 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class NoteManager : MonoBehaviour
+public class NetworkNoteManager : MonoBehaviour
 {
-    public static NoteManager instance { get; private set; }
+    public static NetworkNoteManager instance { get; private set; }
 
     [SerializeField] public List<PostItNoteNetwork> notes = new List<PostItNoteNetwork>();
     

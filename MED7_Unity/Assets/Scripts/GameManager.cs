@@ -31,7 +31,7 @@ public class GameManager : NetworkBehaviour
     [Header("PostIt Spawn Layout")]
     [SerializeField] private GameObject postItParentLocal;
     [SerializeField] private GameObject postItNotePrefab;
-    private bool _notesSentToServer = false;
+    private bool _notesSentToServer, _localNotesImported;
     [SerializeField] private float sameApplicantOffset = .03f;
     [SerializeField] private float diffApplicantOffset = .05f;
     
@@ -164,8 +164,6 @@ public class GameManager : NetworkBehaviour
         {
             markerTransformData.Add(clientId, new PlaneTransformData(Vector3.zero, Quaternion.identity));
             
-            Debug.Log($"db: Client {clientId} connected to the server!");
-            
             // Disable the connect UI
             connectUIObject.SetActive(false);
             blackBackgroundUI.SetActive(false);
@@ -173,15 +171,10 @@ public class GameManager : NetworkBehaviour
             // Enable AR settings UI 
             arSettingsUI.SetActive(true);
 
-            Debug.Log($"db: isNotes Sent to server: {_notesSentToServer}");
             if (!_notesSentToServer)
             {
-                Debug.Log($"db: Sending notes to server! Starting Coroutine");
-
-                // Send all applicant notes to the server
+                // Send all applicant notes to the server / but first, find marker
                 StartCoroutine(UserToFindMarkerBeforeSpawnNotes());
-
-                //SendAllNotesToServer();
             }
             
             // Unsubscribe from the callback to prevent multiple subscriptions
@@ -196,62 +189,39 @@ public class GameManager : NetworkBehaviour
 
     private IEnumerator UserToFindMarkerBeforeSpawnNotes()
     {
-        Debug.Log($"db: Coroutine started. Checking if user is finding marker: {_isFindingMarker}'.");
-
         if (_isFindingMarker) yield break;
+        
         _isFindingMarker = true;
         
-        Debug.Log($"db: User wasn't user is now finding marker: {_isFindingMarker}'.");
-        
-        ImageNetworkAnchorer anchor = FindObjectOfType<ImageNetworkAnchorer>();
-        
+        TabletopMarkerAnchorer anchor = FindObjectOfType<TabletopMarkerAnchorer>();
         findMarkerUI.SetActive(true);
-        //check if ui is active
-        Debug.Log($"is marker UI set to active: {findMarkerUI.activeSelf}");
-        if (findMarkerUI.activeSelf) Debug.Log($"Hi, I'm a fucking UI and I'm active ({findMarkerUI.activeSelf}) but I wont show will I? Why? Because I'm a fucking UI and I'm a fucking");
-        
         CanvasGroup buttonCg = placeNotesButton.GetComponent<CanvasGroup>();
         buttonCg.alpha = 0;
-        
         markerInstruction.text = "Find the marker and place it within view of the camera view";
-        Debug.Log($"db: Marker instruction set to: '{markerInstruction.text}'");
-        
-        // wait for user to find AR marker -- instruct user to find marker
-        
-        Debug.Log($"db: Showing UI. Is now waiting for anchor.isMarkerFound: {anchor.isMarkerFound}.");
         
         yield return new WaitUntil(() => anchor.isMarkerFound);
         
-        Debug.Log($"db: Marker found: (anchor.isMarkerfound: {anchor.isMarkerFound}). Setting found plane as parent.");
-
-       markerInstruction.text = "Position yourself around the table. When you're ready, place your notes.";
+        markerInstruction.text = "Position yourself around the table. When you're ready, place your notes.";
         buttonCg.alpha = 1;
-        
-        Debug.Log($"db: Adding listener to button.");
-
-
         placeNotesButton.onClick.AddListener(SendAllNotesToServer);
-        
-        Debug.Log($"db: Waiting until button has been clicked: {_isNotesButtonClicked}.");
-
         
         yield return new WaitUntil(() => _isNotesButtonClicked);
         
-        
-        Debug.Log($"db: Button clicked ({_isNotesButtonClicked}) ! Sending notes to server.");
-
         buttonCg.alpha = 0;
         markerInstruction.text = "Creating your notes...";
-
+        
         yield return new WaitUntil(() => _notesSentToServer);
         
+        markerInstruction.text = "Sent to server";
         
-        Debug.Log($"db: Notes were sent to server: {_notesSentToServer}. Closing UI.");
-
-        
-        markerInstruction.text = "Succes!";
-
         yield return new WaitForSeconds(1f);
+
+        markerInstruction.text = "Setting  up locally ...";
+        _localNotesImported = false;
+        ImportNotesToLocalServerRpc();
+        
+        yield return new WaitUntil(() => _localNotesImported);
+        
         
         findMarkerUI.SetActive(false);
     }
@@ -280,11 +250,8 @@ public class GameManager : NetworkBehaviour
     private void SendAllNotesToServer()
     {
         _isNotesButtonClicked = true;
-        Debug.Log($"db: Entered 'SendAllNotesToServer()'");
-
         
         float currentBaseOffsetX = 0; // offset starts at 0
-        //float totalOffsetX = 0; // we also calculate a total offset to later be able to center all notes
         
         float postItWidth = postItNotePrefab.transform.localScale.x; // store the size we've given post its
         float sameApplicantNoteOffset = postItWidth + (postItWidth * sameApplicantOffset); // calc offset based on size
@@ -292,7 +259,7 @@ public class GameManager : NetworkBehaviour
         float applicantNum = 0; // numbers for indenting the offset between new applicant notes
         
         float totalCols = 0;
-        foreach (var applicant in applicantNotes.applicants)
+        foreach (var applicant in applicantNotes.applicants) 
             totalCols += (float)Math.Round(Math.Sqrt(applicant.notes.Count));
         float totalNotesWidth = totalCols * sameApplicantNoteOffset - (sameApplicantOffset * applicantNum) + diffApplicantOffset * (applicantNum-1);
         float centerOffsetX = (totalNotesWidth / 2);
@@ -300,8 +267,6 @@ public class GameManager : NetworkBehaviour
         // loop through all applicants and their notes
         foreach (var applicant in applicantNotes.applicants)
         {
-            Debug.Log($"db: Entered first foreach for applicant {applicantNum}'.");
-
             float currApplicantNumNotes = applicant.notes.Count; // the number of total notes for this applicant
             float currApplicantNumCols = (float)Math.Round(Math.Sqrt(currApplicantNumNotes)); // sqrt for square layout
 
@@ -310,21 +275,15 @@ public class GameManager : NetworkBehaviour
             
             foreach (var noteText in applicant.notes)
             {
-                Debug.Log($"db: Entered seconds foreach for note {applicantNum}/'{noteText}'");
-
                 // Check if the note text is note empty or null
                 if (!string.IsNullOrEmpty(noteText))
                 {
-                    Debug.Log($"db: Entered if statemetn meaning '{noteText}' is not null/empty!");
-                    
                     // calculate positions
                     float posX = currentBaseOffsetX + currNoteX * sameApplicantNoteOffset - centerOffsetX;
                     float posZ = currNoteY * sameApplicantNoteOffset;
                     Vector3 newPos = new Vector3(posX, 0, posZ);
 
-                    Debug.Log($"db: Calling 'CreateNoteServerRpc()'");
                     CreateNoteServerRpc(newPos, noteText, applicant.applicantColour, applicant.applicantNumber);
-                    Debug.Log($"db: Called 'CreateNoteServerRpc()'");
                     
                     // increment positions
                     currNoteX++;
@@ -333,14 +292,8 @@ public class GameManager : NetworkBehaviour
                         currNoteX = 0;
                         currNoteY++;
                     }
-                    
-                    Debug.Log($"db: Note sent to server: with text \"{noteText}\",\nand position ({posX}, {posZ})");
                 }
-                
             }
-            
-            Debug.Log($"db: Finished notes for applicant {applicantNum}. Incrementing.");
-            
             // if we want to add for another applicant, we set the new corner for where to begin by adding the offset
             applicantNum++;
             currentBaseOffsetX += (sameApplicantNoteOffset * currApplicantNumCols) + (diffApplicantOffset-sameApplicantOffset);
@@ -354,25 +307,18 @@ public class GameManager : NetworkBehaviour
     public void CreateNoteServerRpc(Vector3 newPos, string text, Color color, int applicantNumber, ServerRpcParams rpcParams = default)
     {
         // Creating the note GameObject
-        ImageNetworkAnchorer anchor = FindObjectOfType<ImageNetworkAnchorer>();
-        postItParentLocal = anchor.GetParentObject();
+        TabletopMarkerAnchorer anchor = FindObjectOfType<TabletopMarkerAnchorer>();
+        postItParentLocal = anchor.GetTabletopObject();
 
         GameObject postItNoteObject = Instantiate(postItNotePrefab, postItParentLocal.transform);
         
         // Get NetworkObject and spawn it
         NetworkObject networkObject = postItNoteObject.GetComponent<NetworkObject>();
         networkObject.Spawn();
-        // postItNetworkObject = networkObject;
         
         // Get the PostItNoteNetwork component from the PostItNoteObject
         PostItNoteNetwork postItNoteNetwork = postItNoteObject.GetComponent<PostItNoteNetwork>();
         
-        Debug.Log($"db: Setting post-it parent!");
-        // TODO: we might need to first set this when plane is spawned. Set "spawn post its" to a button which appears after plane is detected
-        //networkObject.transform.SetParent(postItParentLocalCoords.transform); // set parent to the marker plane
-        Debug.Log($"db: Post-it parent was set successfully! (SKIPPING THIS STEP NOW)");
-
-
         // Set the note data directly on the server
         postItNoteNetwork.noteText.Value = new FixedString512Bytes(text);
         postItNoteNetwork.noteColor.Value = color;
@@ -382,5 +328,14 @@ public class GameManager : NetworkBehaviour
         
         // Log the note creation
         DataLogger.instance.LogPostItNoteCreated(newPos, text, color, 0); //TODO: needs the correct client id
+    }
+
+    [ServerRpc(RequireOwnership = false)]
+    private void ImportNotesToLocalServerRpc()
+    {
+        LocalNoteManager localNoteManager = FindObjectOfType<LocalNoteManager>();
+        localNoteManager.RegisterAndSpawnNotesLocally();
+        
+        _localNotesImported = true;
     }
 }

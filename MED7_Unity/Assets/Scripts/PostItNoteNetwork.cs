@@ -47,7 +47,7 @@ public class PostItNoteNetwork : NetworkBehaviour
         OnTextChanged(new FixedString512Bytes(), noteText.Value);
         OnColorChanged(Color.magenta, noteColor.Value);
 
-        NoteManager.instance.RegisterNote(this);
+        NetworkNoteManager.instance.RegisterNote(this);
         
         //Renderer renderer = GetComponent<Renderer>(); // what the shit
 
@@ -56,8 +56,7 @@ public class PostItNoteNetwork : NetworkBehaviour
 
     private void OnPositionChanged(Vector3 oldPosition, Vector3 newPosition)
     {
-        var parentPos = _gameManager.markerTransformData[NetworkManager.Singleton.LocalClientId].position;
-        transform.position = newPosition + parentPos;
+        transform.position = newPosition ;
     }
     
     private void OnTextChanged(FixedString512Bytes oldText, FixedString512Bytes newText)
