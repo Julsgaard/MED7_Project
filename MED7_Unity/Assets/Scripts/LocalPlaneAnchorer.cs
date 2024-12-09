@@ -6,7 +6,7 @@ using Unity.Netcode;
 using UnityEngine.UI;
 using UnityEngine.XR.ARFoundation;
 
-public class ImageNetworkAnchorer : NetworkBehaviour
+public class LocalPlaneAnchorer : NetworkBehaviour
 {
 
     [SerializeField] private ARTrackedImageManager imageManager;
@@ -16,8 +16,6 @@ public class ImageNetworkAnchorer : NetworkBehaviour
     private NetworkObject _postItParentNetwork;
     private PostItParentNetwork _parentNetworkObject;
     private GameManager _gameManager;
-    
-    public bool isMarkerFound;
     
     private void Awake()
     {
@@ -30,12 +28,12 @@ public class ImageNetworkAnchorer : NetworkBehaviour
         _gameManager = FindObjectOfType<GameManager>();
     }
     
-    public GameObject GetParentObject() => parentGameObject;
-
     private void OnTrackedImagesChanged(ARTrackedImagesChangedEventArgs args)
     {
         foreach (var trackedImage in args.added)
         {
+            _gameManager.markerTransformData[NetworkManager.Singleton.LocalClientId] = new PlaneTransformData(trackedImage.transform.position, trackedImage.transform.rotation);
+            
             // parentGameObject.transform.SetPositionAndRotation(trackedImage.transform.position, trackedImage.transform.rotation);
             _parentNetworkObject = FindAnyObjectByType<PostItParentNetwork>();
             
@@ -51,12 +49,12 @@ public class ImageNetworkAnchorer : NetworkBehaviour
             
             if (_parentNetworkObject.gameObject.GetComponent<ARAnchor>() == null)
                 _parentNetworkObject.gameObject.AddComponent<ARAnchor>();
-            
-            isMarkerFound = true;
         }
 
         foreach (var trackedImage in args.updated)
         {
+            _gameManager.markerTransformData[NetworkManager.Singleton.LocalClientId] = new PlaneTransformData(trackedImage.transform.position, trackedImage.transform.rotation);
+
             HandleTrackedImageUpdate(trackedImage.transform);
         }
     }

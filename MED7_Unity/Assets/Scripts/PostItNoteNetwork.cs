@@ -25,6 +25,8 @@ public class PostItNoteNetwork : NetworkBehaviour
     string baseColor = "BaseColour";
     Renderer unityRenderer;
 
+    private GameManager _gameManager;
+
     private Dictionary<clientColor,Color> clientColorMap = new Dictionary<clientColor, Color>
     {
         {clientColor.yellow, new Color(240,228,66)},
@@ -48,12 +50,16 @@ public class PostItNoteNetwork : NetworkBehaviour
         NoteManager.instance.RegisterNote(this);
         
         //Renderer renderer = GetComponent<Renderer>(); // what the shit
+
+        _gameManager = FindObjectOfType<GameManager>();
     }
 
     private void OnPositionChanged(Vector3 oldPosition, Vector3 newPosition)
     {
-        transform.position = newPosition;
+        var parentPos = _gameManager.markerTransformData[NetworkManager.Singleton.LocalClientId].position;
+        transform.position = newPosition + parentPos;
     }
+    
     private void OnTextChanged(FixedString512Bytes oldText, FixedString512Bytes newText)
     {
         // Set the text for the note
@@ -99,9 +105,7 @@ public class PostItNoteNetwork : NetworkBehaviour
             unityRenderer.material.SetColor(outlineColor, clientColorMap[clientColours[NetworkManager.Singleton.LocalClientId]]);
             Vector3 newPosition = gameObject.transform.localPosition + movement;
             RequestMoveServerRpc(newPosition);
-
         }
-        
     }
 
     [ServerRpc(RequireOwnership = false)]
@@ -117,5 +121,4 @@ public class PostItNoteNetwork : NetworkBehaviour
         isBeingMoved.Value = false;
         unityRenderer.material.SetColor(outlineColor, noteColor.Value);
     }
-
 }
