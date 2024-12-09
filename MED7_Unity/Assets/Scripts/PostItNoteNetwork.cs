@@ -3,6 +3,7 @@ using System.Linq;
 using TMPro;
 using Unity.Collections;
 using Unity.Netcode;
+using Unity.Networking.Transport;
 using UnityEngine;
 
 public class PostItNoteNetwork : NetworkBehaviour
@@ -21,9 +22,10 @@ public class PostItNoteNetwork : NetworkBehaviour
 
     private Dictionary<ulong, clientColor> clientColours = new Dictionary<ulong, clientColor>();
 
+
     string outlineColor = "OutlineColour";
     string baseColor = "BaseColour";
-    Renderer unityRenderer;
+    private Renderer unityRenderer;
 
     private Dictionary<clientColor,Color> clientColorMap = new Dictionary<clientColor, Color>
     {
@@ -33,7 +35,7 @@ public class PostItNoteNetwork : NetworkBehaviour
     };
     public override void OnNetworkSpawn()
     {
-        unityRenderer = GetComponent<Renderer>(); // fucking shit ass fuck
+        unityRenderer = GetComponent<MeshRenderer>();
         
         // Subscribe to value changes
         notePosition.OnValueChanged += OnPositionChanged;
@@ -46,13 +48,14 @@ public class PostItNoteNetwork : NetworkBehaviour
         OnColorChanged(Color.magenta, noteColor.Value);
 
         NoteManager.instance.RegisterNote(this);
-        
-        //Renderer renderer = GetComponent<Renderer>(); // what the shit
+
+        unityRenderer.enabled = false;
     }
 
     private void OnPositionChanged(Vector3 oldPosition, Vector3 newPosition)
     {
-        transform.position = newPosition;
+        if (IsServer) { return; }
+        transform.position = ARAnchorOnMarker.instance.GetLocalPostItParent().transform.position + newPosition;
     }
     private void OnTextChanged(FixedString512Bytes oldText, FixedString512Bytes newText)
     {
@@ -117,5 +120,21 @@ public class PostItNoteNetwork : NetworkBehaviour
         isBeingMoved.Value = false;
         unityRenderer.material.SetColor(outlineColor, noteColor.Value);
     }
+    public void ShowObjectToSpecificClients()
+    {
+        if (IsServer)
+        {
+            ShowObjectToSpecificClientRpc();
+        }
+    }
 
+    [ClientRpc]
+    private void ShowObjectToSpecificClientRpc()
+    {
+        foreach(var client in clientColours)
+        {
+            if(client.Key == NetworkManager.Singleton.LocalClientId)
+                unityRenderer.enabled = true; 
+        }
+    }
 }

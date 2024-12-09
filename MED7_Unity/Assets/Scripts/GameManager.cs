@@ -28,7 +28,7 @@ public class GameManager : NetworkBehaviour
     [SerializeField] private GameObject arSession, windowsCamera, manomotionManager, gizmoCanvas, skeletonManager;
     
     [Header("PostIt Spawn Layout")]
-    [SerializeField] private GameObject postItParentLocal;
+    // [SerializeField] private GameObject postItParentLocal;
     [SerializeField] private GameObject postItNotePrefab;
     private bool _notesSentToServer = false;
     [SerializeField] private float sameApplicantOffset = .03f;
@@ -38,6 +38,7 @@ public class GameManager : NetworkBehaviour
     [Header("Script References")]
     [SerializeField] private ApplicantNotes applicantNotes;
     
+
     private void Awake()
     {
         AddListenersToUI();
@@ -51,7 +52,7 @@ public class GameManager : NetworkBehaviour
     private void Start()
     {
         anchor = FindObjectOfType<ARAnchorOnMarker>();
-        postItParentLocal = anchor.GetMarkerCoordinateSystem();
+        //postItParentLocal = anchor.GetMarkerCoordinateSystem();
     }
 
     private void ShowIntroUI()
@@ -214,15 +215,15 @@ public class GameManager : NetworkBehaviour
         markerInstruction.text = "Find the marker and place it within view of the camera view";
         Debug.Log($"db: Marker instruction set to: '{markerInstruction.text}'");
         
-        // wait for user to find AR marker -- instruct user to find marker
+        //wait for user to find AR marker -- instruct user to find marker
         
         Debug.Log($"db: Showing UI. Is now waiting for anchor.isMarkerFound: {anchor.isMarkerFound}.");
-        
+       
         yield return new WaitUntil(() => anchor.isMarkerFound);
         
         Debug.Log($"db: Marker found: (anchor.isMarkerfound: {anchor.isMarkerFound}). Setting found plane as parent.");
         
-        Debug.Log($"db: Plane set as posItParent: {postItParentLocal}.");
+       // Debug.Log($"db: Plane set as posItParent: {postItParentLocal}.");
 
         markerInstruction.text = "Position yourself around the table. When you're ready, place your notes.";
         buttonCG.alpha = 1;
@@ -283,7 +284,6 @@ public class GameManager : NetworkBehaviour
         _isNotesButtonClicked = true;
         Debug.Log($"db: Entered 'SendAllNotesToServer()'");
 
-        
         float currentBaseOffsetX = 0; // offset starts at 0
         //float totalOffsetX = 0; // we also calculate a total offset to later be able to center all notes
         
@@ -326,9 +326,9 @@ public class GameManager : NetworkBehaviour
                     float posX = currentBaseOffsetX + currNoteX * sameApplicantNoteOffset - centerOffsetX;
                     float posZ = currNoteY * sameApplicantNoteOffset;
                     Vector3 newPos = new Vector3(posX, 0, posZ);
-
+                    Quaternion newRot = Quaternion.identity;
                     Debug.Log($"db: Calling 'CreateNoteServerRpc()'");
-                    CreateNoteServerRpc(newPos, noteText, applicant.applicantColour, applicant.applicantNumber);
+                    CreateNoteServerRpc(newPos, newRot, noteText, applicant.applicantColour, applicant.applicantNumber);
                     Debug.Log($"db: Called 'CreateNoteServerRpc()'");
                     
                     // increment positions
@@ -368,7 +368,7 @@ public class GameManager : NetworkBehaviour
     
     // Server RPC method for creating the note on the server. RequireOnwership is set to false, it allows the client to create the note on the server
     [ServerRpc(RequireOwnership = false)]
-    public void CreateNoteServerRpc(Vector3 newPos, string text, Color color, int applicantNumber, ServerRpcParams rpcParams = default)
+    public void CreateNoteServerRpc(Vector3 newPos, Quaternion newRot, string text, Color color, int applicantNumber, ServerRpcParams rpcParams = default)
     {
         // Debug.Log($"db: Is postItParentLocal null?: {postItParentLocal == null}");
         // if (postItParentLocal == null)
@@ -379,7 +379,7 @@ public class GameManager : NetworkBehaviour
         // }
         
         // Creating the note GameObject
-        GameObject postItNoteObject = Instantiate(postItNotePrefab, postItParentLocal.transform);
+        GameObject postItNoteObject = Instantiate(postItNotePrefab);
         
         // Set the position of the note
         //postItNoteObject.transform.position = newPos;
@@ -403,8 +403,10 @@ public class GameManager : NetworkBehaviour
         postItNoteNetwork.noteColor.Value = color;
         postItNoteNetwork.notePosition.Value = newPos;
         
+
         postItNoteNetwork.newClient(NetworkManager.Singleton.LocalClientId);
-        
+
+        postItNoteNetwork.ShowObjectToSpecificClients();
         // Log the note creation
         DataLogger.instance.LogPostItNoteCreated(newPos, text, color, 0); //TODO: needs the correct client id
     }

@@ -865,10 +865,12 @@ MonoBehaviour:
         byte0507: 0
         byte0508: 0
         byte0509: 0
-  applicantColor:
-    m_InternalValue: {r: 0, g: 0, b: 0, a: 0}
   noteColor:
     m_InternalValue: {r: 0, g: 0, b: 0, a: 0}
+  isBeingMoved:
+    m_InternalValue: 0
+  movingCLient:
+    m_InternalValue: 0
 --- !u!114 &8157072493330048188
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -883,11 +885,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   UseUnreliableDeltas: 0
   SyncPositionX: 1
-  SyncPositionY: 0
+  SyncPositionY: 1
   SyncPositionZ: 1
-  SyncRotAngleX: 0
-  SyncRotAngleY: 0
-  SyncRotAngleZ: 0
+  SyncRotAngleX: 1
+  SyncRotAngleY: 1
+  SyncRotAngleZ: 1
   SyncScaleX: 0
   SyncScaleY: 0
   SyncScaleZ: 0
