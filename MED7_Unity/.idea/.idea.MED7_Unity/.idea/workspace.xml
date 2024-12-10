@@ -5,7 +5,20 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="05c6e882-459c-461a-a6db-dc6523f5c602" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/ProjectSettings/EditorBuildSettings.asset" beforeDir="false" afterPath="$PROJECT_DIR$/ProjectSettings/EditorBuildSettings.asset" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/.idea.MED7_Unity/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.MED7_Unity/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/ManoMotion Skeleton/Materials/SkeletonJointMaterial_3D_Blue.mat" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/ManoMotion Skeleton/Materials/SkeletonJointMaterial_3D_Blue.mat" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/ManoMotion Skeleton/Materials/SkeletonJointMaterial_3D_DarkGreen.mat" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/ManoMotion Skeleton/Materials/SkeletonJointMaterial_3D_DarkGreen.mat" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/ManoMotion Skeleton/Materials/SkeletonJointMaterial_3D_Green.mat" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/ManoMotion Skeleton/Materials/SkeletonJointMaterial_3D_Green.mat" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/ManoMotion Skeleton/Materials/SkeletonJointMaterial_3D_Purple.mat" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/ManoMotion Skeleton/Materials/SkeletonJointMaterial_3D_Purple.mat" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/ManoMotion Skeleton/Materials/SkeletonJointMaterial_3D_Red.mat" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/ManoMotion Skeleton/Materials/SkeletonJointMaterial_3D_Red.mat" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/ManoMotion Skeleton/Materials/SkeletonJointMaterial_3D_Yellow.mat" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/ManoMotion Skeleton/Materials/SkeletonJointMaterial_3D_Yellow.mat" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/ManoMotion Skeleton/Scripts/SkeletonManager.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/ManoMotion Skeleton/Scripts/SkeletonManager.cs.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Scenes/SampleScene.unity" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scenes/SampleScene.unity" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/_ARMarker/Markers/ReferenceImageLibrary.asset" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/_ARMarker/Markers/ReferenceImageLibrary.asset" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/scripts/ARAnchorOnMarker.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/scripts/ARAnchorOnMarker.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/scripts/FingerCollider.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/scripts/FingerCollider.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ProjectSettings/ProjectSettings.asset" beforeDir="false" afterPath="$PROJECT_DIR$/ProjectSettings/ProjectSettings.asset" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -60,7 +73,7 @@
     &quot;Attach to Unity Editor.Attach to Unity Editor.executor&quot;: &quot;Debug&quot;,
     &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
     &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;LocalPlanes____Interaction&quot;,
     &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
     &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
     &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
@@ -150,6 +163,7 @@
       <workItem from="1733384975447" duration="1254000" />
       <workItem from="1733393689325" duration="1134000" />
       <workItem from="1733451009118" duration="6178000" />
+      <workItem from="1733826091390" duration="6034000" />
     </task>
     <servers />
   </component>

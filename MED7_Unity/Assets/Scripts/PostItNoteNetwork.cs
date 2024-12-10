@@ -120,8 +120,16 @@ public class PostItNoteNetwork : NetworkBehaviour
         OnOutlineColorChanged(Color.red, outLineColor.Value);
 
     }
-    public void RequestMoveNote(Vector3 movement)
+    
+    
+    // TODO: Make server move note
+    // TODO: Update note position when we find and update marker
+    // TODO: Fix outline color from the dictionary index error
+    [ServerRpc(RequireOwnership = false)]
+    public void RequestMoveNoteServerRpc(Vector3 movement)
     {
+        Debug.Log($"Trying to move note by {movement}");
+        
         if (isBeingMoved.Value)
         {
             if (movingCLient.Value != NetworkManager.Singleton.LocalClientId)
@@ -210,6 +218,7 @@ public class PostItNoteNetwork : NetworkBehaviour
         clients.Add(clientID);
         newClient(clientID);
     }
+    
     private void newClient(ulong clientID)
     {
         if (clientColours.ContainsKey(clientID))
@@ -218,5 +227,7 @@ public class PostItNoteNetwork : NetworkBehaviour
         }
         int index = clients.IndexOf(clientID);
         clientColours.Add(clientID, (clientColor)index);
+        
+        Debug.Log($"Added color {clientColorMap[(clientColor)index]} for client {clientID}");
     }
 }

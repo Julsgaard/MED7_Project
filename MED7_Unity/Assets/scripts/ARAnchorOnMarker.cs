@@ -50,7 +50,9 @@ public class ARAnchorOnMarker : MonoBehaviour
     private void UpdateTracker(Transform newPose)
     {
         postItParent.transform.position = newPose.position;
-        postItParent.transform.rotation = newPose.rotation;
+        var rotation = newPose.rotation;
+        rotation = Quaternion.Euler(0, rotation.eulerAngles.y, 0);
+        postItParent.transform.rotation = rotation;
         planeAnchor.transform.position = newPose.position;
         planeAnchor.transform.rotation = newPose.rotation;
     }
