@@ -365,10 +365,7 @@ public class GameManager : NetworkBehaviour
         }
         
         _notesSentToServer = true;
-        foreach (PostItNoteNetwork note in NoteManager.instance.notes)
-        {
-            note.UpdateNote();
-        }
+        updateOldNotesServerRpc();
     }
     
     // Server RPC method for creating the note on the server. RequireOnwership is set to false, it allows the client to create the note on the server
@@ -417,5 +414,13 @@ public class GameManager : NetworkBehaviour
         DataLogger.instance.LogPostItNoteCreated(newPos, text, color, 0); //TODO: needs the correct client id
     }
 
+    [ServerRpc(RequireOwnership =false)]
+    private void updateOldNotesServerRpc() 
+    {
+        foreach (PostItNoteNetwork note in NoteManager.instance.notes)
+        {
+            note.UpdateNote();
+        }
+    }
 
 }
