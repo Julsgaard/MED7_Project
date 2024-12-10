@@ -1,5 +1,6 @@
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using TMPro;
 using Unity.Collections;
 using Unity.Netcode;
@@ -37,8 +38,8 @@ public class GameManager : NetworkBehaviour
     
     [Header("Script References")]
     [SerializeField] private ApplicantNotes applicantNotes;
-    
 
+    private List<ulong> clients = new List<ulong>();
     private void Awake()
     {
         AddListenersToUI();
@@ -364,6 +365,10 @@ public class GameManager : NetworkBehaviour
         }
         
         _notesSentToServer = true;
+        foreach (PostItNoteNetwork note in NoteManager.instance.notes)
+        {
+            note.UpdateNote();
+        }
     }
     
     // Server RPC method for creating the note on the server. RequireOnwership is set to false, it allows the client to create the note on the server
@@ -404,11 +409,13 @@ public class GameManager : NetworkBehaviour
         //postItNoteNetwork.notePosition.Value = newPos;
         
         postItNoteNetwork.StartNote(color, new FixedString512Bytes(text), newPos, newRot);
-        postItNoteNetwork.AddClient(NetworkManager.Singleton.LocalClientId);
+        clients.Add(NetworkManager.Singleton.LocalClientId);
+        postItNoteNetwork.AddClient(clients);
 
         postItNoteNetwork.ShowObjectToSpecificClients();
         // Log the note creation
         DataLogger.instance.LogPostItNoteCreated(newPos, text, color, 0); //TODO: needs the correct client id
     }
+
 
 }

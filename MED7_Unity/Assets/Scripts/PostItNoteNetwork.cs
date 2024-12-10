@@ -58,12 +58,12 @@ public class PostItNoteNetwork : NetworkBehaviour
     {
         unityRenderer = GetComponent<Renderer>();
         unityRenderer.material.SetColor(outlineColourVariable, noteColor.Value);
-        unityRenderer.enabled = false;
-        Renderer[] childRenderers = unityRenderer.gameObject.GetComponentsInChildren<Renderer>();
-        foreach (Renderer renderer in childRenderers)
-        {
-            renderer.enabled = false;
-        }
+        //unityRenderer.enabled = false;
+        // Renderer[] childRenderers = unityRenderer.gameObject.GetComponentsInChildren<Renderer>();
+        // foreach (Renderer renderer in childRenderers)
+        //{
+          //  renderer.enabled = false;
+        //}
     }
     private void OnRotationChanger(Quaternion oldrotation, Quaternion newRotation)
     {
@@ -110,6 +110,16 @@ public class PostItNoteNetwork : NetworkBehaviour
         outLineColor.Value = Startcolour;
     }
 
+    public void UpdateNote()
+    {
+        unityRenderer = GetComponent<Renderer>();
+        OnPositionChanged(Vector3.zero, notePosition.Value);
+        OnRotationChanger(Quaternion.identity, noteRotation.Value);
+        OnTextChanged("", noteText.Value);
+        OnColorChanged(Color.red, noteColor.Value);
+        OnOutlineColorChanged(Color.red, outLineColor.Value);
+
+    }
     public void RequestMoveNote(Vector3 movement)
     {
         if (isBeingMoved.Value)
@@ -156,32 +166,38 @@ public class PostItNoteNetwork : NetworkBehaviour
         if (IsServer)
         {
             Debug.Log("Showing object to specific clients");
-            ShowObjectToSpecificClientRpc();
+            foreach (var client in clients)
+            {
+                if (client == NetworkManager.Singleton.LocalClientId)
+                {
+                    ShowObjectToSpecificClientRpc();
+                }
+            }
+            
         }
     }
     //TODO: Show object to specific client this one is currently not working as intended
     [ClientRpc]
     private void ShowObjectToSpecificClientRpc()
     {
-        foreach (var client in clients)
+        unityRenderer.enabled = true;
+        Renderer[] childRenderers = unityRenderer.gameObject.GetComponentsInChildren<Renderer>();
+        foreach (Renderer renderer in childRenderers)
         {
-            if (client == NetworkManager.Singleton.LocalClientId)
-            {
-                unityRenderer.enabled = true;
-                Renderer[] childRenderers = unityRenderer.gameObject.GetComponentsInChildren<Renderer>();
-                foreach (Renderer renderer in childRenderers)
-                {
-                    renderer.enabled = true;
-                }
-            }
+            renderer.enabled = true;
         }
     }
-    public void AddClient(ulong clientID)
+    public void AddClient(List<ulong> clientIDs)
     {
         if (IsServer)
         {
-            AddClientClientRpc(clientID);
-            Debug.Log("Added client");
+            foreach (ulong clientID in clientIDs)
+            {
+                AddClientClientRpc(clientID);
+                Debug.Log("Added client");
+
+            }
+            
         }
     }
     [ClientRpc]

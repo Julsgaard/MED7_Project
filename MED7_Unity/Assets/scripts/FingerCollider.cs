@@ -93,7 +93,7 @@ public class FingerCollider : MonoBehaviour
         Vector3 screenPoint = camera.WorldToScreenPoint(gameObject.transform.position);
         Ray cameraRay = camera.ScreenPointToRay(screenPoint);
         RaycastHit hit;
-        if (Physics.Raycast(cameraRay, out hit, 1000, 6))
+        if (Physics.Raycast(cameraRay, out hit, 1000, LayerMask.NameToLayer("Table")))
         {
             currentPostIt.RequestMoveNote(hit.transform.position);
         }
