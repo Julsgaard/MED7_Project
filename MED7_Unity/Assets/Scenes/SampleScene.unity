@@ -7278,8 +7278,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 728ad7fae8e460a4ba41265c7308d757, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_AnchorPrefab: {fileID: 4218618458727912268, guid: 1c411ce284b8b8b4d80c992fb4b4b29b,
-    type: 3}
+  m_AnchorPrefab: {fileID: 0}
 --- !u!1 &920969223
 GameObject:
   m_ObjectHideFlags: 0
@@ -12497,7 +12496,6 @@ MonoBehaviour:
   manomotionManager: {fileID: 247568459}
   gizmoCanvas: {fileID: 578744503}
   skeletonManager: {fileID: 293565486}
-  postItParentLocal: {fileID: 0}
   postItNotePrefab: {fileID: 8494581529409893070, guid: 84fa2a5ce9505694a99d354030f5980b,
     type: 3}
   sameApplicantOffset: 0.03
@@ -15749,6 +15747,9 @@ MonoBehaviour:
   planePrefab: {fileID: 4218618458727912268, guid: 1c411ce284b8b8b4d80c992fb4b4b29b,
     type: 3}
   trackedImageManager: {fileID: 331264290}
+  postItParent: {fileID: 0}
+  planeAnchor: {fileID: 0}
+  isMarkerFound: 0
 --- !u!4 &1931163541
 Transform:
   m_ObjectHideFlags: 0

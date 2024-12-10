@@ -17,7 +17,17 @@ public class ARAnchorOnMarker : MonoBehaviour
     {
         trackedImageManager.trackedImagesChanged += OnTrackedImagesChanged;
     }
-    
+    private void Awake()
+    {
+        if (instance != null && instance != this)
+        {
+            Destroy(gameObject);
+            return;
+        }
+
+        instance = this;
+    }
+
     private void OnTrackedImagesChanged(ARTrackedImagesChangedEventArgs args)
     {
         foreach (var trackedImage in args.added) 

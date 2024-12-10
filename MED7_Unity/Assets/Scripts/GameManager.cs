@@ -399,15 +399,16 @@ public class GameManager : NetworkBehaviour
 
 
         // Set the note data directly on the server
-        postItNoteNetwork.noteText.Value = new FixedString512Bytes(text);
-        postItNoteNetwork.noteColor.Value = color;
-        postItNoteNetwork.notePosition.Value = newPos;
+        // postItNoteNetwork.noteText.Value = new FixedString512Bytes(text);
+        //postItNoteNetwork.noteColor.Value = color;
+        //postItNoteNetwork.notePosition.Value = newPos;
         
-
-        postItNoteNetwork.newClient(NetworkManager.Singleton.LocalClientId);
+        postItNoteNetwork.StartNote(color, new FixedString512Bytes(text), newPos, newRot);
+        postItNoteNetwork.AddClient(NetworkManager.Singleton.LocalClientId);
 
         postItNoteNetwork.ShowObjectToSpecificClients();
         // Log the note creation
         DataLogger.instance.LogPostItNoteCreated(newPos, text, color, 0); //TODO: needs the correct client id
     }
+
 }
