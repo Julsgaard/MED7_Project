@@ -6,6 +6,7 @@ using Unity.Collections;
 using Unity.Netcode;
 using Unity.Netcode.Transports.UTP;
 using UnityEngine;
+using UnityEngine.Serialization;
 using UnityEngine.UI;
 
 public class GameManager : NetworkBehaviour
@@ -30,7 +31,7 @@ public class GameManager : NetworkBehaviour
     
     [Header("PostIt Spawn Layout")]
     [SerializeField] private GameObject postItParentLocal;
-    [SerializeField] private GameObject postItNotePrefab;
+    [FormerlySerializedAs("postItNotePrefab")] [SerializeField] private GameObject networkNotePrefab;
     private bool _notesSentToServer, _localNotesImported;
     [SerializeField] private float sameApplicantOffset = .03f;
     [SerializeField] private float diffApplicantOffset = .05f;
@@ -197,32 +198,36 @@ public class GameManager : NetworkBehaviour
         findMarkerUI.SetActive(true);
         CanvasGroup buttonCg = placeNotesButton.GetComponent<CanvasGroup>();
         buttonCg.alpha = 0;
-        markerInstruction.text = "Find the marker and place it within view of the camera view";
         
+        markerInstruction.text = "Find the marker and place it within view of the camera view";
         yield return new WaitUntil(() => anchor.isMarkerFound);
         
-        markerInstruction.text = "Position yourself around the table. When you're ready, place your notes.";
         buttonCg.alpha = 1;
+        
         placeNotesButton.onClick.AddListener(SendAllNotesToServer);
         
+        markerInstruction.text = "Position yourself around the table. When you're ready, place your notes.";
         yield return new WaitUntil(() => _isNotesButtonClicked);
         
         buttonCg.alpha = 0;
-        markerInstruction.text = "Creating your notes...";
         
+        markerInstruction.text = "Creating your notes...";
         yield return new WaitUntil(() => _notesSentToServer);
         
-        markerInstruction.text = "Sent to server";
-        
+        markerInstruction.text = "Sent to server!";
         yield return new WaitForSeconds(1f);
 
-        markerInstruction.text = "Setting  up locally ...";
         _localNotesImported = false;
-        ImportNotesToLocalServerRpc();
+        
+        markerInstruction.text = "Setting  up locally ...";
+        RequestImportNotesToLocalServerRpc();
         
         yield return new WaitUntil(() => _localNotesImported);
         
+        markerInstruction.text = "Success";
+        yield return new WaitForSeconds(1f);
         
+        markerInstruction.text = "";
         findMarkerUI.SetActive(false);
     }
 
@@ -253,7 +258,7 @@ public class GameManager : NetworkBehaviour
         
         float currentBaseOffsetX = 0; // offset starts at 0
         
-        float postItWidth = postItNotePrefab.transform.localScale.x; // store the size we've given post its
+        float postItWidth = networkNotePrefab.transform.localScale.x; // store the size we've given post its
         float sameApplicantNoteOffset = postItWidth + (postItWidth * sameApplicantOffset); // calc offset based on size
         
         float applicantNum = 0; // numbers for indenting the offset between new applicant notes
@@ -307,10 +312,7 @@ public class GameManager : NetworkBehaviour
     public void CreateNoteServerRpc(Vector3 newPos, string text, Color color, int applicantNumber, ServerRpcParams rpcParams = default)
     {
         // Creating the note GameObject
-        TabletopMarkerAnchorer anchor = FindObjectOfType<TabletopMarkerAnchorer>();
-        postItParentLocal = anchor.GetTabletopObject();
-
-        GameObject postItNoteObject = Instantiate(postItNotePrefab, postItParentLocal.transform);
+        GameObject postItNoteObject = Instantiate(networkNotePrefab);
         
         // Get NetworkObject and spawn it
         NetworkObject networkObject = postItNoteObject.GetComponent<NetworkObject>();
@@ -327,11 +329,17 @@ public class GameManager : NetworkBehaviour
         postItNoteNetwork.newClient(NetworkManager.Singleton.LocalClientId);
         
         // Log the note creation
-        DataLogger.instance.LogPostItNoteCreated(newPos, text, color, 0); //TODO: needs the correct client id
+        DataLogger.instance.LogPostItNoteCreated(newPos, text, color, rpcParams.Receive.SenderClientId); //noTODO: needs the correct client id
     }
 
     [ServerRpc(RequireOwnership = false)]
-    private void ImportNotesToLocalServerRpc()
+    private void RequestImportNotesToLocalServerRpc()
+    {
+        ImportNotesToLocalClientRpc();
+    }
+    
+    [ClientRpc(RequireOwnership = false)]
+    private void ImportNotesToLocalClientRpc()
     {
         LocalNoteManager localNoteManager = FindObjectOfType<LocalNoteManager>();
         localNoteManager.RegisterAndSpawnNotesLocally();
