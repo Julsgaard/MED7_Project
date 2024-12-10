@@ -1,6 +1,9 @@
+using System.Collections;
+using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using Unity.Netcode;
+using UnityEngine.UI;
 using UnityEngine.XR.ARFoundation;
 
 public class LocalPlaneAnchorer : NetworkBehaviour

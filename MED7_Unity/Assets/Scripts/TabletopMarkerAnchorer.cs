@@ -1,6 +1,10 @@
+using System.Collections;
+using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using Unity.Netcode;
+using UnityEngine.Serialization;
+using UnityEngine.UI;
 using UnityEngine.XR.ARFoundation;
 
 public class TabletopMarkerAnchorer : NetworkBehaviour
@@ -25,10 +29,7 @@ public class TabletopMarkerAnchorer : NetworkBehaviour
     private void OnTrackedImagesChanged(ARTrackedImagesChangedEventArgs args)
     {
         foreach (var trackedImage in args.added)
-        {
-            isMarkerFound = true; 
-            localTabletopGO = Instantiate(localTabletopPrefab, trackedImage.transform.position, trackedImage.transform.rotation);
-        }
+            CreateTabletopObject(trackedImage);
         
         foreach (var trackedImage in args.updated)
             UpdateTabletopPositionAndRotation(trackedImage);
@@ -38,7 +39,18 @@ public class TabletopMarkerAnchorer : NetworkBehaviour
     {
         var position = trackedImage.transform.position;
         var rotation = trackedImage.transform.rotation;
-        rotation = Quaternion.Euler(0, rotation.eulerAngles.y, 0);
+        rotation = Quaternion.Euler(90, rotation.eulerAngles.y, 0);
+            
         localTabletopGO.transform.SetPositionAndRotation(position, rotation);
+        isMarkerFound = true; 
+    }
+
+    private void CreateTabletopObject(ARTrackedImage trackedImage)
+    {
+        var position = trackedImage.transform.position;
+        var rotation = trackedImage.transform.rotation;
+        rotation = Quaternion.Euler(90, rotation.eulerAngles.y, 0);
+            
+        localTabletopGO = Instantiate(localTabletopPrefab, position, rotation);
     }
 }

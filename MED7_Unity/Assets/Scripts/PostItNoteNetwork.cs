@@ -64,9 +64,12 @@ public class PostItNoteNetwork : NetworkBehaviour
         // Set the text for the note
         TextMeshPro textMeshPro = GetComponentInChildren<TextMeshPro>();
         textMeshPro.text = newText.ToString();
+        
+        Debug.Log("Set note text: " + newText);
     }
     private void OnColorChanged(Color oldColor, Color newColor)
     {
+        Debug.Log($"unityRenderer");
         // Set the color for the note
         unityRenderer.material.SetColor(baseColor, newColor);
         //Debug.Log("Set note color: " + newColor);
@@ -85,12 +88,14 @@ public class PostItNoteNetwork : NetworkBehaviour
         {
             if (movingCLient.Value != NetworkManager.Singleton.LocalClientId)
             {
+                return;
             }
             else
             {
                 Vector3 newPosition = gameObject.transform.localPosition + movement;
                 RequestMoveServerRpc(newPosition);
             }
+            return;
         }
         else
         {
