@@ -112,12 +112,7 @@ public class PostItNoteNetwork : NetworkBehaviour
 
     public void UpdateNote()
     {
-        unityRenderer = GetComponent<Renderer>();
-        OnPositionChanged(Vector3.zero, notePosition.Value);
-        OnRotationChanger(Quaternion.identity, noteRotation.Value);
-        OnTextChanged("", noteText.Value);
-        OnColorChanged(Color.red, noteColor.Value);
-        OnOutlineColorChanged(Color.red, outLineColor.Value);
+        updateNoteClientRpc();
 
     }
     public void RequestMoveNote(Vector3 movement)
@@ -218,5 +213,15 @@ public class PostItNoteNetwork : NetworkBehaviour
         }
         int index = clients.IndexOf(clientID);
         clientColours.Add(clientID, (clientColor)index);
+    }
+    [ClientRpc]
+    private void updateNoteClientRpc()
+    {
+        unityRenderer = GetComponent<Renderer>();
+        OnPositionChanged(Vector3.zero, notePosition.Value);
+        OnRotationChanger(Quaternion.identity, noteRotation.Value);
+        OnTextChanged(new FixedString512Bytes(), noteText.Value);
+        OnColorChanged(Color.magenta, noteColor.Value);
+        OnOutlineColorChanged(Color.magenta, outLineColor.Value);
     }
 }
