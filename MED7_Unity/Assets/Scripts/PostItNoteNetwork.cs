@@ -52,7 +52,6 @@ public class PostItNoteNetwork : NetworkBehaviour
         OnTextChanged(new FixedString512Bytes(), noteText.Value);
         OnColorChanged(Color.magenta, noteColor.Value);
         NoteManager.instance.RegisterNote(this);
-
     }
     private void Awake()
     {
@@ -89,9 +88,9 @@ public class PostItNoteNetwork : NetworkBehaviour
         // transform.localPosition = ARAnchorOnMarker.instance.GetLocalPostItParent().transform.position + newPosition;
         
         var finalPosition = new Vector3(newPosition.x,
-            ARAnchorOnMarker.instance.GetLocalPostItParent().transform.position.y,
+            ARAnchorOnMarker.instance.GetLocalPostItParent().transform.position.y + 0.01f,
             newPosition.z);
-        _lerpCoroutine = StartCoroutine(LerpToPosition(oldPosition, newPosition));
+        _lerpCoroutine = StartCoroutine(LerpToPosition(oldPosition, finalPosition));
     }
 
     private IEnumerator LerpToPosition(Vector3 startPosition, Vector3 targetPosition, float lerpTime = 0.1f)
@@ -180,7 +179,7 @@ public class PostItNoteNetwork : NetworkBehaviour
              */
             notePosition.Value = newPosition;
             
-            RequestStopMove();
+            // RequestStopMove();
         }
         else
         {
@@ -193,9 +192,9 @@ public class PostItNoteNetwork : NetworkBehaviour
             notePosition.Value = newPosition;
             
             // Log the movement
-            DataLogger.instance.LogPostItNoteMove(newPosition, movingClient.Value);
+            DataLogger.instance.LogPostItNoteMove(newPosition, movingClient.Value); // TODO: Only shows client 0
             
-            RequestStopMove();
+            // RequestStopMove();
         }
     }
     
