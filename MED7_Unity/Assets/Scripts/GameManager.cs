@@ -49,9 +49,6 @@ public class GameManager : NetworkBehaviour
         ipAddressInputField.text = defaultIpAddress;
 
         ShowIntroUI();
-
-        // Set Manomotion fast mode to true for faster hand tracking
-        // ManomotionManager.Instance.ShouldRunFastMode(true);
     }
 
     private void ShowIntroUI()
