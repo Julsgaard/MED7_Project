@@ -62,6 +62,7 @@ public class ARAnchorOnMarker : MonoBehaviour
     {
         trackedImageManager.trackedImagesChanged -= OnTrackedImagesChanged;
     }
+    
     public GameObject GetLocalPostItParent()
     {
         return postItParent;

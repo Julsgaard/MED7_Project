@@ -132,8 +132,12 @@ public class PostItNoteNetwork : NetworkBehaviour
     [ClientRpc]
     private void UpdateNotesClientRpc()
     {
+        ARAnchorOnMarker arAnchorOnMarker = FindObjectOfType<ARAnchorOnMarker>();
+        Vector3 arPlanePosition = arAnchorOnMarker.GetLocalPostItParent().transform.position;
+        Vector3 newPos = arPlanePosition + notePosition.Value + new Vector3(0, 0.01f, 0);
+        
         unityRenderer = GetComponent<Renderer>();
-        OnPositionChanged(Vector3.zero, notePosition.Value);
+        OnPositionChanged(Vector3.zero, newPos);
         OnRotationChanger(Quaternion.identity, noteRotation.Value);
         OnTextChanged("", noteText.Value);
         OnColorChanged(Color.red, noteColor.Value);
