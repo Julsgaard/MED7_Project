@@ -298,7 +298,7 @@ public class GameManager : NetworkBehaviour
             float currNoteY = 0; // same for y
             
             // Get the AR Plane's position
-            Vector3 arPlanePosition = arAnchorOnMarker.GetLocalPostItParent().transform.position;
+            //Vector3 arPlanePosition = arAnchorOnMarker.GetLocalPostItParent().transform.position;
             
             foreach (var noteText in applicant.notes)
             {
@@ -314,9 +314,9 @@ public class GameManager : NetworkBehaviour
                     float posZ = currNoteY * sameApplicantNoteOffset;
                     
                     // Set the new position of the note
-                    Vector3 newPos = arPlanePosition + new Vector3(posX, 0.01f, posZ);
-                    
-                    Quaternion newRot = Quaternion.identity;
+                    //Vector3 newPos = arPlanePosition + new Vector3(posX, 0.01f, posZ);
+                    Vector3 newPos = new Vector3(posX, 0, posZ);
+                    Quaternion newRot = Quaternion.identity; // TODO: Maybe remove this if we don't want the notes to rotate
                     Debug.Log($"db: Calling 'CreateNoteServerRpc()'");
                     CreateNoteServerRpc(newPos, newRot, noteText, applicant.applicantColour, applicant.applicantNumber);
                     Debug.Log($"db: Called 'CreateNoteServerRpc()'");
