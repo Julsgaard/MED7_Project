@@ -30,7 +30,7 @@ public class DataLogger : NetworkBehaviour
         
         // Create a new .csv file and write the header
         string header = "Timestamp;EventType;Position;Text;Color;ClientId";
-        System.IO.File.WriteAllText(_savePath, header + "\n"); //TODO: If the note text contains a ; or a newline, this will break
+        System.IO.File.WriteAllText(_savePath, header + "\n");
         
         Debug.Log("Log file created at: " + _savePath);
     }
@@ -44,7 +44,14 @@ public class DataLogger : NetworkBehaviour
     private void LogData(string eventType, string position, string text, string color, string clientId)
     {
         string timeStamp = GetTimeStamp();
+        
+        // Make sure that the text does not contain any newlines or semicolons, because it will break the .csv file
+        text = text.Replace("\n", "\\n").Replace("\r", "\\r").Replace(";", "\\;");
+        
+        // Combine the data into a single string
         string log = $"{timeStamp};{eventType};{position};{text};{color};{clientId}";
+        
+        // Append the log to the file
         System.IO.File.AppendAllText(_savePath, log + "\n");
     }
 
