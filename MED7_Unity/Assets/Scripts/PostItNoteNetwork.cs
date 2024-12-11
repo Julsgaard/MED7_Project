@@ -159,47 +159,35 @@ public class PostItNoteNetwork : NetworkBehaviour
     // TODO: Update note position when we find and update marker
     // TODO: Fix outline color from the dictionary index error
     [ServerRpc(RequireOwnership = false)]
-    public void RequestMoveNoteServerRpc(Vector3 movement)
+    public void RequestMoveNoteServerRpc(Vector3 movement, ServerRpcParams rpcParams = default)
     {
-        Debug.Log($"Trying to move note by {movement}");
-        
-        if (isBeingMoved.Value)
-        {
-            Debug.Log($"Note is already being moved ({isBeingMoved.Value}) by {movingClient.Value}");
-            if (movingClient.Value != NetworkManager.Singleton.LocalClientId)
-                return;
-            
-            Vector3 newPosition = gameObject.transform.localPosition + movement;
-            
-            /* we need only update the networked variable position value
-             * only the server can do this. The client will get the updated value via
-             * the OnValueChanged event.
-             */
-            notePosition.Value = newPosition;
-            
-            // RequestStopMove();
-        }
-        else
-        {
-            Debug.Log($"Note is not being moved ({isBeingMoved.Value}) yet. Client {movingClient.Value} is about to move it.");
+        ulong senderClientId = rpcParams.Receive.SenderClientId;
 
-            isBeingMoved.Value = true;
-            movingClient.Value = NetworkManager.Singleton.LocalClientId;
-            //unityRenderer.material.SetColor(outlineColourVariable, clientColorMap[clientColours[movingClient.Value]]);
-            Vector3 newPosition = gameObject.transform.localPosition + movement;
-            notePosition.Value = newPosition;
-            
-            // Log the movement
-            DataLogger.instance.LogPostItNoteMove(newPosition, movingClient.Value); // TODO: Only shows client 0
-            
-            // RequestStopMove();
+        if (!CanMove(senderClientId))
+        {
+            Debug.LogWarning($"Move request denied: Note is being moved by {movingClient.Value}, but {senderClientId} tried to move it.");
+            return;
         }
-    }
-    
-    public void RequestStopMove()
-    {
+
+        // Update the position of the note
+        Vector3 newPosition = gameObject.transform.localPosition + movement;
+        notePosition.Value = newPosition;
+        
+        isBeingMoved.Value = true;
+        movingClient.Value = senderClientId;
+        
+        //Log the movement of the note
+        DataLogger.instance.LogPostItNoteMove(notePosition.Value, noteText.Value, noteColor.Value, senderClientId);
+
+        // Reset
         isBeingMoved.Value = false;
-        //unityRenderer.material.SetColor(outlineColourVariable, noteColor.Value);
+        movingClient.Value = 0;
+    }
+
+    private bool CanMove(ulong senderClientId)
+    {
+        // Allow movement if no one is moving the note or the sender is the current mover
+        return !isBeingMoved.Value || movingClient.Value == senderClientId;
     }
     
     public void ShowObjectToSpecificClients()

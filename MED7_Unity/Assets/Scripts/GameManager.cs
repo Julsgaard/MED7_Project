@@ -365,12 +365,14 @@ public class GameManager : NetworkBehaviour
         PostItNoteNetwork postItNoteNetwork = postItNoteObject.GetComponent<PostItNoteNetwork>();
  
         postItNoteNetwork.StartNote(color, new FixedString512Bytes(text), newPos, newRot);
-        clients.Add(NetworkManager.Singleton.LocalClientId);
+        
+        clients.Add(NetworkManager.Singleton.LocalClientId); //TODO: LocalClientId is always 0 - maybe use senderClientId instead?
         postItNoteNetwork.AddClient(clients);
         postItNoteNetwork.ShowObjectToSpecificClients();
         
+        ulong senderClientId = rpcParams.Receive.SenderClientId;
         // Log the note creation
-        DataLogger.instance.LogPostItNoteCreated(newPos, text, color, NetworkManager.Singleton.LocalClientId);
+        DataLogger.instance.LogPostItNoteCreated(newPos, text, color, senderClientId);
     }
 
     [ServerRpc(RequireOwnership =false)]

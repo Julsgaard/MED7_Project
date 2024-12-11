@@ -1,3 +1,4 @@
+using Unity.Collections;
 using Unity.Netcode;
 using UnityEngine;
 
@@ -20,6 +21,8 @@ public class DataLogger : NetworkBehaviour
 
     private void Start()
     {
+        if (IsClient) return;
+
         CreateLogFile();
     }
 
@@ -57,29 +60,41 @@ public class DataLogger : NetworkBehaviour
 
     public void LogPostItNoteCreated(Vector3 position, string text, Color color, ulong clientId)
     {
+        if (IsClient) return;
+
         string positionStr = position.ToString();
         string colorStr = ColorUtility.ToHtmlStringRGBA(color);
         LogData("PostItNoteCreated", positionStr, text, colorStr, clientId.ToString());
     }
 
-    public void LogPostItNoteMove(Vector3 position, ulong clientId)
+    public void LogPostItNoteMove(Vector3 position,FixedString512Bytes text, Color color, ulong clientId)
     {
+        if (IsClient) return;
+
         string positionStr = position.ToString();
-        LogData("PostItNoteMoved", positionStr, "", "", clientId.ToString());
+        string textStr = text.ToString();
+        string colorStr = ColorUtility.ToHtmlStringRGBA(color);
+        LogData("PostItNoteMoved", positionStr, textStr, colorStr, clientId.ToString());
     }
 
     public void LogClientConnected(ulong clientId)
     {
+        if (IsClient) return;
+
         LogData("ClientConnected", "", "", "", clientId.ToString());
     }
 
     public void LogClientDisconnected(ulong clientId)
     {
+        if (IsClient) return;
+
         LogData("ClientDisconnected", "", "", "", clientId.ToString());
     }
     
     public void LogServerStarted()
     {
+        if (IsClient) return;
+        
         LogData("ServerStarted", "", "", "", "");
     }
 }
