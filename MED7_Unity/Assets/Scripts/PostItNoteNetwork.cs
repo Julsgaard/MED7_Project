@@ -145,6 +145,7 @@ public class PostItNoteNetwork : NetworkBehaviour
     [ServerRpc(RequireOwnership = false)]
     public void RequestMoveNoteServerRpc(Vector3 movement, ServerRpcParams rpcParams = default)
     {
+        Debug.Log($"Trying to move post it from {notePosition.Value} to {movement}");
         ulong senderClientId = rpcParams.Receive.SenderClientId;
 
         if (!CanMove(senderClientId))
