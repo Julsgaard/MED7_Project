@@ -47,6 +47,7 @@ public class ARAnchorOnMarker : MonoBehaviour
         isMarkerFound = true;
     }
 
+    // TODO: update post it positions when plane is updated to avoid drift
     private void UpdateTracker(Transform newPose)
     {
         postItParent.transform.position = newPose.position;

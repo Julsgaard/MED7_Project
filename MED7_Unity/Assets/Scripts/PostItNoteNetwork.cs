@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using TMPro;
@@ -6,14 +7,15 @@ using Unity.Netcode;
 using Unity.Networking.Transport;
 using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 public class PostItNoteNetwork : NetworkBehaviour
 {
-    public enum clientColor
+    public enum ClientColor
     {
-        yellow,
-        vermillion,
-        reddishPurple,
+        YELLOW,
+        VERMILLION,
+        REDDISHPURPLE,
     }
 
     public NetworkVariable<Vector3> notePosition = new NetworkVariable<Vector3>();
@@ -22,22 +24,24 @@ public class PostItNoteNetwork : NetworkBehaviour
     public NetworkVariable<Color> noteColor = new NetworkVariable<Color>();
     public NetworkVariable<Color> outLineColor = new NetworkVariable<Color>();
     public NetworkVariable<bool> isBeingMoved = new NetworkVariable<bool>();
-    public NetworkVariable<ulong> movingCLient = new NetworkVariable<ulong>();
+    [FormerlySerializedAs("movingCLient")] public NetworkVariable<ulong> movingClient = new NetworkVariable<ulong>();
 
     private List<ulong> clients = new List<ulong>();
-    private Dictionary<ulong, clientColor> clientColours = new Dictionary<ulong, clientColor>();
+    private Dictionary<ulong, ClientColor> clientColours;
 
     string outlineColourVariable = "_OutlineColour";
     string baseColor = "_BaseColour";
     private Renderer unityRenderer;
-
-
-    private Dictionary<clientColor, Color> clientColorMap = new Dictionary<clientColor, Color>
+    
+    private Dictionary<ClientColor, Color> clientColorMap = new Dictionary<ClientColor, Color>
     {
-        {clientColor.yellow, new Color(240,228,66)},
-        {clientColor.vermillion, new Color(213,90,0)},
-        {clientColor.reddishPurple, new Color(204,121,167)}
+        {ClientColor.YELLOW, new Color(240,228,66)},
+        {ClientColor.VERMILLION, new Color(213,90,0)},
+        {ClientColor.REDDISHPURPLE, new Color(204,121,167)}
     };
+    
+    private Coroutine _lerpCoroutine;
+    
     public override void OnNetworkSpawn()
     {
         // Subscribe to value changes
@@ -64,17 +68,49 @@ public class PostItNoteNetwork : NetworkBehaviour
         //{
           //  renderer.enabled = false;
         //}
+        
+        clientColours = new Dictionary<ulong, ClientColor>();
     }
+    
     private void OnRotationChanger(Quaternion oldrotation, Quaternion newRotation)
     {
         if (IsServer) { return; }
         transform.localRotation = ARAnchorOnMarker.instance.GetLocalPostItParent().transform.rotation * newRotation;
     }
+    
     private void OnPositionChanged(Vector3 oldPosition, Vector3 newPosition)
     {
         if (IsServer) { return; }
-        transform.localPosition = ARAnchorOnMarker.instance.GetLocalPostItParent().transform.position + newPosition;
+
+        if (_lerpCoroutine != null)
+            StopCoroutine(_lerpCoroutine);
+        
+        /* Since the note is a child of the ARAnchorOnMarker instance, we can 
+         *  just set the local position of the note to the new position. This new
+         * position is a raycast hit from the plane, meaning the note will be
+         * moved along the plane in that sense.
+         */
+        // transform.localPosition = ARAnchorOnMarker.instance.GetLocalPostItParent().transform.position + newPosition;
+        
+        var finalPosition = new Vector3(newPosition.x,
+            ARAnchorOnMarker.instance.GetLocalPostItParent().transform.position.y,
+            newPosition.z);
+        _lerpCoroutine = StartCoroutine(LerpToPosition(oldPosition, newPosition));
     }
+
+    private IEnumerator LerpToPosition(Vector3 startPosition, Vector3 targetPosition, float lerpTime = 0.1f)
+    {
+        float distance = Vector3.Distance(startPosition, targetPosition);
+        float speed = distance / lerpTime;
+
+        while (Vector3.Distance(transform.localPosition, targetPosition) > 0.01f)
+        {
+            transform.localPosition = Vector3.MoveTowards(transform.localPosition, targetPosition, speed * Time.deltaTime);
+            yield return null;
+        }
+        transform.localPosition = targetPosition; // Ensure the final position is set exactly to the target
+    }
+    
     private void OnTextChanged(FixedString512Bytes oldText, FixedString512Bytes newText)
     {
         // Set the text for the note
@@ -83,6 +119,7 @@ public class PostItNoteNetwork : NetworkBehaviour
 
         Debug.Log("Set note text: " + newText);
     }
+    
     private void OnColorChanged(Color oldColor, Color newColor)
     {
         Debug.Log($"unityRenderer");
@@ -91,6 +128,7 @@ public class PostItNoteNetwork : NetworkBehaviour
         unityRenderer.material.SetColor(baseColor, newColor);
         //Debug.Log("Set note color: " + newColor);
     }
+    
     private void OnOutlineColorChanged(Color oldColor, Color newColor)
     {
         Debug.Log($"unityRenderer");
@@ -100,18 +138,22 @@ public class PostItNoteNetwork : NetworkBehaviour
         //Debug.Log("Set note color: " + newColor);
     }
 
-    public void StartNote(Color Startcolour, FixedString512Bytes startString, Vector3 startPosition, Quaternion startRotaion)
+    public void StartNote(Color startColor, FixedString512Bytes startString, Vector3 startPosition, Quaternion startRotaion)
     {
         unityRenderer = GetComponent<Renderer>();
         noteRotation.Value = startRotaion;
         notePosition.Value = startPosition;
         noteText.Value = startString;
-        noteColor.Value = Startcolour;
-        outLineColor.Value = Startcolour;
+        noteColor.Value = startColor;
+        outLineColor.Value = startColor;
     }
 
     public void UpdateNote()
     {
+        /* TODO: Can we set all these components in awake? They are 
+         *  said to be 'expensive' and we work with somewhat limited
+         *  hardware on the phones
+         */
         unityRenderer = GetComponent<Renderer>();
         OnPositionChanged(Vector3.zero, notePosition.Value);
         OnRotationChanger(Quaternion.identity, noteRotation.Value);
@@ -121,8 +163,6 @@ public class PostItNoteNetwork : NetworkBehaviour
 
     }
     
-    
-    // TODO: Make server move note
     // TODO: Update note position when we find and update marker
     // TODO: Fix outline color from the dictionary index error
     [ServerRpc(RequireOwnership = false)]
@@ -132,43 +172,37 @@ public class PostItNoteNetwork : NetworkBehaviour
         
         if (isBeingMoved.Value)
         {
-            if (movingCLient.Value != NetworkManager.Singleton.LocalClientId)
-            {
+            Debug.Log($"Note is already being moved ({isBeingMoved.Value}) by {movingClient.Value}");
+            if (movingClient.Value != NetworkManager.Singleton.LocalClientId)
                 return;
-            }
-            else
-            {
-                Vector3 newPosition = gameObject.transform.localPosition + movement;
-                RequestMoveServerRpc(newPosition);
-            }
-            return;
+            
+            Vector3 newPosition = gameObject.transform.localPosition + movement;
+            
+            /* we need only update the networked variable position value
+             * only the server can do this. The client will get the updated value via
+             * the OnValueChanged event.
+             */
+            notePosition.Value = newPosition;
         }
         else
         {
+            Debug.Log($"Note is not being moved ({isBeingMoved.Value}) yet. Client {movingClient.Value} is about to move it.");
+
             isBeingMoved.Value = true;
-            movingCLient.Value = NetworkManager.Singleton.LocalClientId;
-            unityRenderer.material.SetColor(outlineColourVariable, clientColorMap[clientColours[NetworkManager.Singleton.LocalClientId]]);
+            movingClient.Value = NetworkManager.Singleton.LocalClientId;
+            unityRenderer.material.SetColor(outlineColourVariable, clientColorMap[clientColours[movingClient.Value]]);
             Vector3 newPosition = gameObject.transform.localPosition + movement;
-            RequestMoveServerRpc(newPosition);
-
+            
+            notePosition.Value = newPosition;
         }
-
     }
-
-
-    [ServerRpc(RequireOwnership = false)]
-    public void RequestMoveServerRpc(Vector3 newPosition, ServerRpcParams rpcParams = default)
-    {
-        // Server updates the note position
-        notePosition.Value = newPosition;
-        Debug.Log($"Server moved note to {newPosition} for client {rpcParams.Receive.SenderClientId}");
-    }
-
+    
     public void RequestStopMove()
     {
         isBeingMoved.Value = false;
         unityRenderer.material.SetColor(outlineColourVariable, noteColor.Value);
     }
+    
     public void ShowObjectToSpecificClients()
     {
         if (IsServer)
@@ -184,6 +218,7 @@ public class PostItNoteNetwork : NetworkBehaviour
             
         }
     }
+    
     //TODO: Show object to specific client this one is currently not working as intended
     [ClientRpc]
     private void ShowObjectToSpecificClientRpc()
@@ -195,6 +230,7 @@ public class PostItNoteNetwork : NetworkBehaviour
             renderer.enabled = true;
         }
     }
+    
     public void AddClient(List<ulong> clientIDs)
     {
         if (IsServer)
@@ -203,11 +239,10 @@ public class PostItNoteNetwork : NetworkBehaviour
             {
                 AddClientClientRpc(clientID);
                 Debug.Log("Added client");
-
             }
-            
         }
     }
+    
     [ClientRpc]
     private void AddClientClientRpc(ulong clientID)
     {
@@ -216,18 +251,18 @@ public class PostItNoteNetwork : NetworkBehaviour
             return;
         }
         clients.Add(clientID);
-        newClient(clientID);
+        NewClient(clientID);
     }
     
-    private void newClient(ulong clientID)
+    private void NewClient(ulong clientID)
     {
-        if (clientColours.ContainsKey(clientID))
+        if (!clientColours.ContainsKey(clientID))
         {
-            return;
+            clientColours[clientID] = (ClientColor)clients.IndexOf(clientID);
         }
-        int index = clients.IndexOf(clientID);
-        clientColours.Add(clientID, (clientColor)index);
-        
-        Debug.Log($"Added color {clientColorMap[(clientColor)index]} for client {clientID}");
+        // int index = clients.IndexOf(clientID);
+        // clientColours.Add(clientID, (ClientColor)index);
+        //
+        // Debug.Log($"Added color {clientColorMap[(ClientColor)index]} for client {clientID}");
     }
 }

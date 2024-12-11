@@ -354,12 +354,7 @@ public class GameManager : NetworkBehaviour
             }
             
             Debug.Log($"db: Finished notes for applicant {applicantNum}. Incrementing.");
-
             
-            //totalOffsetX += (sameApplicantNoteOffset * currApplicantNumCols) // full width of current appl. notes
-            //                - sameApplicantOffset; // minus 1*offset which will be added on the end
-            
-            // if we want to add for another applicant, we set the new corner for where to begin by adding the offset
             applicantNum++;
             currentBaseOffsetX += (sameApplicantNoteOffset * currApplicantNumCols) + (diffApplicantOffset-sameApplicantOffset);
         }
@@ -375,44 +370,17 @@ public class GameManager : NetworkBehaviour
     [ServerRpc(RequireOwnership = false)]
     public void CreateNoteServerRpc(Vector3 newPos, Quaternion newRot, string text, Color color, int applicantNumber, ServerRpcParams rpcParams = default)
     {
-        // Debug.Log($"db: Is postItParentLocal null?: {postItParentLocal == null}");
-        // if (postItParentLocal == null)
-        // {
-        //     postItParentLocal = FindObjectOfType<ARAnchorOnMarker>().GetMarkerCoordinateSystem();
-        //     Debug.Log($"db: postItParentLocal was null! Tried to set it to an instance again: {postItParentLocal == null}");
-        //
-        // }
-        
-        // Creating the note GameObject
         GameObject postItNoteObject = Instantiate(postItNotePrefab);
-        
-        // Set the position of the note
-        //postItNoteObject.transform.position = newPos;
-        
-        // Get NetworkObject and spawn it
         NetworkObject networkObject = postItNoteObject.GetComponent<NetworkObject>();
         networkObject.Spawn();
-        // postItNetworkObject = networkObject;
-        
-        // Get the PostItNoteNetwork component from the PostItNoteObject
+
         PostItNoteNetwork postItNoteNetwork = postItNoteObject.GetComponent<PostItNoteNetwork>();
-        
-        Debug.Log($"db: Setting post-it parent!");
-        // TODO: we might need to first set this when plane is spawned. Set "spawn post its" to a button which appears after plane is detected
-        //networkObject.transform.SetParent(postItParentLocalCoords.transform); // set parent to the marker plane
-        Debug.Log($"db: Post-it parent was set successfully! (SKIPPING THIS STEP NOW)");
-
-
-        // Set the note data directly on the server
-        // postItNoteNetwork.noteText.Value = new FixedString512Bytes(text);
-        //postItNoteNetwork.noteColor.Value = color;
-        //postItNoteNetwork.notePosition.Value = newPos;
-        
+ 
         postItNoteNetwork.StartNote(color, new FixedString512Bytes(text), newPos, newRot);
         clients.Add(NetworkManager.Singleton.LocalClientId);
         postItNoteNetwork.AddClient(clients);
-
         postItNoteNetwork.ShowObjectToSpecificClients();
+        
         // Log the note creation
         DataLogger.instance.LogPostItNoteCreated(newPos, text, color, 0); //TODO: needs the correct client id
     }

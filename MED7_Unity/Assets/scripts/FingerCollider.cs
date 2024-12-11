@@ -32,45 +32,25 @@ public class FingerCollider : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        
-        //thisMaterial.color = Color.green;
-        //movePostIt(postIt);
-        //GetComponentInChildren<TextMeshPro>().text = gameObject.transform.position.ToString();
-
         HandInfo handInfo = ManomotionManager.Instance.Hand_infos[0].hand_info;
-        
         if (handInfo.gesture_info.mano_gesture_trigger == ManoGestureTrigger.PICK)
         {
-            Debug.Log($"Registered Pick");
             thisMaterial.color = Color.cyan;
             
             if(postIt == null)
-            {
                 CatchPostIt();
-            }
+            
         }
         else if (handInfo.gesture_info.mano_gesture_trigger == ManoGestureTrigger.DROP)
         {
-            Debug.Log($"Registered Drop");
-
+            /* TODO: Make this state "searching" where a ray is continually
+             *  cast to find a post it. When one is found, bind it.
+             */
             thisMaterial.color = Color.blue;
-
-            if (postIt != null)
-            {
-
-                postIt = null;
-            }
-            
-            Destroy(debugBall);
+            postIt = null;
         }
         if (postIt != null)
         {
-            Debug.Log($"Trying to move post it");
-
-            thisMaterial.color = Color.green;
-            debugBall = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-            debugBall.transform.localScale = new Vector3(0.01f, 0.01f, 0.01f);
-            
             MovePostIt(postIt);
         }
     }
@@ -80,30 +60,22 @@ public class FingerCollider : MonoBehaviour
         Ray cameraRay = camera.ScreenPointToRay(screenPoint);
         
         DisplayDebugLine(cameraRay);
-        CheckRayHitsForPostIts(Physics.RaycastAll(cameraRay, 1000));
+        CheckRayHitsForPostIts(Physics.RaycastAll(cameraRay, 3));
     }
 
     private void CheckRayHitsForPostIts(RaycastHit[] hits)
     {
-        Debug.Log($"Ray hit {hits.Length} objects");
-        
         foreach (RaycastHit hit in hits) 
         {
             GetComponentInChildren<TextMeshPro>().text = hit.collider.gameObject.tag;
             
-            Debug.Log($"Looping through hit objects: {hit.collider.gameObject.tag}: {hit.collider.gameObject.name}");
-            
-            if (hit.collider.gameObject.tag == "Post-it")
+            if (hit.collider.gameObject.CompareTag("Post-it"))
             {
-                Debug.Log($"Tag was 'post-it'");
-                
                 postIt = hit.collider.gameObject.GetComponent<PostItNoteNetwork>();
+                
                 if (postIt != null)
-                {
-                    Debug.Log($"Post it was null. Setting post it to {postIt.gameObject.name}");
-                    
-                    GetComponentInChildren<TextMeshPro>().text = postIt.gameObject.name;
-                }
+                    GetComponentInChildren<TextMeshPro>().text = postIt?.gameObject.name;
+                
                 break;
             }
         }
@@ -113,35 +85,32 @@ public class FingerCollider : MonoBehaviour
     {
         debugLine.positionCount = 2;
         debugLine.SetPosition(0, cameraRay.origin - new Vector3(0, 0.01f, 0));
-        debugLine.SetPosition(1, cameraRay.origin + cameraRay.direction * 10000);
+        debugLine.SetPosition(1, cameraRay.origin + cameraRay.direction * 3);
     }
     
-    // TODO: find out why table says untagged
-    // TODO: find out how to catch post its
     private void MovePostIt(PostItNoteNetwork currentPostIt)
     {
+        thisMaterial.color = Color.green;
+        
         Vector3 screenPoint = camera.WorldToScreenPoint(gameObject.transform.position);
         Ray cameraRay = camera.ScreenPointToRay(screenPoint);
         RaycastHit hit;
         
         DisplayDebugLine(cameraRay);
         
-        Debug.Log($"Creating new ray from {cameraRay.origin} to {cameraRay.direction}.");
-        
-        if (Physics.Raycast(cameraRay, out hit, 1000))
+        /* @frederik, I added back the "table" layer mask. Here it;s fine, but when
+         * we before looked for post its, it needed to be removed.
+         */
+        if (Physics.Raycast(cameraRay, out hit, 3, LayerMask.GetMask("Table"), QueryTriggerInteraction.Ignore))
         {
-            Debug.Log($"Hit object: {hit.collider.gameObject.name}");
-
-            currentPostIt.RequestMoveNoteServerRpc(hit.transform.position);
-            debugBall.transform.position = hit.transform.position;
+            currentPostIt.RequestMoveNoteServerRpc(hit.point);
+            
+            if (debugBall == null)
+            {
+                debugBall = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+                debugBall.transform.localScale = new Vector3(0.01f, 0.01f, 0.01f);
+            }
+            debugBall.transform.position = hit.point;
         }
-     
-        /*
-         * Old Movement logic
-        Vector3 movePos = gameObject.transform.position - oldPos;
-        movePos = new Vector3(movePos.x, 0, movePos.z) * (Vector3.Distance(camera.transform.position, currentPostIt.transform.position)/Vector3.Distance(camera.transform.position, gameObject.transform.position));
-        currentPostIt.RequestMoveNote(movePos);
-        oldPos = gameObject.transform.position;
-        */
     }
 }
