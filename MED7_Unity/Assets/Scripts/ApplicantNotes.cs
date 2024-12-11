@@ -154,7 +154,7 @@ public class ApplicantNotes : MonoBehaviour
         }
         
         // Update UI text and colour
-        currentApplicantNumberText.text = $"Applicant {currentApplicant.applicantNumber}";
+        currentApplicantNumberText.text = $"{currentApplicant.applicantNumber}";
         currentApplicantColorImage.color = currentApplicant.applicantColour;
 
         // Create the notes input fields again
