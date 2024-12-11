@@ -1,13 +1,9 @@
 using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
 using TMPro;
 using Unity.Collections;
 using Unity.Netcode;
-using Unity.Networking.Transport;
-using Unity.VisualScripting;
 using UnityEngine;
-using UnityEngine.Serialization;
 
 public class PostItNoteNetwork : NetworkBehaviour
 {
@@ -24,7 +20,7 @@ public class PostItNoteNetwork : NetworkBehaviour
     public NetworkVariable<Color> noteColor = new NetworkVariable<Color>();
     public NetworkVariable<Color> outLineColor = new NetworkVariable<Color>();
     public NetworkVariable<bool> isBeingMoved = new NetworkVariable<bool>();
-    [FormerlySerializedAs("movingCLient")] public NetworkVariable<ulong> movingClient = new NetworkVariable<ulong>();
+    public NetworkVariable<ulong> movingClient = new NetworkVariable<ulong>();
 
     private List<ulong> clients = new List<ulong>();
     private Dictionary<ulong, ClientColor> clientColours;
@@ -183,6 +179,8 @@ public class PostItNoteNetwork : NetworkBehaviour
              * the OnValueChanged event.
              */
             notePosition.Value = newPosition;
+            
+            RequestStopMove();
         }
         else
         {
@@ -192,15 +190,19 @@ public class PostItNoteNetwork : NetworkBehaviour
             movingClient.Value = NetworkManager.Singleton.LocalClientId;
             unityRenderer.material.SetColor(outlineColourVariable, clientColorMap[clientColours[movingClient.Value]]);
             Vector3 newPosition = gameObject.transform.localPosition + movement;
-            
             notePosition.Value = newPosition;
+            
+            // Log the movement
+            DataLogger.instance.LogPostItNoteMove(newPosition, movingClient.Value);
+            
+            RequestStopMove();
         }
     }
     
     public void RequestStopMove()
     {
         isBeingMoved.Value = false;
-        unityRenderer.material.SetColor(outlineColourVariable, noteColor.Value);
+        //unityRenderer.material.SetColor(outlineColourVariable, noteColor.Value);
     }
     
     public void ShowObjectToSpecificClients()
@@ -261,15 +263,5 @@ public class PostItNoteNetwork : NetworkBehaviour
             clientColours[clientID] = (ClientColor)clients.IndexOf(clientID);
         }
        
-    }
-    [ClientRpc]
-    private void updateNoteClientRpc()
-    {
-        unityRenderer = GetComponent<Renderer>();
-        OnPositionChanged(Vector3.zero, notePosition.Value);
-        OnRotationChanger(Quaternion.identity, noteRotation.Value);
-        OnTextChanged(new FixedString512Bytes(), noteText.Value);
-        OnColorChanged(Color.magenta, noteColor.Value);
-        OnOutlineColorChanged(Color.magenta, outLineColor.Value);
     }
 }

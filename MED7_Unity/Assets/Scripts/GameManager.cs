@@ -40,17 +40,18 @@ public class GameManager : NetworkBehaviour
     [SerializeField] private ApplicantNotes applicantNotes;
 
     private List<ulong> clients = new List<ulong>();
+
     private void Awake()
     {
         AddListenersToUI();
-        
+
         // Set the input field text to the default IP address
         ipAddressInputField.text = defaultIpAddress;
-        
+
         ShowIntroUI();
-        
+
         // Set Manomotion fast mode to true for faster hand tracking
-        ManomotionManager.Instance.ShouldRunFastMode(true);
+        // ManomotionManager.Instance.ShouldRunFastMode(true);
     }
 
     private void Start()
@@ -113,14 +114,7 @@ public class GameManager : NetworkBehaviour
         connectToServerButton.onClick.AddListener(ConnectToServer);
         connectToServerButtonOptions.onClick.AddListener(ConnectToServer);
         nextButton.onClick.AddListener(NextButtonIntro);
-        
         serverButton.onClick.AddListener(StartServer);
-        moveAllNotesUpButton.onClick.AddListener(MoveAllNotesUp);
-    }
-    
-    private void MoveAllNotesUp()
-    {
-        //NoteManager.Instance.MoveAllNotes();
     }
     
     // Method for connecting to the server
