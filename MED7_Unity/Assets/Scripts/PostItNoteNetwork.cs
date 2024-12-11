@@ -40,6 +40,13 @@ public class PostItNoteNetwork : NetworkBehaviour
     
     public override void OnNetworkSpawn()
     {
+        // Get the renderer component and set the outline color
+        unityRenderer = GetComponent<Renderer>();
+        unityRenderer.material.SetColor(outlineColourVariable, noteColor.Value);
+        
+        // Initialize the clientColours dictionary
+        clientColours = new Dictionary<ulong, ClientColor>();
+        
         // Subscribe to value changes
         notePosition.OnValueChanged += OnPositionChanged;
         noteText.OnValueChanged += OnTextChanged;
@@ -52,19 +59,6 @@ public class PostItNoteNetwork : NetworkBehaviour
         OnTextChanged(new FixedString512Bytes(), noteText.Value);
         OnColorChanged(Color.magenta, noteColor.Value);
         NoteManager.instance.RegisterNote(this);
-    }
-    private void Awake()
-    {
-        unityRenderer = GetComponent<Renderer>();
-        unityRenderer.material.SetColor(outlineColourVariable, noteColor.Value);
-        //unityRenderer.enabled = false;
-        // Renderer[] childRenderers = unityRenderer.gameObject.GetComponentsInChildren<Renderer>();
-        // foreach (Renderer renderer in childRenderers)
-        //{
-          //  renderer.enabled = false;
-        //}
-        
-        clientColours = new Dictionary<ulong, ClientColor>();
     }
     
     private void OnRotationChanger(Quaternion oldrotation, Quaternion newRotation)
@@ -191,7 +185,7 @@ public class PostItNoteNetwork : NetworkBehaviour
 
             isBeingMoved.Value = true;
             movingClient.Value = NetworkManager.Singleton.LocalClientId;
-            unityRenderer.material.SetColor(outlineColourVariable, clientColorMap[clientColours[movingClient.Value]]);
+            //unityRenderer.material.SetColor(outlineColourVariable, clientColorMap[clientColours[movingClient.Value]]);
             Vector3 newPosition = gameObject.transform.localPosition + movement;
             notePosition.Value = newPosition;
             

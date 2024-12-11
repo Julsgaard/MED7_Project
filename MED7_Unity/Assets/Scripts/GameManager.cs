@@ -31,10 +31,10 @@ public class GameManager : NetworkBehaviour
     [Header("PostIt Spawn Layout")]
     // [SerializeField] private GameObject postItParentLocal;
     [SerializeField] private GameObject postItNotePrefab;
-    private bool _notesSentToServer = false;
+    private bool _notesSentToServer;
     [SerializeField] private float sameApplicantOffset = .03f;
     [SerializeField] private float diffApplicantOffset = .05f;
-    private ARAnchorOnMarker anchor;
+    [SerializeField] private ARAnchorOnMarker arAnchorOnMarker;
     
     [Header("Script References")]
     [SerializeField] private ApplicantNotes applicantNotes;
@@ -52,12 +52,6 @@ public class GameManager : NetworkBehaviour
 
         // Set Manomotion fast mode to true for faster hand tracking
         // ManomotionManager.Instance.ShouldRunFastMode(true);
-    }
-
-    private void Start()
-    {
-        anchor = FindObjectOfType<ARAnchorOnMarker>();
-        //postItParentLocal = anchor.GetMarkerCoordinateSystem();
     }
 
     private void ShowIntroUI()
@@ -215,11 +209,11 @@ public class GameManager : NetworkBehaviour
         
         //wait for user to find AR marker -- instruct user to find marker
         
-        Debug.Log($"db: Showing UI. Is now waiting for anchor.isMarkerFound: {anchor.isMarkerFound}.");
+        Debug.Log($"db: Showing UI. Is now waiting for anchor.isMarkerFound: {arAnchorOnMarker.isMarkerFound}.");
        
-        yield return new WaitUntil(() => anchor.isMarkerFound);
+        yield return new WaitUntil(() => arAnchorOnMarker.isMarkerFound);
         
-        Debug.Log($"db: Marker found: (anchor.isMarkerfound: {anchor.isMarkerFound}). Setting found plane as parent.");
+        Debug.Log($"db: Marker found: (anchor.isMarkerfound: {arAnchorOnMarker.isMarkerFound}). Setting found plane as parent.");
         
        // Debug.Log($"db: Plane set as posItParent: {postItParentLocal}.");
 
@@ -376,7 +370,7 @@ public class GameManager : NetworkBehaviour
         postItNoteNetwork.ShowObjectToSpecificClients();
         
         // Log the note creation
-        DataLogger.instance.LogPostItNoteCreated(newPos, text, color, 0); //TODO: needs the correct client id
+        DataLogger.instance.LogPostItNoteCreated(newPos, text, color, NetworkManager.Singleton.LocalClientId);
     }
 
     [ServerRpc(RequireOwnership =false)]

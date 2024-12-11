@@ -9158,7 +9158,7 @@ PrefabInstance:
     - target: {fileID: 224130951485110974, guid: 9ed2a051c32b4fe47a5e4fb95c20b03f,
         type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: -0.00012207031
+      value: -0.000061035156
       objectReference: {fileID: 0}
     - target: {fileID: 224166536479716514, guid: 9ed2a051c32b4fe47a5e4fb95c20b03f,
         type: 3}
@@ -13097,6 +13097,7 @@ MonoBehaviour:
     type: 3}
   sameApplicantOffset: 0.03
   diffApplicantOffset: 0.05
+  arAnchorOnMarker: {fileID: 1931163540}
   applicantNotes: {fileID: 1724130751}
 --- !u!4 &1477298637
 Transform:
@@ -16390,7 +16391,7 @@ GameObject:
   - component: {fileID: 1931163541}
   - component: {fileID: 1931163540}
   m_Layer: 0
-  m_Name: ArAnchorPlacer
+  m_Name: ArAnchorOnMarker
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
