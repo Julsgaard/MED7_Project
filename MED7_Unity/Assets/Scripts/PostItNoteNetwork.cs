@@ -272,14 +272,4 @@ public class PostItNoteNetwork : NetworkBehaviour
         OnColorChanged(Color.magenta, noteColor.Value);
         OnOutlineColorChanged(Color.magenta, outLineColor.Value);
     }
-    [ClientRpc]
-    private void updateNoteClientRpc()
-    {
-        unityRenderer = GetComponent<Renderer>();
-        OnPositionChanged(Vector3.zero, notePosition.Value);
-        OnRotationChanger(Quaternion.identity, noteRotation.Value);
-        OnTextChanged(new FixedString512Bytes(), noteText.Value);
-        OnColorChanged(Color.magenta, noteColor.Value);
-        OnOutlineColorChanged(Color.magenta, outLineColor.Value);
-    }
 }
