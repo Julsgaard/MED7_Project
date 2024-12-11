@@ -143,6 +143,11 @@ public class PostItNoteNetwork : NetworkBehaviour
 
     public void UpdateNote()
     {
+        UpdateNotesClientRpc();
+    }
+
+    private void UpdateNotesClientRpc()
+    {
         /* TODO: Can we set all these components in awake? They are 
          *  said to be 'expensive' and we work with somewhat limited
          *  hardware on the phones
@@ -153,9 +158,8 @@ public class PostItNoteNetwork : NetworkBehaviour
         OnTextChanged("", noteText.Value);
         OnColorChanged(Color.red, noteColor.Value);
         OnOutlineColorChanged(Color.red, outLineColor.Value);
-
     }
-    
+
     // TODO: Update note position when we find and update marker
     // TODO: Fix outline color from the dictionary index error
     [ServerRpc(RequireOwnership = false)]
@@ -202,7 +206,6 @@ public class PostItNoteNetwork : NetworkBehaviour
                     ShowObjectToSpecificClientRpc();
                 }
             }
-            
         }
     }
     
@@ -247,6 +250,5 @@ public class PostItNoteNetwork : NetworkBehaviour
         {
             clientColours[clientID] = (ClientColor)clients.IndexOf(clientID);
         }
-       
     }
 }

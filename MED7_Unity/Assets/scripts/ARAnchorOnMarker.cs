@@ -58,7 +58,6 @@ public class ARAnchorOnMarker : MonoBehaviour
         planeAnchor.transform.rotation = newPose.rotation;
     }
 
-
     void OnDisable()
     {
         trackedImageManager.trackedImagesChanged -= OnTrackedImagesChanged;
