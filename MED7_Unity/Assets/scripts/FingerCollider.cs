@@ -91,6 +91,8 @@ public class FingerCollider : MonoBehaviour
         if (Physics.Raycast(cameraRay, out hit, 10, LayerMask.GetMask("Table"), QueryTriggerInteraction.Ignore))
         {
             _tmp.text = "Moving note";
+            _thisMaterial.color = Color.green;
+            DisplayDebugLine(cameraRay, Color.green);
             currentPostIt.RequestMoveNoteServerRpc(hit.point);
         }
     }
@@ -111,8 +113,8 @@ public class FingerCollider : MonoBehaviour
                 _tmp.text = "Move within table surface";
                 _isTryingToCatchPostIt = false;
                 
-                _thisMaterial.color = Color.green;
-                DisplayDebugLine(cameraRay, Color.green);
+                _thisMaterial.color = Color.gray;
+                DisplayDebugLine(cameraRay, Color.gray);
                 return;
             }
             
