@@ -385,6 +385,7 @@ public class GameManager : NetworkBehaviour
         foreach (PostItNoteNetwork note in NoteManager.instance.notes)
         {
             note.UpdateNote();
+            Debug.Log("Note updated");
         }
     }
 

@@ -70,6 +70,8 @@ public class PostItNoteNetwork : NetworkBehaviour
     private void OnRotationChanger(Quaternion oldrotation, Quaternion newRotation)
     {
         if (IsServer) { return; }
+        if (ARAnchorOnMarker.instance.GetLocalPostItParent() == null) { return; }
+        
         transform.localRotation = ARAnchorOnMarker.instance.GetLocalPostItParent().transform.rotation * newRotation;
     }
     
@@ -79,6 +81,8 @@ public class PostItNoteNetwork : NetworkBehaviour
 
         if (_lerpCoroutine != null)
             StopCoroutine(_lerpCoroutine);
+        
+        if (ARAnchorOnMarker.instance.GetLocalPostItParent() == null) { return; }
         
         /* Since the note is a child of the ARAnchorOnMarker instance, we can 
          *  just set the local position of the note to the new position. This new
