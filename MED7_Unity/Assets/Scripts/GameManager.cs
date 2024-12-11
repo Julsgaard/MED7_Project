@@ -294,27 +294,28 @@ public class GameManager : NetworkBehaviour
 
             float currApplicantNumNotes = applicant.notes.Count; // the number of total notes for this applicant
             float currApplicantNumCols = (float)Math.Round(Math.Sqrt(currApplicantNumNotes)); // sqrt for square layout
-
             float currNoteX = 0; // keep track of current x pos
             float currNoteY = 0; // same for y
+            
+            // Get the AR Plane's position
+            Vector3 arPlanePosition = arAnchorOnMarker.GetLocalPostItParent().transform.position;
             
             foreach (var noteText in applicant.notes)
             {
                 Debug.Log($"db: Entered seconds foreach for note {applicantNum}/'{noteText}'");
 
                 // Check if the note text is note empty or null
-                if (noteText != "" && noteText != null)
+                if (!string.IsNullOrEmpty(noteText))
                 {
                     Debug.Log($"db: Entered if statemetn meaning '{noteText}' is not null/empty!");
-                    // Create the note and send it to the server
-                    //postItNoteObject = Instantiate(postItNotePrefab);
-                    //Debug.Log($"is postItNoteObject null: {networkObject == null}");
-                    // GameObject postit = postItNetworkObject;
 
                     // calculate positions
                     float posX = currentBaseOffsetX + currNoteX * sameApplicantNoteOffset - centerOffsetX;
                     float posZ = currNoteY * sameApplicantNoteOffset;
-                    Vector3 newPos = new Vector3(posX, 0, posZ);
+                    
+                    // Set the new position of the note
+                    Vector3 newPos = arPlanePosition + new Vector3(posX, 0.01f, posZ);
+                    
                     Quaternion newRot = Quaternion.identity;
                     Debug.Log($"db: Calling 'CreateNoteServerRpc()'");
                     CreateNoteServerRpc(newPos, newRot, noteText, applicant.applicantColour, applicant.applicantNumber);
@@ -327,26 +328,14 @@ public class GameManager : NetworkBehaviour
                         currNoteX = 0;
                         currNoteY++;
                     }
-                    
-                    // Set the text for the note
-                    //TextMeshPro textMeshPro = networkObject.GetComponentInChildren<TextMeshPro>();
-                    //textMeshPro.text = noteText;
-                
-                    // Set the color for the note
-                    //Renderer r = networkObject.GetComponent<Renderer>();
-                    //r.material.color = applicant.applicantColour;
-                    
                     Debug.Log($"db: Note sent to server: with text \"{noteText}\",\nand position ({posX}, {posZ})");
                 }
-                
             }
-            
             Debug.Log($"db: Finished notes for applicant {applicantNum}. Incrementing.");
             
             applicantNum++;
             currentBaseOffsetX += (sameApplicantNoteOffset * currApplicantNumCols) + (diffApplicantOffset-sameApplicantOffset);
         }
-        
         _notesSentToServer = true;
         UpdateOldNotesServerRpc();
     }
