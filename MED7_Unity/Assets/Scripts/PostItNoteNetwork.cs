@@ -78,13 +78,6 @@ public class PostItNoteNetwork : NetworkBehaviour
         
         if (ARAnchorOnMarker.instance.GetLocalPostItParent() == null) { return; }
         
-        /* Since the note is a child of the ARAnchorOnMarker instance, we can 
-         *  just set the local position of the note to the new position. This new
-         * position is a raycast hit from the plane, meaning the note will be
-         * moved along the plane in that sense.
-         */
-        // transform.localPosition = ARAnchorOnMarker.instance.GetLocalPostItParent().transform.position + newPosition;
-        
         var finalPosition = new Vector3(newPosition.x,
             ARAnchorOnMarker.instance.GetLocalPostItParent().transform.position.y + 0.01f,
             newPosition.z);
@@ -109,28 +102,18 @@ public class PostItNoteNetwork : NetworkBehaviour
         // Set the text for the note
         TextMeshPro textMeshPro = GetComponentInChildren<TextMeshPro>();
         textMeshPro.text = newText.ToString();
-
-        Debug.Log("Set note text: " + newText);
     }
     
     private void OnColorChanged(Color oldColor, Color newColor)
     {
-        Debug.Log($"unityRenderer");
-        // Set the color for the note
-        //unityRenderer = GetComponent<Renderer>();
         unityRenderer.material.SetColor(baseColor, newColor);
-        //Debug.Log("Set note color: " + newColor);
     }
     
     private void OnOutlineColorChanged(Color oldColor, Color newColor)
     {
-        Debug.Log($"unityRenderer");
-        // Set the color for the note
-        //unityRenderer = GetComponent<Renderer>();
         unityRenderer.material.SetColor(outlineColourVariable, newColor);
-        //Debug.Log("Set note color: " + newColor);
     }
-
+    
     public void StartNote(Color startColor, FixedString512Bytes startString, Vector3 startPosition, Quaternion startRotaion)
     {
         unityRenderer = GetComponent<Renderer>();
@@ -140,18 +123,15 @@ public class PostItNoteNetwork : NetworkBehaviour
         noteColor.Value = startColor;
         outLineColor.Value = startColor;
     }
-
+    
     public void UpdateNote()
     {
         UpdateNotesClientRpc();
     }
-
+    
+    [ClientRpc]
     private void UpdateNotesClientRpc()
     {
-        /* TODO: Can we set all these components in awake? They are 
-         *  said to be 'expensive' and we work with somewhat limited
-         *  hardware on the phones
-         */
         unityRenderer = GetComponent<Renderer>();
         OnPositionChanged(Vector3.zero, notePosition.Value);
         OnRotationChanger(Quaternion.identity, noteRotation.Value);
@@ -159,7 +139,7 @@ public class PostItNoteNetwork : NetworkBehaviour
         OnColorChanged(Color.red, noteColor.Value);
         OnOutlineColorChanged(Color.red, outLineColor.Value);
     }
-
+    
     // TODO: Update note position when we find and update marker
     // TODO: Fix outline color from the dictionary index error
     [ServerRpc(RequireOwnership = false)]
@@ -172,7 +152,7 @@ public class PostItNoteNetwork : NetworkBehaviour
             Debug.LogWarning($"Move request denied: Note is being moved by {movingClient.Value}, but {senderClientId} tried to move it.");
             return;
         }
-
+        
         // Update the position of the note
         Vector3 newPosition = gameObject.transform.localPosition + movement;
         notePosition.Value = newPosition;
@@ -198,7 +178,6 @@ public class PostItNoteNetwork : NetworkBehaviour
     {
         if (IsServer)
         {
-            Debug.Log("Showing object to specific clients");
             foreach (var client in clients)
             {
                 if (client == NetworkManager.Singleton.LocalClientId)
@@ -228,7 +207,6 @@ public class PostItNoteNetwork : NetworkBehaviour
             foreach (ulong clientID in clientIDs)
             {
                 AddClientClientRpc(clientID);
-                Debug.Log("Added client");
             }
         }
     }

@@ -5,8 +5,6 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="05c6e882-459c-461a-a6db-dc6523f5c602" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/.idea.MED7_Unity/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.MED7_Unity/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/scripts/ARAnchorOnMarker.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/scripts/ARAnchorOnMarker.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Assets/scripts/GameManager.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/scripts/GameManager.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Assets/scripts/PostItNoteNetwork.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/scripts/PostItNoteNetwork.cs" afterDir="false" />
     </list>
