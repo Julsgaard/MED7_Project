@@ -39,15 +39,12 @@ public class GameManager : NetworkBehaviour
     [Header("Script References")]
     [SerializeField] private ApplicantNotes applicantNotes;
 
-    private List<ulong> clients = new List<ulong>();
+    private readonly List<ulong> _clients = new List<ulong>();
 
     private void Awake()
     {
         AddListenersToUI();
-
-        // Set the input field text to the default IP address
         ipAddressInputField.text = defaultIpAddress;
-
         ShowIntroUI();
     }
 
@@ -81,57 +78,39 @@ public class GameManager : NetworkBehaviour
     
     private void NextButtonIntro()
     {
-        // Disable the intro UI
         introUIObject.SetActive(false);
-        
-        // Enable the create applicant UI
         createApplicantUIObject.SetActive(true);
     }
     
-    // Method for showing the connect to server UI
     public void ShowConnectUI()
     {
-        // Enable the connect to server UI
         if (connectUIObject)
-        {
             connectUIObject.SetActive(true);
-            //Debug.Log("Connect UI enabled");
-        }
     }
     
     private void AddListenersToUI()
     {
-        // Add listeners to the buttons
         connectToServerButton.onClick.AddListener(ConnectToServer);
         connectToServerButtonOptions.onClick.AddListener(ConnectToServer);
         nextButton.onClick.AddListener(NextButtonIntro);
         serverButton.onClick.AddListener(StartServer);
     }
     
-    // Method for connecting to the server
     private void ConnectToServer()
     {
         SetIPAddress();
 
-        // Check if the client is already connected to prevent multiple connections from the same client when pressing the connect button quickly
-        if (!NetworkManager.Singleton.IsClient)
-        {
-            // Connect to the server
-            NetworkManager.Singleton.StartClient();
+        if (NetworkManager.Singleton.IsClient) return;
         
-            // Subscribe to the client connected and disconnected events
-            NetworkManager.Singleton.OnClientConnectedCallback += OnClientConnected;
-            NetworkManager.Singleton.OnClientDisconnectCallback += OnClientDisconnected;
-        }
+        NetworkManager.Singleton.StartClient();
+        NetworkManager.Singleton.OnClientConnectedCallback += OnClientConnected;
+        NetworkManager.Singleton.OnClientDisconnectCallback += OnClientDisconnected;
     }
     
     private void SetIPAddress()
     {
-        // Get the transport
         var transport = NetworkManager.Singleton.GetComponent<UnityTransport>();
-        
-        // Set the IP address (Overwrites the default IP address in the network manager)
-        transport.ConnectionData.Address = ipAddressInputField.text;
+        transport.ConnectionData.Address = ipAddressInputField.text; // override default networkmanager IP
     }
     
     // Method for starting the server
@@ -154,8 +133,6 @@ public class GameManager : NetworkBehaviour
     {
         if (IsClient && NetworkManager.Singleton.IsConnectedClient)
         {
-            Debug.Log($"db: Client {clientId} connected to the server!");
-            
             // Disable the connect UI
             connectUIObject.SetActive(false);
             blackBackgroundUI.SetActive(false);
@@ -163,18 +140,11 @@ public class GameManager : NetworkBehaviour
             // Enable AR settings UI 
             arSettingsUI.SetActive(true);
 
-            Debug.Log($"db: isNotes Sent to server: {_notesSentToServer}");
             if (!_notesSentToServer)
             {
-                Debug.Log($"db: Sending notes to server! Starting Coroutine");
-
-                // Send all applicant notes to the server
                 StartCoroutine(UserToFindMarkerBeforeSpawnNotes());
-
-                //SendAllNotesToServer();
             }
             
-            // Unsubscribe from the callback to prevent multiple subscriptions
             NetworkManager.Singleton.OnClientConnectedCallback -= OnClientConnected;
         }
         if (IsServer)
@@ -186,62 +156,32 @@ public class GameManager : NetworkBehaviour
 
     private IEnumerator UserToFindMarkerBeforeSpawnNotes()
     {
-        Debug.Log($"db: Coroutine started. Checking if user is finding marker: {_isFindingMarker}'.");
-
         if (_isFindingMarker) yield break;
         _isFindingMarker = true;
         
-        Debug.Log($"db: User wasn't user is now finding marker: {_isFindingMarker}'.");
-        
         findMarkerUI.SetActive(true);
-        //check if ui is active
-        Debug.Log($"is marker UI set to active: {findMarkerUI.activeSelf}");
-        if (findMarkerUI.activeSelf) Debug.Log($"Hi, I'm a fucking UI and I'm active ({findMarkerUI.activeSelf}) but I wont show will I? Why? Because I'm a fucking UI and I'm a fucking");
-        
-        CanvasGroup buttonCG = placeNotesButton.GetComponent<CanvasGroup>();
-        buttonCG.alpha = 0;
+        CanvasGroup buttonCg = placeNotesButton.GetComponent<CanvasGroup>();
+        buttonCg.alpha = 0;
         
         markerInstruction.text = "Find the marker and place it within view of the camera view";
-        Debug.Log($"db: Marker instruction set to: '{markerInstruction.text}'");
-        
-        //wait for user to find AR marker -- instruct user to find marker
-        
-        Debug.Log($"db: Showing UI. Is now waiting for anchor.isMarkerFound: {arAnchorOnMarker.isMarkerFound}.");
-       
         yield return new WaitUntil(() => arAnchorOnMarker.isMarkerFound);
-        
-        Debug.Log($"db: Marker found: (anchor.isMarkerfound: {arAnchorOnMarker.isMarkerFound}). Setting found plane as parent.");
-        
-       // Debug.Log($"db: Plane set as posItParent: {postItParentLocal}.");
-
-        markerInstruction.text = "Position yourself around the table. When you're ready, place your notes.";
-        buttonCG.alpha = 1;
-        
-        Debug.Log($"db: Adding listener to button.");
-
 
         placeNotesButton.onClick.AddListener(SendAllNotesToServer);
+        buttonCg.alpha = 1;
         
-        Debug.Log($"db: Waiting until button has been clicked: {_isNotesButtonClicked}.");
-
-        
+        markerInstruction.text = "Position yourself around the table. When you're ready, place your notes.";
         yield return new WaitUntil(() => _isNotesButtonClicked);
         
+        buttonCg.alpha = 0;
         
-        Debug.Log($"db: Button clicked ({_isNotesButtonClicked}) ! Sending notes to server.");
-
-        buttonCG.alpha = 0;
         markerInstruction.text = "Creating your notes...";
-
         yield return new WaitUntil(() => _notesSentToServer);
         
+        markerInstruction.text = "Success!";
+        yield return new WaitForSeconds(2f);
         
-        Debug.Log($"db: Notes were sent to server: {_notesSentToServer}. Closing UI.");
-
-        
-        markerInstruction.text = "Succes!";
-
-        yield return new WaitForSeconds(1f);
+        markerInstruction.text = "You can move your notes around using a pinch gesture!";
+        yield return new WaitForSeconds(8f);
         
         findMarkerUI.SetActive(false);
         
@@ -252,18 +192,14 @@ public class GameManager : NetworkBehaviour
         if (IsClient)
         {
             Debug.Log($"Client {clientId} disconnected from the server");
-
-            // Enable the connect UI
+    
             connectUIObject.SetActive(true); 
-            
-            // Unsubscribe from the callback
             NetworkManager.Singleton.OnClientDisconnectCallback -= OnClientDisconnected;
             
             StopAllCoroutines();
         }
         if (IsServer)
         {
-            // Log client disconnected
             DataLogger.instance.LogClientDisconnected(clientId);
         }
     }
@@ -271,55 +207,36 @@ public class GameManager : NetworkBehaviour
     private void SendAllNotesToServer()
     {
         _isNotesButtonClicked = true;
-        Debug.Log($"db: Entered 'SendAllNotesToServer()'");
-
-        float currentBaseOffsetX = 0; // offset starts at 0
-        //float totalOffsetX = 0; // we also calculate a total offset to later be able to center all notes
         
+        float currentBaseOffsetX = 0; // offset starts at 0
         float postItWidth = postItNotePrefab.transform.localScale.x; // store the size we've given post its
         float sameApplicantNoteOffset = postItWidth + (postItWidth * sameApplicantOffset); // calc offset based on size
         
         float applicantNum = 0; // numbers for indenting the offset between new applicant notes
-        
         float totalCols = 0;
+        
         foreach (var applicant in applicantNotes.applicants)
             totalCols += (float)Math.Round(Math.Sqrt(applicant.notes.Count));
         float totalNotesWidth = totalCols * sameApplicantNoteOffset - (sameApplicantOffset * applicantNum) + diffApplicantOffset * (applicantNum-1);
         float centerOffsetX = (totalNotesWidth / 2);
         
-        // loop through all applicants and their notes
         foreach (var applicant in applicantNotes.applicants)
         {
-            Debug.Log($"db: Entered first foreach for applicant {applicantNum}'.");
-
             float currApplicantNumNotes = applicant.notes.Count; // the number of total notes for this applicant
             float currApplicantNumCols = (float)Math.Round(Math.Sqrt(currApplicantNumNotes)); // sqrt for square layout
             float currNoteX = 0; // keep track of current x pos
             float currNoteY = 0; // same for y
             
-            // Get the AR Plane's position
-            //Vector3 arPlanePosition = arAnchorOnMarker.GetLocalPostItParent().transform.position;
-            
             foreach (var noteText in applicant.notes)
             {
-                Debug.Log($"db: Entered seconds foreach for note {applicantNum}/'{noteText}'");
-
-                // Check if the note text is note empty or null
                 if (!string.IsNullOrEmpty(noteText))
                 {
-                    Debug.Log($"db: Entered if statemetn meaning '{noteText}' is not null/empty!");
-
-                    // calculate positions
                     float posX = currentBaseOffsetX + currNoteX * sameApplicantNoteOffset - centerOffsetX;
                     float posZ = currNoteY * sameApplicantNoteOffset;
                     
-                    // Set the new position of the note
-                    //Vector3 newPos = arPlanePosition + new Vector3(posX, 0.01f, posZ);
                     Vector3 newPos = new Vector3(posX, 0, posZ);
                     Quaternion newRot = Quaternion.identity; // TODO: Maybe remove this if we don't want the notes to rotate
-                    Debug.Log($"db: Calling 'CreateNoteServerRpc()'");
                     CreateNoteServerRpc(newPos, newRot, noteText, applicant.applicantColour, applicant.applicantNumber);
-                    Debug.Log($"db: Called 'CreateNoteServerRpc()'");
                     
                     // increment positions
                     currNoteX++;
@@ -328,10 +245,8 @@ public class GameManager : NetworkBehaviour
                         currNoteX = 0;
                         currNoteY++;
                     }
-                    Debug.Log($"db: Note sent to server: with text \"{noteText}\",\nand position ({posX}, {posZ})");
                 }
             }
-            Debug.Log($"db: Finished notes for applicant {applicantNum}. Incrementing.");
             
             applicantNum++;
             currentBaseOffsetX += (sameApplicantNoteOffset * currApplicantNumCols) + (diffApplicantOffset-sameApplicantOffset);
@@ -354,8 +269,8 @@ public class GameManager : NetworkBehaviour
         
         ulong senderClientId = rpcParams.Receive.SenderClientId;
         
-        clients.Add(senderClientId); //TODO: LocalClientId is always 0 - maybe use senderClientId instead?
-        postItNoteNetwork.AddClient(clients);
+        _clients.Add(senderClientId); //TODO: LocalClientId is always 0 - maybe use senderClientId instead?
+        postItNoteNetwork.AddClient(_clients);
         postItNoteNetwork.ShowObjectToSpecificClients();
         
         // Log the note creation
