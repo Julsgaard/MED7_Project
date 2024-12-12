@@ -13072,7 +13072,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cd51fa6bc2841c64394a79e77d0a4d73, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  defaultIpAddress: 192.168.50.141
+  defaultIpAddress: 100.77.147.101
   ipAddressInputField: {fileID: 2132021173}
   connectUIObject: {fileID: 1232902817}
   introUIObject: {fileID: 832707599}
