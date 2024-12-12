@@ -1,8 +1,5 @@
 using System;
 using System.Collections;
-using System.Collections.Generic;
-using TMPro;
-using Unity.VisualScripting;
 using UnityEngine;
 
 public class RotatePostItText : MonoBehaviour
@@ -29,7 +26,7 @@ public class RotatePostItText : MonoBehaviour
             float clampedAngle = (float)Math.Round(((angle + 180) / 360) * 4) * 90;
             // Debug.Log($"Angle: {angle}. ClampedAngle: {clampedAngle}");
             
-            transform.rotation = Quaternion.Euler(90, 0, -clampedAngle);
+            transform.localRotation = Quaternion.Euler(90, 0, -clampedAngle);
             
             // controls update frequency
             yield return new WaitForSeconds(0.5f);

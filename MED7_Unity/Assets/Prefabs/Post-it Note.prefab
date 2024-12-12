@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 8722524741947629146}
   - component: {fileID: 4569713184503773048}
   - component: {fileID: 7882920037030011979}
+  - component: {fileID: 2964652278990472550}
   m_Layer: 0
   m_Name: Note
   m_TagString: Untagged
@@ -176,6 +177,19 @@ MonoBehaviour:
   m_hasFontAssetChanged: 0
   m_renderer: {fileID: 4569713184503773048}
   m_maskType: 0
+--- !u!114 &2964652278990472550
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2037536391496986482}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b59e1dc8adff42746938e805e731ce61, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  mainCamera: {fileID: 0}
 --- !u!1 &8494581529409893070
 GameObject:
   m_ObjectHideFlags: 0
@@ -190,7 +204,6 @@ GameObject:
   - component: {fileID: 4775113525371290116}
   - component: {fileID: -458700418956170796}
   - component: {fileID: -3464608852933167934}
-  - component: {fileID: 8157072493330048188}
   m_Layer: 0
   m_Name: Post-it Note
   m_TagString: Post-it
@@ -320,6 +333,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   notePosition:
     m_InternalValue: {x: 0, y: 0, z: 0}
+  noteRotation:
+    m_InternalValue: {x: 0, y: 0, z: 0, w: 0}
   noteText:
     m_InternalValue:
       utf8LengthInBytes: 0
@@ -865,38 +880,11 @@ MonoBehaviour:
         byte0507: 0
         byte0508: 0
         byte0509: 0
-  applicantColor:
-    m_InternalValue: {r: 0, g: 0, b: 0, a: 0}
   noteColor:
     m_InternalValue: {r: 0, g: 0, b: 0, a: 0}
---- !u!114 &8157072493330048188
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8494581529409893070}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e96cb6065543e43c4a752faaa1468eb1, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  UseUnreliableDeltas: 0
-  SyncPositionX: 1
-  SyncPositionY: 0
-  SyncPositionZ: 1
-  SyncRotAngleX: 0
-  SyncRotAngleY: 0
-  SyncRotAngleZ: 0
-  SyncScaleX: 0
-  SyncScaleY: 0
-  SyncScaleZ: 0
-  PositionThreshold: 0.001
-  RotAngleThreshold: 0.01
-  ScaleThreshold: 0.01
-  UseQuaternionSynchronization: 0
-  UseQuaternionCompression: 0
-  UseHalfFloatPrecision: 0
-  InLocalSpace: 0
-  Interpolate: 1
-  SlerpPosition: 0
+  outLineColor:
+    m_InternalValue: {r: 0, g: 0, b: 0, a: 0}
+  isBeingMoved:
+    m_InternalValue: 0
+  movingClient:
+    m_InternalValue: 0
