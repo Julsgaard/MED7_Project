@@ -259,14 +259,18 @@ public class GameManager : NetworkBehaviour
     [ServerRpc(RequireOwnership = false)]
     public void CreateNoteServerRpc(Vector3 newPos, Quaternion newRot, string text, Color color, int applicantNumber, ServerRpcParams rpcParams = default)
     {
+        // Instantiate the note on the server using the post-it note prefab
         GameObject postItNoteObject = Instantiate(postItNotePrefab);
+        
+        // Get the network object and spawn it
         NetworkObject networkObject = postItNoteObject.GetComponent<NetworkObject>();
-        networkObject.Spawn();
-
+        networkObject.Spawn(); // Synchronizes the object across the network
+        
+        // Get the postItNoteNetwork script from the object and set the note's properties
         PostItNoteNetwork postItNoteNetwork = postItNoteObject.GetComponent<PostItNoteNetwork>();
- 
         postItNoteNetwork.StartNote(color, new FixedString512Bytes(text), newPos, newRot);
         
+        // Get the sender's client ID for logging
         ulong senderClientId = rpcParams.Receive.SenderClientId;
         
         _clients.Add(senderClientId); //TODO: LocalClientId is always 0 - maybe use senderClientId instead?
